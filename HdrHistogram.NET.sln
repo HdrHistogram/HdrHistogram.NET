@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.NET", "HdrHistogram.NET\HdrHistogram.NET.csproj", "{61D5BACD-D36A-4BE2-945B-9B4CC98F85B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.NET", "src\HdrHistogram.NET\HdrHistogram.NET.csproj", "{61D5BACD-D36A-4BE2-945B-9B4CC98F85B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
