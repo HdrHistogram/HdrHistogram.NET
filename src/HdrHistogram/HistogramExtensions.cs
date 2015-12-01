@@ -241,16 +241,16 @@ namespace HdrHistogram
             return histogram.NextNonEquivalentValue(value) - 1;
         }
 
-        /// <summary>
-        /// Executes the action and records the time to complete the action. The time is recorded in ticks.
-        /// </summary>
-        /// <param name="histogram">The Histogram to record the latency in.</param>
-        /// <param name="action">The functionality to execute and measure</param>
-        /// <remarks>
-        /// Ticks are used as the unit of recording here as they are the smallest unit that .NET can measure
-        /// and require no conversion at time of recording. Instead conversion (scaling) can be done at time
-        /// of output to microseconds, milliseconds, seconds or other appropriate unit.
-        /// </remarks>
+        ///// <summary>
+        ///// Executes the action and records the time to complete the action. The time is recorded in ticks.
+        ///// </summary>
+        ///// <param name="histogram">The Histogram to record the latency in.</param>
+        ///// <param name="action">The functionality to execute and measure</param>
+        ///// <remarks>
+        ///// Ticks are used as the unit of recording here as they are the smallest unit that .NET can measure
+        ///// and require no conversion at time of recording. Instead conversion (scaling) can be done at time
+        ///// of output to microseconds, milliseconds, seconds or other appropriate unit.
+        ///// </remarks>
         public static void RecordLatency(this HistogramBase histogram, Action action)
         {
             var start = Stopwatch.GetTimestamp();
