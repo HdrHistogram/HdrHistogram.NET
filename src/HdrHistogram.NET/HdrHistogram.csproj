@@ -36,7 +36,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractHistogram.cs" />
     <Compile Include="HistogramBase.cs" />
     <Compile Include="Iteration\AbstractHistogramEnumerator.cs" />
     <Compile Include="Iteration\AllValuesEnumerator.cs" />
