@@ -518,7 +518,7 @@ namespace HdrHistogram
         /// <returns><c>true</c> if this histogram has had a count value overflow, else <c>false</c>.</returns>
         /// <remarks>
         /// Since counts are kept in fixed integer form with potentially limited range (e.g. int and short), a specific value range count could potentially overflow, leading to an inaccurate and misleading histogram representation.
-        /// This method accurately determines whether or not an overflow condition has happened in an <see cref="IntHistogram"/> or <see cref="ShortHistogram"/>.
+        /// This method accurately determines whether or not an overflow condition has happened.
         /// </remarks>
         public bool HasOverflowed()
         {
@@ -527,6 +527,9 @@ namespace HdrHistogram
             for (var i = 0; i < CountsArrayLength; i++)
             {
                 totalCounted += GetCountAtIndex(i);
+                //If adding has wrapped back around (for Long implementations)
+                if (totalCounted < 0)
+                    return true;
             }
             return (totalCounted != TotalCount);
         }
