@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram", "src\HdrHistogram\HdrHistogram.csproj", "{33201713-4EFD-4A2A-AF3E-911D6A69681C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.UnitTests", "HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj", "{51860461-40E4-49D4-A691-030065674172}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.UnitTests", "src\HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj", "{51860461-40E4-49D4-A691-030065674172}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -63,7 +63,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\HdrHistogram\HdrHistogram.csproj">
+    <ProjectReference Include="..\HdrHistogram\HdrHistogram.csproj">
       <Project>{33201713-4efd-4a2a-af3e-911d6a69681c}</Project>
       <Name>HdrHistogram</Name>
     </ProjectReference>
