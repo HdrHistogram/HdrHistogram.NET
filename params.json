@@ -1,0 +1,6 @@
+{
+  "name": "Hdrhistogram.net",
+  "tagline": "The .NET port of HdrHistogram",
+  "body": "#HdrHistogram for .NET\r\nThis is the official port of the original Java HdrHistogram.\r\n\r\nMore can be found out about the original project at [http://hdrhistogram.net/](http://hdrhistogram.net/).\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
