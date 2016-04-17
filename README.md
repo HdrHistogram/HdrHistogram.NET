@@ -242,27 +242,6 @@ Next can you please ensure that your PR (Pull Request) has a comment in it descr
 Ideally if it is fixing an issue or a bug, there would be a Unit Test proving the fix and a reference to the Issues in the PR comments.
 
 
-#Why an unofficial port, and not contribute to the official C# code base?
-
-At the time of forking away from the the Official HdrHistogram C# code base, I had the following reservations:
-
-1. Both the C# and Java code were in the same repository. I find that this makes things messy as they share only concepts but no artefacts. I think this also makes it harder to follow the C# code base evolution as you have to sift through unrelated commits to the Java code.
-2. The C# code is a port from Java which maintains the Java idioms. This is meant to aid patching the C# code base with updates to the Java code base. However this reduces the usability of the resulting .NET library.
-3. The intent of keeping the C# code to be like the Java code was to be able to keep it up to date. However, at time of writing it was over 10 months behind.
-4. There were failing tests in the C# code base.
-5. There appeared to be no automated build.
-6. The C# and Java APIs do not have to be the same. They ideally would produce the same results and have similar features, but like `NUnit` and `JUnit` they should be allowed to diverge to meet the needs of the community. 
-7. It is not using the latest version of Visual Studio (2015) 
-8. There is no Nuget package for the library. You need to download and compile it yourself
-9. A simple Pull Request to update the project (to Visual Studio 2015 sln type) had not been actioned in 3 weeks.
-10. Documentation is weak, and in places that it existed it was mainly in `JavaDoc` format.
-
-This is not intended to be a slight on the previous contributors or maintainers.
-People have busy lives and priorities change.
-You will note that this code base has intentionally been created from the original Java-with-.NET repository to keep the commit history intact.
-
-The long term goal is to have this code base moved into the new (but already abandoned) official HdrHistorgram.NET repository - https://github.com/HdrHistogram/HdrHistogram.NET.
-
 HdrHistogram Details
 ----------------------------------------------
 
