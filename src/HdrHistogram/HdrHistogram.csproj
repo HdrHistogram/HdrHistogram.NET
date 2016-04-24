@@ -48,7 +48,16 @@
   <ItemGroup>
     <Compile Include="HistogramBase.cs" />
     <Compile Include="HistogramExtensions.cs" />
+    <Compile Include="Iteration\AbstractHistogramEnumerator.cs" />
+    <Compile Include="Iteration\HistogramIterationValue.cs" />
+    <Compile Include="Iteration\PercentileEnumerable.cs" />
+    <Compile Include="Iteration\PercentileEnumerator.cs" />
+    <Compile Include="Iteration\RecordedValuesEnumerable.cs" />
+    <Compile Include="Iteration\RecordedValuesEnumerator.cs" />
     <Compile Include="OutputScalingFactor.cs" />
+    <Compile Include="Output\CsvOutputFormatter.cs" />
+    <Compile Include="Output\HgrmOutputFormatter.cs" />
+    <Compile Include="Output\IOutputFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.g.cs" />
     <Compile Include="Utilities\Bitwise.cs" />
     <Compile Include="LongHistogram.cs" />

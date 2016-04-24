@@ -7,7 +7,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using HdrHistogram.Iteration;
 using HdrHistogram.Utilities;
 
 namespace HdrHistogram
@@ -62,9 +64,9 @@ namespace HdrHistogram
         public abstract long TotalCount { get; }
 
 
-        internal int BucketCount { get; }
-        internal int SubBucketCount { get; }
-        internal int SubBucketHalfCount { get; }
+        public int BucketCount { get; }
+        public int SubBucketCount { get; }
+        public int SubBucketHalfCount { get; }
 
         /// <summary>
         /// The length of the internal array that stores the counts.
@@ -283,6 +285,17 @@ namespace HdrHistogram
             var subBucketIndex = GetSubBucketIndex(value, bucketIndex);
             // May throw ArrayIndexOutOfBoundsException:
             return GetCountAt(bucketIndex, subBucketIndex);
+        }
+
+
+        /// <summary>
+        /// Provide a means of iterating through all recorded histogram values using the finest granularity steps supported by the underlying representation.
+        /// The iteration steps through all non-zero recorded value counts, and terminates when all recorded histogram values are exhausted.
+        /// </summary>
+        /// <returns>An enumerator of <see cref="HistogramIterationValue"/> through the histogram using a <see cref="RecordedValuesEnumerator"/></returns>
+        public IEnumerable<HistogramIterationValue> RecordedValues()
+        {
+            return new RecordedValuesEnumerable(this);
         }
 
         /// <summary>

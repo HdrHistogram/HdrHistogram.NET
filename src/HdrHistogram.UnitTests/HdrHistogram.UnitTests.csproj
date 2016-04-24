@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LongHistogramTests.cs" />
+    <Compile Include="HgrmPercentileDistrubutionOutputTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,36 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_1sf_TicksPerHour_asMs_10percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_1sf_TicksPerHour_asMs_20percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_1sf_TicksPerHour_asMs_5percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_2sf_TicksPerHour_asMs_10percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_2sf_TicksPerHour_asMs_20percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_2sf_TicksPerHour_asMs_5percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_3sf_TicksPerHour_asMs_10percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_3sf_TicksPerHour_asMs_20percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_3sf_TicksPerHour_asMs_5percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_4sf_TicksPerHour_asMs_10percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_4sf_TicksPerHour_asMs_20percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_4sf_TicksPerHour_asMs_5percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_10percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_20percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_5percPerHalfDistance.hgrm" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_1sf_TicksPerHour_asMs_10percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_1sf_TicksPerHour_asMs_20percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_1sf_TicksPerHour_asMs_5percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_2sf_TicksPerHour_asMs_10percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_2sf_TicksPerHour_asMs_20percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_2sf_TicksPerHour_asMs_5percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_3sf_TicksPerHour_asMs_10percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_3sf_TicksPerHour_asMs_20percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_3sf_TicksPerHour_asMs_5percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_4sf_TicksPerHour_asMs_10percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_4sf_TicksPerHour_asMs_20percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_4sf_TicksPerHour_asMs_5percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_10percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_20percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_5percPerHalfDistance.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HdrHistogram\HdrHistogram.csproj">

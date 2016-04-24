@@ -50,9 +50,9 @@ Here we show an example of writing to the `Console`.
 
 ```  csharp
 var writer = new StringWriter();
-histogram.outputPercentileDistribution(writer);
+histogram.OutputPercentileDistribution(writer);
 Console.WriteLine(writer.ToString());
-//Or just simply histogram.outputPercentileDistribution(Console.Out);
+//Or just simply histogram.OutputPercentileDistribution(Console.Out);
 ```
 
 Would produce output similar to:
