@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using HdrHistogram.Iteration;
@@ -139,6 +140,55 @@ namespace HdrHistogram
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes the action and records the time to complete the action. 
+        /// The time is recorded in ticks. 
+        /// Note this is a convenience method and can carry a cost.
+        /// If the <paramref name="action"/> delegate is not cached, then it may incur an allocation cost for each invocation of <see cref="Record"/>
+        /// </summary>
+        /// <param name="histogram">The Histogram to record the latency in.</param>
+        /// <param name="action">The functionality to execute and measure</param>
+        /// <remarks>
+        /// <para>
+        /// Ticks are used as the unit of recording here as they are the smallest unit that .NET can measure
+        /// and require no conversion at time of recording. Instead conversion (scaling) can be done at time
+        /// of output to microseconds, milliseconds, seconds or other appropriate unit.
+        /// </para>
+        /// <para>
+        /// If you are able to cache the <paramref name="action"/> delegate, then doing so is encouraged.
+        /// <example>
+        /// Here are two examples.
+        /// The first does not cache the delegate
+        /// 
+        /// <code>
+        /// for (long i = 0; i &lt; loopCount; i++)
+        /// {
+        ///   histogram.Record(IncrementNumber);
+        /// }
+        /// </code>
+        /// This second example does cache the delegate
+        /// <code>
+        /// Action incrementNumber = IncrementNumber;
+        /// for (long i = 0; i &lt; loopCount; i++)
+        /// {
+        ///   histogram.Record(incrementNumber);
+        /// }
+        /// </code>
+        /// In the second example, we will not be making allocations each time i.e. an allocation of an <seealso cref="Action"/> from <code>IncrementNumber</code>.
+        /// This will reduce memory pressure and therefore garbage collection penalties.
+        /// For performance sensitive applications, this method may not be suitable.
+        /// As always, you are encouraged to test and measure the impact for your scenario.
+        /// </example>
+        /// </para>
+        /// </remarks>
+        public static void Record(this HistogramBase histogram, Action action)
+        {
+            var start = Stopwatch.GetTimestamp();
+            action();
+            var elapsedTicks = (Stopwatch.GetTimestamp() - start);
+            histogram.RecordValue(elapsedTicks);
         }
     }
 
