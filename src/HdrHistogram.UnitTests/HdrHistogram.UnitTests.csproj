@@ -49,8 +49,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HistogramAssert.cs" />
+    <Compile Include="HistogramEncodingTest.cs" />
+    <Compile Include="HistogramIterationValueComparer.cs" />
+    <Compile Include="HistogramLogReaderWriterTests.cs" />
     <Compile Include="LongHistogramTests.cs" />
     <Compile Include="HgrmPercentileDistrubutionOutputTests.cs" />
+    <Compile Include="MathEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +94,10 @@
     <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_10percPerHalfDistance.csv" />
     <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_20percPerHalfDistance.csv" />
     <EmbeddedResource Include="Resources\Sample_10kBy1k_5sf_TicksPerHour_asMs_5percPerHalfDistance.csv" />
+    <EmbeddedResource Include="Resources\jHiccup-2.0.1.logV0.hlog" />
+    <EmbeddedResource Include="Resources\jHiccup-2.0.6.logV1.hlog" />
+    <EmbeddedResource Include="Resources\jHiccup-2.0.7S.logV2.hlog" />
+    <EmbeddedResource Include="Resources\ycsb.logV1.hlog" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HdrHistogram\HdrHistogram.csproj">

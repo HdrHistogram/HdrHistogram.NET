@@ -114,6 +114,15 @@ namespace HdrHistogram.UnitTests
             Assert.AreEqual(1L, valueHistogram.TotalCount);
         }
 
+        [Test]
+        public void RecordAction_increments_TotalCount()
+        {
+            var longHistogram = new LongHistogram(HighestTrackableValue, NumberOfSignificantValueDigits);
+
+            longHistogram.Record(() => { });
+            Assert.AreEqual(1, longHistogram.TotalCount);
+        }
+
 
         [Test]
         public void Reset_sets_counts_to_zero()
@@ -142,14 +151,14 @@ namespace HdrHistogram.UnitTests
 
             Assert.AreEqual(2L, longHistogram.GetCountAtValue(TestValueLevel));
             Assert.AreEqual(2L, longHistogram.GetCountAtValue(TestValueLevel * 1000));
-            Assert.AreEqual(4L, longHistogram.TotalCount);            
+            Assert.AreEqual(4L, longHistogram.TotalCount);
         }
 
         [Test]
         public void Add_should_allow_small_range_hsitograms_to_be_added()
         {
             var longHistogram = new LongHistogram(HighestTrackableValue, NumberOfSignificantValueDigits);
-            
+
             longHistogram.RecordValue(TestValueLevel);
             longHistogram.RecordValue(TestValueLevel * 1000);
 
@@ -169,7 +178,7 @@ namespace HdrHistogram.UnitTests
         {
             var longHistogram = new LongHistogram(HighestTrackableValue, NumberOfSignificantValueDigits);
             var biggerOther = new LongHistogram(HighestTrackableValue * 2, NumberOfSignificantValueDigits);
-            
+
             Assert.Throws<ArgumentOutOfRangeException>(() => { longHistogram.Add(biggerOther); });
         }
 
@@ -187,7 +196,7 @@ namespace HdrHistogram.UnitTests
             var scaledHistogram = new LongHistogram(1024, HighestTrackableValue, NumberOfSignificantValueDigits);
             Assert.AreEqual(expected * 1024, scaledHistogram.SizeOfEquivalentValueRange(value * 1024));
         }
-        
+
         [TestCase(10000, 10007)]
         [TestCase(10008, 10009)]
         public void LowestEquivalentValue_returns_the_smallest_value_that_would_be_assigned_to_the_same_count(int expected, int value)
