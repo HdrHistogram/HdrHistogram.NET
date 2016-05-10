@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Histogram.cs" />
+    <Compile Include="HistogramEncoding.cs" />
     <Compile Include="Encoding\HistogramEncoderV2.cs" />
     <Compile Include="Encoding\IEncoder.cs" />
     <Compile Include="Encoding\IHeader.cs" />
@@ -59,6 +59,7 @@
     <Compile Include="HistogramLogReader.cs" />
     <Compile Include="HistogramLogWriter.cs" />
     <Compile Include="IHistogramLogV1Reader.cs" />
+    <Compile Include="IntHistogram.cs" />
     <Compile Include="Iteration\AbstractHistogramEnumerator.cs" />
     <Compile Include="Iteration\AllValueEnumerable.cs" />
     <Compile Include="Iteration\AllValuesEnumerator.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Persistence\SimpleCountsDecoder.cs" />
     <Compile Include="Persistence\V2MaxWordSizeCountsDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.g.cs" />
+    <Compile Include="ShortHistogram.cs" />
     <Compile Include="Utilities\ArrayExtensions.cs" />
     <Compile Include="Utilities\Bitwise.cs" />
     <Compile Include="LongHistogram.cs" />

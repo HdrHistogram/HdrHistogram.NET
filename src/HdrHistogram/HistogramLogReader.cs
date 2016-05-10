@@ -20,6 +20,19 @@ namespace HdrHistogram
         private double _startTimeInSeconds;
 
         /// <summary>
+        /// Reads each histogram out from the underlying stream.
+        /// </summary>
+        /// <param name="inputStream">The <see cref="Stream"/> to read from.</param>
+        /// <returns>Return a lazily evaluated sequence of histograms.</returns>
+        public static IEnumerable<HistogramBase> Read(Stream inputStream)
+        {
+            using (var reader = new HistogramLogReader(inputStream))
+            {
+                return reader.ReadHistograms();
+            }
+        }
+
+        /// <summary>
         /// Creates a <see cref="HistogramLogReader"/> that reads from the provided <see cref="Stream"/>.
         /// </summary>
         /// <param name="inputStream">The <see cref="Stream"/> to read from.</param>
@@ -202,7 +215,7 @@ namespace HdrHistogram
 
         private static HistogramBase DecodeHistogram(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
-            return Histogram.DecodeFromCompressedByteBuffer<LongHistogram>(buffer, minBarForHighestTrackableValue);
+            return HistogramEncoding.DecodeFromCompressedByteBuffer(buffer, minBarForHighestTrackableValue);
         }
 
         private IEnumerable<string> ReadLines()

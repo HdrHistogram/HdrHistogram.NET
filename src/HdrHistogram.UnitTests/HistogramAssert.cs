@@ -8,6 +8,11 @@ namespace HdrHistogram.UnitTests
         public static void AreEqual(HistogramBase expected, HistogramBase actual)
         {
             Assert.AreEqual(expected.GetType(), actual.GetType());
+            AreValueEqual(expected, actual);
+        }
+
+        public static void AreValueEqual(HistogramBase expected, HistogramBase actual)
+        {
             Assert.AreEqual(expected.TotalCount, actual.TotalCount);
             Assert.AreEqual(expected.StartTimeStamp, actual.StartTimeStamp);
             Assert.AreEqual(expected.EndTimeStamp, actual.EndTimeStamp);

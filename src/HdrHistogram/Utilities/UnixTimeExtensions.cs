@@ -8,7 +8,7 @@ namespace HdrHistogram.Utilities
     public static class UnixTimeExtensions
     {
         private const long EpochInTicks = 621355968000000000;
-        
+
         /// <summary>
         /// Gets the seconds elapsed since the Unix Epoch (01-Jan-1970 UTC)
         /// </summary>
@@ -41,6 +41,17 @@ namespace HdrHistogram.Utilities
         public static DateTime ToDateFromSecondsSinceEpoch(this double secondsSinceUnixEpoch)
         {
             var ticks = (long)(secondsSinceUnixEpoch * TimeSpan.TicksPerSecond);
+            return new DateTime(EpochInTicks + ticks, DateTimeKind.Utc);
+        }
+
+        /// <summary>
+        /// Returns the date and time specified by the milliseconds since the Unix Epoch
+        /// </summary>
+        /// <param name="millisecondsSinceUnixEpoch">The milliseconds since epoch</param>
+        /// <returns>A DateTime value in UTC kind.</returns>
+        public static DateTime ToDateFromMillisecondsSinceEpoch(this long millisecondsSinceUnixEpoch)
+        {
+            var ticks = millisecondsSinceUnixEpoch * TimeSpan.TicksPerMillisecond;
             return new DateTime(EpochInTicks + ticks, DateTimeKind.Utc);
         }
     }

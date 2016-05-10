@@ -52,11 +52,19 @@
     <Compile Include="HistogramAssert.cs" />
     <Compile Include="HistogramEncodingTest.cs" />
     <Compile Include="HistogramIterationValueComparer.cs" />
-    <Compile Include="HistogramLogReaderWriterTests.cs" />
+    <Compile Include="Persistence\HistogramLogExtensions.cs" />
+    <Compile Include="Persistence\HistogramLogReaderWriterTestBase.cs" />
+    <Compile Include="Persistence\IntHistogramLogReaderWriterTests.cs" />
+    <Compile Include="HistogramTestBase.cs" />
+    <Compile Include="IntHistogramTests.cs" />
     <Compile Include="LongHistogramTests.cs" />
     <Compile Include="HgrmPercentileDistrubutionOutputTests.cs" />
     <Compile Include="MathEx.cs" />
+    <Compile Include="Persistence\LongHistogramLogReaderWriterTests.cs" />
+    <Compile Include="Persistence\ShortHistogramLogReaderWriterTests.cs" />
+    <Compile Include="Persistence\TestCaseGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShortHistogramTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
@@ -105,6 +113,7 @@
       <Name>HdrHistogram</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

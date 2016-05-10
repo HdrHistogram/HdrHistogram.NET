@@ -15,6 +15,20 @@ namespace HdrHistogram
         private readonly TextWriter _log;
 
         /// <summary>
+        /// Writes the provided histograms to the underlying <see cref="Stream"/> with a given overall start time.
+        /// </summary>
+        /// <param name="outputStream">The <see cref="Stream"/> to write to.</param>
+        /// <param name="startTime">The start time of the set of histograms.</param>
+        /// <param name="histograms">The histograms to include in the output.</param>
+        public static void Write(Stream outputStream, DateTime startTime, params HistogramBase[] histograms)
+        {
+            using (var writer = new HistogramLogWriter(outputStream))
+            {
+                writer.Write(startTime, histograms);
+            }
+        }
+
+        /// <summary>
         /// Creates a <see cref="HistogramLogWriter"/> that writes to an underlying <see cref="Stream"/>.
         /// </summary>
         /// <param name="outputStream">

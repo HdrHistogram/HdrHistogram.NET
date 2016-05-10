@@ -68,7 +68,7 @@ namespace HdrHistogram.UnitTests
             var targetBuffer = ByteBuffer.Allocate(source.GetNeededByteBufferCapacity());
             source.Encode(targetBuffer, EncoderV2);
             targetBuffer.Position = 0;
-            return Histogram.DecodeFromByteBuffer<LongHistogram>(targetBuffer, 0);
+            return (LongHistogram)HistogramEncoding.DecodeFromByteBuffer(targetBuffer, 0);
         }
 
         private static LongHistogram CompressedEncodeDecode(LongHistogram source)
@@ -76,7 +76,7 @@ namespace HdrHistogram.UnitTests
             var targetBuffer = ByteBuffer.Allocate(source.GetNeededByteBufferCapacity());
             source.EncodeIntoCompressedByteBuffer(targetBuffer);
             targetBuffer.Position = 0;
-            return Histogram.DecodeFromCompressedByteBuffer<LongHistogram>(targetBuffer, 0);
+            return (LongHistogram)HistogramEncoding.DecodeFromCompressedByteBuffer(targetBuffer, 0);
         }
 
         private static void Load(LongHistogram source)

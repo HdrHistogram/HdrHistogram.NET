@@ -1,15 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using HdrHistogram.Utilities;
 using NUnit.Framework;
 
-namespace HdrHistogram.UnitTests
+namespace HdrHistogram.UnitTests.Persistence
 {
-    [TestFixture]
-    public class HistogramLogReaderWriterTests
+    public abstract class HistogramLogReaderWriterTestBase
     {
         [Test]
         public void CanReadEmptyLog()
@@ -22,7 +20,7 @@ namespace HdrHistogram.UnitTests
 
             using (var writerStream = new MemoryStream())
             {
-                Histogram.Write(writerStream, startTimeWritten);
+                HistogramLogWriter.Write(writerStream, startTimeWritten);
                 data = writerStream.ToArray();
             }
 
@@ -40,58 +38,44 @@ namespace HdrHistogram.UnitTests
         public void CanRoundTripSingleHistogram(long highestTrackableValue, int significantDigits, int multiplier)
         {
             var histogram = CreatePopulatedHistogram(highestTrackableValue, significantDigits, multiplier);
-            var startTimeWritten = DateTime.Now;
-            var endTimeWritten = startTimeWritten.AddMinutes(30);
 
-            histogram.StartTimeStamp = startTimeWritten.MillisecondsSinceUnixEpoch();
-            histogram.EndTimeStamp = endTimeWritten.MillisecondsSinceUnixEpoch();
-
-            var data = WriteLog(startTimeWritten, histogram);
-            var actualHistograms = ReadHistograms(data);
+            histogram.SetTimes();
+            var data = histogram.WriteLog();
+            var actualHistograms = data.ReadHistograms();
 
             Assert.AreEqual(1, actualHistograms.Length);
-            HistogramAssert.AreEqual(histogram, actualHistograms.Single());
+            HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
-
-        [Test, TestCaseSource(nameof(PowersOfTwo))]
-        public void CanRoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
+        
+        protected void RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
         {
             var value = 1;
             var highestTrackableValue = long.MaxValue - 1L;
             var significantDigits = 3;
-            var histogram = new LongHistogram(highestTrackableValue, significantDigits);
-            histogram.RecordValueWithCount(value,count);
-            
-            var startTimeWritten = DateTime.Now;
-            var endTimeWritten = startTimeWritten.AddMinutes(30);
+            var histogram = Create(highestTrackableValue, significantDigits);
+            histogram.RecordValueWithCount(value, count);
 
-            histogram.StartTimeStamp = startTimeWritten.MillisecondsSinceUnixEpoch();
-            histogram.EndTimeStamp = endTimeWritten.MillisecondsSinceUnixEpoch();
-
-            var data = WriteLog(startTimeWritten, histogram);
-            var actualHistograms = ReadHistograms(data);
+            histogram.SetTimes();
+            var data = histogram.WriteLog();
+            var actualHistograms = data.ReadHistograms();
 
             Assert.AreEqual(1, actualHistograms.Length);
-            HistogramAssert.AreEqual(histogram, actualHistograms.Single());
+            HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
         [Test]
         public void CanRoundTripSingleHistogramsWithSparseValues()
         {
-            var histogram = new LongHistogram(highestTrackableValue:long.MaxValue-1, numberOfSignificantValueDigits:3);
+            var histogram = Create(highestTrackableValue: long.MaxValue - 1, numberOfSignificantValueDigits: 3);
             histogram.RecordValue(1);
-            histogram.RecordValue((long.MaxValue / 2)+1);
+            histogram.RecordValue((long.MaxValue / 2) + 1);
 
-            var startTimeWritten = DateTime.Now;
-            var endTimeWritten = startTimeWritten.AddMinutes(30);
-            histogram.StartTimeStamp = startTimeWritten.MillisecondsSinceUnixEpoch();
-            histogram.EndTimeStamp = endTimeWritten.MillisecondsSinceUnixEpoch();
-
-            var data = WriteLog(startTimeWritten, histogram);
-            var actualHistograms = ReadHistograms(data);
+            histogram.SetTimes();
+            var data = histogram.WriteLog();
+            var actualHistograms = data.ReadHistograms();
 
             Assert.AreEqual(1, actualHistograms.Length);
-            HistogramAssert.AreEqual(histogram, actualHistograms.Single());
+            HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
         [TestCase("jHiccup-2.0.7S.logV2.hlog")]
@@ -101,7 +85,7 @@ namespace HdrHistogram.UnitTests
             var reader = new HistogramLogReader(readerStream);
             int histogramCount = 0;
             long totalCount = 0;
-            var accumulatedHistogram = new LongHistogram(85899345920838, 3);
+            var accumulatedHistogram = Create(85899345920838, 3);
             foreach (var histogram in reader.ReadHistograms())
             {
                 histogramCount++;
@@ -117,8 +101,7 @@ namespace HdrHistogram.UnitTests
             Assert.AreEqual(1796210687, accumulatedHistogram.GetMaxValue());
             Assert.AreEqual(1441812279.474, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
-
-
+        
         [TestCase("jHiccup-2.0.1.logV0.hlog", 0, int.MaxValue, 81, 61256, 1510998015, 1569718271, 1438869961.225)]
         [TestCase("jHiccup-2.0.1.logV0.hlog", 19, 25, 25, 18492, 459007, 623103, 1438869961.225)]
         [TestCase("jHiccup-2.0.1.logV0.hlog", 45, 34, 34, 25439, 1209008127, 1234173951, 1438869961.225)]
@@ -132,7 +115,7 @@ namespace HdrHistogram.UnitTests
 
             int histogramCount = 0;
             long totalCount = 0;
-            var accumulatedHistogram = new LongHistogram(3600L * 1000 * 1000 * 1000, 3);
+            var accumulatedHistogram = Create(3600L * 1000 * 1000 * 1000, 3);
             var histograms = ((IHistogramLogV1Reader)reader).ReadHistograms()
                 .Skip(skip)
                 .Take(take);
@@ -165,7 +148,7 @@ namespace HdrHistogram.UnitTests
             int histogramCount = 0;
             long totalCount = 0;
 
-            HistogramBase accumulatedHistogram = new LongHistogram(3600L * 1000 * 1000 * 1000, 3);
+            HistogramBase accumulatedHistogram = Create(3600L * 1000 * 1000 * 1000, 3);
             var histograms = reader.ReadHistograms()
                 .Skip(skip)
                 .Take(take);
@@ -195,7 +178,7 @@ namespace HdrHistogram.UnitTests
             int histogramCount = 0;
             long totalCount = 0;
 
-            HistogramBase accumulatedHistogram = new LongHistogram(3600L * 1000 * 1000 * 1000, 3);
+            HistogramBase accumulatedHistogram = Create(3600L * 1000 * 1000 * 1000, 3);
             var histograms = reader.ReadHistograms()
                 .Where(h => h.StartTimeStamp >= reader.GetStartTime().MillisecondsSinceUnixEpoch())
                 .Skip(skip)
@@ -214,32 +197,9 @@ namespace HdrHistogram.UnitTests
             Assert.AreEqual(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
 
-
-
-        private static HistogramBase[] ReadHistograms(byte[] data)
+        private HistogramBase CreatePopulatedHistogram(long highestTrackableValue, int significantDigits, int multiplier)
         {
-            HistogramBase[] actualHistograms;
-            using (var readerStream = new MemoryStream(data))
-            {
-                actualHistograms = Histogram.Read(readerStream).ToArray();
-            }
-            return actualHistograms;
-        }
-
-        private static byte[] WriteLog(DateTime startTimeWritten, LongHistogram histogram)
-        {
-            byte[] data;
-            using (var writerStream = new MemoryStream())
-            {
-                Histogram.Write(writerStream, startTimeWritten, histogram);
-                data = writerStream.ToArray();
-            }
-            return data;
-        }
-
-        private static LongHistogram CreatePopulatedHistogram(long highestTrackableValue, int significantDigits, int multiplier)
-        {
-            var histogram = new LongHistogram(highestTrackableValue, significantDigits);
+            var histogram = Create(highestTrackableValue, significantDigits);
             //Ensure reasonable number of counts
             long i;
             for (i = 0; i < 10000; i++)
@@ -263,12 +223,6 @@ namespace HdrHistogram.UnitTests
                 .GetManifestResourceStream(fileName);
         }
 
-        private static IEnumerable<long> PowersOfTwo()
-        {
-            for (int i = 0; i < 63; i++)
-            {
-                yield return (1L << i);
-            }
-        }
+        protected abstract HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits);
     }
 }

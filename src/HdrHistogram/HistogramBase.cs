@@ -79,9 +79,16 @@ namespace HdrHistogram
         public abstract long TotalCount { get; protected set; }
 
 
+        /// <summary>
+        /// The number of buckets used to store count values.
+        /// </summary>
         public int BucketCount { get; }
+        /// <summary>
+        /// The number of sub-buckets used to store count values.
+        /// </summary>
         public int SubBucketCount { get; }
-        public int SubBucketHalfCount { get; }
+        
+        internal int SubBucketHalfCount { get; }
 
         /// <summary>
         /// The length of the internal array that stores the counts.
@@ -150,6 +157,12 @@ namespace HdrHistogram
 
             CountsArrayLength = GetLengthForNumberOfBuckets(BucketCount);
         }
+
+        /// <summary>
+        /// Copies the data from this instance to a new instance.
+        /// </summary>
+        /// <returns>A new copy of this instance.</returns>
+        public abstract HistogramBase Copy();
 
         /// <summary>
         /// Records a value in the histogram
