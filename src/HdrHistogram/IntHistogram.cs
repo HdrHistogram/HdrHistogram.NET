@@ -11,7 +11,7 @@ using System;
 namespace HdrHistogram
 {
     /// <summary>
-    /// A High Dynamic Range (HDR) Histogram
+    /// A High Dynamic Range (HDR) Histogram using an <see cref="int"/> count type.
     /// </summary>
     /// <remarks>
     /// Histogram supports the recording and analyzing sampled data value counts across a configurable integer value
@@ -28,30 +28,31 @@ namespace HdrHistogram
     /// (or better) up to 1,000 seconds.
     /// At it's maximum tracked value(1 hour), it would still maintain a resolution of 3.6 seconds (or better).
     /// </para>
-    /// Histogram tracks value counts in <see cref="long"/> fields.
+    /// Histogram tracks value counts in <see cref="int"/> fields.
+    /// Other field types are available in the <see cref="LongHistogram"/> and <see cref="ShortHistogram"/> 
+    /// implementations of <see cref="HistogramBase"/>.
     /// </remarks>
-    public class LongHistogram : HistogramBase
+    public class IntHistogram : HistogramBase
     {
-        private readonly long[] _counts;
+        private readonly int[] _counts;
+
         private long _totalCount;
 
         /// <summary>
-        /// Construct a Histogram given the highest value to be tracked and a number of significant decimal digits. 
-        /// The histogram will be constructed to implicitly track(distinguish from 0) values as low as 1.
+        /// Construct an <see cref="IntHistogram"/> given the highest value to be tracked and a number of significant decimal digits. 
+        /// The histogram will be constructed to implicitly track(distinguish from 0) values as low as 1. 
         /// </summary>
         /// <param name="highestTrackableValue">The highest value to be tracked by the histogram. Must be a positive integer that is &gt;= 2.</param>
-        /// <param name="numberOfSignificantValueDigits">The number of significant decimal digits to which the histogram will maintain value resolution and separation.
-        /// Must be a non-negative integer between 0 and 5.
-        /// </param>
-        public LongHistogram(long highestTrackableValue, int numberOfSignificantValueDigits)
+        /// <param name="numberOfSignificantValueDigits">The number of significant decimal digits to which the histogram will maintain value resolution and separation.Must be a non-negative integer between 0 and 5.</param>
+        public IntHistogram(long highestTrackableValue, int numberOfSignificantValueDigits)
             : this(1, highestTrackableValue, numberOfSignificantValueDigits)
         {
         }
 
         /// <summary>
-        /// Construct a <see cref="LongHistogram"/> given the lowest and highest values to be tracked and a number of significant decimal digits.
-        /// Providing a <paramref name="lowestTrackableValue"/> is useful is situations where the units used for the histogram's values are much smaller that the minimal accuracy required. 
-        /// For example when tracking time values stated in tick (100 nanosecond units), where the minimal accuracy required is a microsecond, the proper value for <paramref name="lowestTrackableValue"/> would be 10.
+        /// Construct a <see cref="IntHistogram"/> given the lowest and highest values to be tracked and a number of significant decimal digits.
+        /// Providing a <paramref name="lowestTrackableValue"/> is useful is situations where the units used for the histogram's values are much smaller that the minimal accuracy required.
+        /// For example when tracking time values stated in ticks (100 nanosecond units), where the minimal accuracy required is a microsecond, the proper value for <paramref name="lowestTrackableValue"/> would be 10.
         /// </summary>
         /// <param name="lowestTrackableValue">
         /// The lowest value that can be tracked (distinguished from 0) by the histogram.
@@ -59,14 +60,11 @@ namespace HdrHistogram
         /// May be internally rounded down to nearest power of 2.
         /// </param>
         /// <param name="highestTrackableValue">The highest value to be tracked by the histogram. Must be a positive integer that is &gt;= (2 * <paramref name="lowestTrackableValue"/>).</param>
-        /// <param name="numberOfSignificantValueDigits">The number of significant decimal digits to which the histogram will maintain value resolution and separation.
-        /// Must be a non-negative integer between 0 and 5.
-        /// </param>
-        public LongHistogram(long lowestTrackableValue, long highestTrackableValue,
-                         int numberOfSignificantValueDigits)
+        /// <param name="numberOfSignificantValueDigits">The number of significant decimal digits to which the histogram will maintain value resolution and separation.Must be a non-negative integer between 0 and 5.</param>
+        public IntHistogram(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
             : base(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
         {
-            _counts = new long[CountsArrayLength];
+            _counts = new int[CountsArrayLength];
         }
 
 
@@ -78,12 +76,12 @@ namespace HdrHistogram
         /// <summary>
         /// Returns the word size of this implementation
         /// </summary>
-        protected override int WordSizeInBytes => 8;
+        protected override int WordSizeInBytes => 4;
 
         /// <summary>
         /// The maximum value a count can be for any given bucket.
         /// </summary>
-        protected override long MaxAllowableCount => long.MaxValue;
+        protected override long MaxAllowableCount => int.MaxValue;
 
         /// <summary>
         /// Create a copy of this histogram, complete with data and everything.
@@ -91,7 +89,7 @@ namespace HdrHistogram
         /// <returns>A distinct copy of this histogram.</returns>
         public override HistogramBase Copy()
         {
-            var copy = new LongHistogram(LowestTrackableValue, HighestTrackableValue, NumberOfSignificantValueDigits);
+            var copy = new IntHistogram(LowestTrackableValue, HighestTrackableValue, NumberOfSignificantValueDigits);
             copy.Add(this);
             return copy;
         }
@@ -113,7 +111,7 @@ namespace HdrHistogram
         /// <param name="value">The value to set</param>
         protected override void SetCountAtIndex(int index, long value)
         {
-            _counts[index] = value;
+            _counts[index] = (int)value;
         }
 
         /// <summary>
@@ -133,7 +131,7 @@ namespace HdrHistogram
         /// <param name="addend">The amount to increment by.</param>
         protected override void AddToCountAtIndex(int index, long addend)
         {
-            _counts[index] += addend;
+            _counts[index] += (int)addend;
             _totalCount += addend;
         }
 
@@ -152,7 +150,10 @@ namespace HdrHistogram
         /// <param name="target">The array to write each count value into.</param>
         protected override void CopyCountsInto(long[] target)
         {
-            Array.Copy(_counts, target, target.Length);
+            for (int i = 0; i < target.Length; i++)
+            {
+                target[i] = _counts[i];
+            }
         }
     }
 }

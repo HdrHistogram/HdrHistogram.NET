@@ -57,6 +57,10 @@ namespace HdrHistogram.Iteration
         /// </summary>
         public double PercentileLevelIteratedTo { get; private set; }
 
+        /// <summary>
+        /// Indicates if this item is to be considered the last value in the set.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if it is the last value, else <c>false</c>.</returns>
         public bool IsLastValue()
         {
             //return PercentileLevelIteratedTo == 100.0D;

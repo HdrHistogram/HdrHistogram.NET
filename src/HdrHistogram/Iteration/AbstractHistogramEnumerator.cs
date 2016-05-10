@@ -25,18 +25,17 @@ namespace HdrHistogram.Iteration
         private long _totalCountToPrevIndex;
         private long _totalValueToCurrentIndex;
         private bool _freshSubBucket;
-
+        private long _currentValueAtIndex;
+        private long _nextValueAtIndex;
+        
         protected HistogramBase SourceHistogram { get; }
         protected long ArrayTotalCount { get; }
         protected int CurrentBucketIndex { get; private set; }
         protected int CurrentSubBucketIndex { get; private set; }
-        protected long CurrentValueAtIndex { get; private set; }
-        protected long NextValueAtIndex { get; private set; }
         protected long TotalCountToCurrentIndex { get; private set; }
         protected long CountAtThisValue { get; private set; }
 
         public HistogramIterationValue Current { get; private set; }
-
 
         protected AbstractHistogramEnumerator(HistogramBase histogram)
         {
@@ -45,10 +44,10 @@ namespace HdrHistogram.Iteration
             ArrayTotalCount = histogram.TotalCount;
             CurrentBucketIndex = 0;
             CurrentSubBucketIndex = 0;
-            CurrentValueAtIndex = 0;
+            _currentValueAtIndex = 0;
             _nextBucketIndex = 0;
             _nextSubBucketIndex = 1;
-            NextValueAtIndex = 1;
+            _nextValueAtIndex = 1;
             _prevValueIteratedTo = 0;
             _totalCountToPrevIndex = 0;
             TotalCountToCurrentIndex = 0;
@@ -82,7 +81,7 @@ namespace HdrHistogram.Iteration
 
         protected virtual long GetValueIteratedTo()
         {
-            return SourceHistogram.HighestEquivalentValue(CurrentValueAtIndex);
+            return SourceHistogram.HighestEquivalentValue(_currentValueAtIndex);
         }
 
         /// <summary>
@@ -99,12 +98,12 @@ namespace HdrHistogram.Iteration
                 {
                     // Don't add unless we've incremented since last bucket...
                     TotalCountToCurrentIndex += CountAtThisValue;
-                    _totalValueToCurrentIndex += CountAtThisValue * SourceHistogram.MedianEquivalentValue(CurrentValueAtIndex);
+                    _totalValueToCurrentIndex += CountAtThisValue * SourceHistogram.MedianEquivalentValue(_currentValueAtIndex);
                     _freshSubBucket = false;
                 }
                 if (ReachedIterationLevel())
                 {
-                    long valueIteratedTo = GetValueIteratedTo();
+                    var valueIteratedTo = GetValueIteratedTo();
                     _currentIterationValue.Set(
                         valueIteratedTo,
                         _prevValueIteratedTo,
@@ -141,7 +140,7 @@ namespace HdrHistogram.Iteration
             // Take on the next index:
             CurrentBucketIndex = _nextBucketIndex;
             CurrentSubBucketIndex = _nextSubBucketIndex;
-            CurrentValueAtIndex = NextValueAtIndex;
+            _currentValueAtIndex = _nextValueAtIndex;
             // Figure out the next next index:
             _nextSubBucketIndex++;
             if (_nextSubBucketIndex >= SourceHistogram.SubBucketCount)
@@ -149,7 +148,7 @@ namespace HdrHistogram.Iteration
                 _nextSubBucketIndex = SourceHistogram.SubBucketHalfCount;
                 _nextBucketIndex++;
             }
-            NextValueAtIndex = SourceHistogram.ValueFromIndex(_nextBucketIndex, _nextSubBucketIndex);
+            _nextValueAtIndex = SourceHistogram.ValueFromIndex(_nextBucketIndex, _nextSubBucketIndex);
         }
 
         #region IEnumerator explicit implementation

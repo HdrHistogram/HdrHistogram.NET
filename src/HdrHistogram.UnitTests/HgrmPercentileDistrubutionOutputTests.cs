@@ -51,8 +51,6 @@ namespace HdrHistogram.UnitTests
         private Stream GetEmbeddedFileStream(string filename)
         {
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);
-            var options = GetType()
-                .Assembly.GetManifestResourceNames();
             return GetType()
                 .Assembly
                 .GetManifestResourceStream(fileName);

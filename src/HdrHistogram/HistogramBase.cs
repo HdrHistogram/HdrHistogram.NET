@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using HdrHistogram.Encoding;
 using HdrHistogram.Iteration;
 using HdrHistogram.Utilities;
 
@@ -39,6 +40,8 @@ namespace HdrHistogram
         private readonly int _unitMagnitude;
         private readonly long _subBucketMask;
         private readonly int _bucketIndexOffset;
+        private long _maxValue;
+        private long _minNonZeroValue;
 
         /// <summary>
         /// Get the configured highestTrackableValue
@@ -59,14 +62,33 @@ namespace HdrHistogram
         public int NumberOfSignificantValueDigits { get; }
 
         /// <summary>
+        /// Gets or Sets the start time stamp value associated with this histogram to a given value.
+        /// By convention in milliseconds since the epoch.
+        /// </summary>
+        public long StartTimeStamp { get; set; }
+
+        /// <summary>
+        /// Gets or Sets the end time stamp value associated with this histogram to a given value.
+        /// By convention in milliseconds since the epoch.
+        /// </summary>
+        public long EndTimeStamp { get; set; }
+
+        /// <summary>
         /// Gets the total number of recorded values.
         /// </summary>
-        public abstract long TotalCount { get; }
+        public abstract long TotalCount { get; protected set; }
 
 
+        /// <summary>
+        /// The number of buckets used to store count values.
+        /// </summary>
         public int BucketCount { get; }
+        /// <summary>
+        /// The number of sub-buckets used to store count values.
+        /// </summary>
         public int SubBucketCount { get; }
-        public int SubBucketHalfCount { get; }
+        
+        internal int SubBucketHalfCount { get; }
 
         /// <summary>
         /// The length of the internal array that stores the counts.
@@ -77,7 +99,12 @@ namespace HdrHistogram
         /// Returns the word size of this implementation
         /// </summary>
         protected abstract int WordSizeInBytes { get; }
-        
+
+        /// <summary>
+        /// The maximum value a count can be for any given bucket.
+        /// </summary>
+        protected abstract long MaxAllowableCount { get; }
+
         /// <summary>
         /// Construct a histogram given the lowest and highest values to be tracked and a number of significant decimal digits.
         /// </summary>
@@ -130,6 +157,12 @@ namespace HdrHistogram
 
             CountsArrayLength = GetLengthForNumberOfBuckets(BucketCount);
         }
+
+        /// <summary>
+        /// Copies the data from this instance to a new instance.
+        /// </summary>
+        /// <returns>A new copy of this instance.</returns>
+        public abstract HistogramBase Copy();
 
         /// <summary>
         /// Records a value in the histogram
@@ -272,7 +305,34 @@ namespace HdrHistogram
         {
             return LowestEquivalentValue(value) + SizeOfEquivalentValueRange(value);
         }
-        
+
+        /// <summary>
+        /// Get the value at a given percentile
+        /// </summary>
+        /// <param name="percentile">The percentile to get the value for</param>
+        /// <returns>The value a given percentage of all recorded value entries in the histogram fall below.</returns>
+        public long GetValueAtPercentile(double percentile)
+        {
+            var requestedPercentile = Math.Min(percentile, 100.0); // Truncate down to 100%
+            var countAtPercentile = (long)(((requestedPercentile / 100.0) * TotalCount) + 0.5); // round to nearest
+            countAtPercentile = Math.Max(countAtPercentile, 1); // Make sure we at least reach the first recorded entry
+            long runningCount = 0;
+            for (var i = 0; i < BucketCount; i++)
+            {
+                var j = (i == 0) ? 0 : (SubBucketCount / 2);
+                for (; j < SubBucketCount; j++)
+                {
+                    runningCount += GetCountAt(i, j);
+                    if (runningCount >= countAtPercentile)
+                    {
+                        var valueAtIndex = ValueFromIndex(i, j);
+                        return this.HighestEquivalentValue(valueAtIndex);
+                    }
+                }
+            }
+            throw new ArgumentOutOfRangeException(nameof(percentile), "percentile value not found in range"); // should not reach here.
+        }
+
         /// <summary>
         /// Get the count of recorded values at a specific value
         /// </summary>
@@ -296,6 +356,37 @@ namespace HdrHistogram
         public IEnumerable<HistogramIterationValue> RecordedValues()
         {
             return new RecordedValuesEnumerable(this);
+        }
+        
+        /// <summary>
+        /// Provide a means of iterating through all histogram values using the finest granularity steps supported by the underlying representation.
+        /// The iteration steps through all possible unit value levels, regardless of whether or not there were recorded values for that value level, and terminates when all recorded histogram values are exhausted.
+        /// </summary>
+        /// <returns>An enumerator of <see cref="HistogramIterationValue"/> through the histogram using a <see cref="RecordedValuesEnumerator"/></returns>
+        public IEnumerable<HistogramIterationValue> AllValues()
+        {
+            return new AllValueEnumerable(this);
+        }
+
+        /// <summary>
+        /// Get the capacity needed to encode this histogram into a <see cref="ByteBuffer"/>
+        /// </summary>
+        /// <returns>the capacity needed to encode this histogram into a <see cref="ByteBuffer"/></returns>
+        public int GetNeededByteBufferCapacity()
+        {
+            return GetNeededByteBufferCapacity(CountsArrayLength);
+        }
+
+        /// <summary>
+        /// Encode this histogram into a <see cref="ByteBuffer"/>
+        /// </summary>
+        /// <param name="targetBuffer">The buffer to encode into</param>
+        /// <param name="encoder">The encoder to use</param>
+        /// <returns>The number of bytes written to the buffer</returns>
+        public int Encode(ByteBuffer targetBuffer, IEncoder encoder)
+        {
+            var data = GetData();
+            return encoder.Encode(data, targetBuffer);
         }
 
         /// <summary>
@@ -339,12 +430,74 @@ namespace HdrHistogram
             return ((long)subBucketIndex) << (bucketIndex + _unitMagnitude);
         }
 
+
+        /// <summary>
+        /// Copies data from the provided buffer into the internal counts array.
+        /// </summary>
+        /// <param name="buffer">The buffer to read from.</param>
+        /// <param name="length">The length of the buffer to read.</param>
+        /// <param name="wordSizeInBytes">The word size in bytes.</param>
+        internal int FillCountsFromBuffer(ByteBuffer buffer, int length, int wordSizeInBytes)
+        {
+            var countsDecoder = Persistence.CountsDecoder.GetDecoderForWordSize(wordSizeInBytes);
+
+            return countsDecoder.ReadCounts(buffer,
+                length,
+                CountsArrayLength,
+                (idx, count) =>
+                {
+                    if (count > MaxAllowableCount)
+                    {
+                        throw new ArgumentException($"An encoded count ({count}) does not fit in the Histogram's ({WordSizeInBytes} bytes) was encountered in the source");
+                    }
+                    SetCountAtIndex(idx, count);
+                });
+        }
+
+        internal void EstablishInternalTackingValues(int lengthToCover)
+        {
+            ResetMaxValue(0);
+            ResetMinNonZeroValue(long.MaxValue);
+            int maxIndex = -1;
+            int minNonZeroIndex = -1;
+            long observedTotalCount = 0;
+            for (int index = 0; index < lengthToCover; index++)
+            {
+                long countAtIndex;
+                if ((countAtIndex = GetCountAtIndex(index)) > 0)
+                {
+                    observedTotalCount += countAtIndex;
+                    maxIndex = index;
+                    if ((minNonZeroIndex == -1) && (index != 0))
+                    {
+                        minNonZeroIndex = index;
+                    }
+                }
+            }
+            if (maxIndex >= 0)
+            {
+                UpdatedMaxValue(this.HighestEquivalentValue(ValueFromIndex(maxIndex)));
+            }
+            if (minNonZeroIndex >= 0)
+            {
+                UpdateMinNonZeroValue(ValueFromIndex(minNonZeroIndex));
+            }
+            TotalCount = observedTotalCount;
+        }
+
         /// <summary>
         /// Gets the number of recorded values at a given index.
         /// </summary>
         /// <param name="index">The index to get the count for</param>
         /// <returns>The number of recorded values at the given index.</returns>
         protected abstract long GetCountAtIndex(int index);
+
+        /// <summary>
+        /// Sets the count at the given index.
+        /// </summary>
+        /// <param name="index">The index to be set</param>
+        /// <param name="value">The value to set</param>
+        protected abstract void SetCountAtIndex(int index, long value);
 
         /// <summary>
         /// Increments the count at the given index. Will also increment the <see cref="TotalCount"/>.
@@ -363,6 +516,53 @@ namespace HdrHistogram
         /// Clears the counts of this implementation.
         /// </summary>
         protected abstract void ClearCounts();
+
+        /// <summary>
+        /// Copies the internal counts array into the supplied array.
+        /// </summary>
+        /// <param name="target">The array to write each count value into.</param>
+        protected abstract void CopyCountsInto(long[] target);
+
+        /// <summary>
+        /// Set internally tracked _maxValue to new value if new value is greater than current one.
+        /// May be overridden by subclasses for synchronization or atomicity purposes.
+        /// </summary>
+        /// <param name="value">new _maxValue to set</param>
+        private void UpdatedMaxValue(long value)
+        {
+            while (value > _maxValue)
+            {
+                ////TODO: Perform atomic CAS operation here -LC
+                //maxValueUpdater.compareAndSet(this, _maxValue, value);
+                _maxValue = value;
+            }
+        }
+
+        /// <summary>
+        /// Set internally tracked _minNonZeroValue to new value if new value is smaller than current one.
+        /// May be overridden by subclasses for synchronization or atomicity purposes.
+        /// </summary>
+        /// <param name="value">new _minNonZeroValue to set</param>
+        private void UpdateMinNonZeroValue(long value)
+        {
+            while (value < _minNonZeroValue)
+            {
+                //TODO: Perform atomic CAS operation here -LC
+                //minNonZeroValueUpdater.compareAndSet(this, _minNonZeroValue, value);
+                _minNonZeroValue = value;
+            }
+        }
+
+
+        private void ResetMinNonZeroValue(long minNonZeroValue)
+        {
+            _minNonZeroValue = minNonZeroValue;
+        }
+
+        private void ResetMaxValue(long maxValue)
+        {
+            _maxValue = maxValue;
+        }
 
         private void RecordSingleValue(long value)
         {
@@ -386,11 +586,16 @@ namespace HdrHistogram
             }
         }
 
+        private int GetNeededByteBufferCapacity(int relevantLength)
+        {
+            return (relevantLength * WordSizeInBytes) + 32;
+        }
+
         private int GetBucketsNeededToCoverValue(long value)
         {
             long trackableValue = (SubBucketCount - 1) << _unitMagnitude;
             var bucketsNeeded = 1;
-            while (trackableValue < value)
+            while (trackableValue < value && trackableValue > 0)
             {
                 trackableValue <<= 1;
                 bucketsNeeded++;
@@ -443,6 +648,32 @@ namespace HdrHistogram
                 bucketIndex = 0;
             }
             return ValueFromIndex(bucketIndex, subBucketIndex);
+        }
+
+        private IRecordedData GetData()
+        {
+            var relevantCounts = GetRelevantCounts();
+            return new RecordedData(
+                this.GetEncodingCookie(),
+                0,
+                this.NumberOfSignificantValueDigits,
+                this.LowestTrackableValue,
+                this.HighestTrackableValue,
+                1.0,
+                relevantCounts
+                );
+        }
+
+        private long[] GetRelevantCounts()
+        {
+            var max = this.GetMaxValue();
+            var bucketIdx = this.GetBucketIndex(max);
+            var subBucketIdx = this.GetSubBucketIndex(max, bucketIdx);
+            var maxIdx = this.CountsArrayIndex(bucketIdx, subBucketIdx);
+            var length = maxIdx + 1;
+            var relevantCounts = new long[length];
+            CopyCountsInto(relevantCounts);
+            return relevantCounts;
         }
     }
 }
