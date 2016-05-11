@@ -19,8 +19,6 @@ properties {
   $semver = "1.0.0-beta"
   $zipFileName = "HdrHistogram.NET$semver.zip"
   $packageId = "HdrHistogram"
-  $signAssemblies = $false
-  $signKeyPath = "C:\Development\Releases\HdrHistogram.snk.pfx"
   $buildNuGet = $true
   $treatWarningsAsErrors = $false
   $baseDir  = resolve-path ..
@@ -30,6 +28,8 @@ properties {
   $releaseDir = "$baseDir\Release"
   $workingDir = "$baseDir\Working"
   $workingSourceDir = "$workingDir\Src"
+  $signAssemblies = $true
+  $signKeyPath = "$buildDir\HdrHistogram.snk"
   $builds = @(
      @{Name = "HdrHistogram"; TestsName = "HdrHistogram.UnitTests"; BuildFunction = "MSBuildBuild"; TestsFunction = "NUnitTests"; Constants=""; FinalDir="Net45"; NuGetDir = "net45"; Framework="net-4.0"}
   )
