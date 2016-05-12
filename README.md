@@ -399,6 +399,8 @@ A conservative (high) estimate of a Histogram's footprint in bytes is available 
   * **Service Time** : The time taken to actually service a request.
   * **Response time** : The sum of the latency and the service time. e.g. the time your request was queued, plus the time it took to process.
 
-Reference 
- - [Designing for Performance - Martin Thompson](https://youtu.be/fDGWWpHlzvw?t=4m56s)
+References (see also)
+ - [How NOT to Measure Latency](http://www.infoq.com/presentations/latency-pitfalls) Gil Tene - qCon 2013
+ - [Understanding Latency](https://www.youtube.com/watch?v=9MKY4KypBzg)  Gil Tene - React San Francisco 2014
+ - [Designing for Performance](https://youtu.be/fDGWWpHlzvw?t=4m56s) Martin Thompson - GOTO Chicago 2015
  - https://en.wikipedia.org/wiki/Response_time_(technology)
