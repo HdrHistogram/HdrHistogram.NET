@@ -4,7 +4,6 @@
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/HdrHistogram/HdrHistogram?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/q0o5faahigq6u4qe/branch/master?svg=true)](https://ci.appveyor.com/project/LeeCampbell/hdrhistogram-net/branch/master) [![Build status](https://ci.appveyor.com/api/projects/status/q0o5faahigq6u4qe?svg=true)](https://ci.appveyor.com/project/LeeCampbell/hdrhistogram-net)
 
-
 ##What is it
 HdrHistogram.NET is the official port of the Java HdrHistogram library. 
 All official implementations of HdrHistogram can be found at https://github.com/HdrHistogram
@@ -17,6 +16,8 @@ Gil Tene (the original author of the Java HdrHistogram) illustrates in numerous 
 Instead you want to collect all of the data and then be able to report your measurements across the range of measurements. 
 
 ##How would I use it?
+The library is available as a package from Nuget as [HdrHistogram](https://www.nuget.org/packages/HdrHistogram/)
+
 Generally you want to be able to record at the finest accuracy the response-time of a given function of your software. 
 To do this code might look something like this
 
