@@ -6,8 +6,8 @@
 
 
 ##What is it
-HdrHistogram.NET is the unofficial port of the Java HdrHistogram library. 
-The official Java, C, and C# implementations of HdrHistogram can be found at https://github.com/HdrHistogram/HdrHistogram
+HdrHistogram.NET is the official port of the Java HdrHistogram library. 
+All official implementations of HdrHistogram can be found at https://github.com/HdrHistogram
 
 ##Why would I use it?
 You would use it to efficiently capture large number of response times measurements.
