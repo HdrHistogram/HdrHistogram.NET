@@ -19,17 +19,17 @@ properties {
   $semver = "1.0.0-beta"
   $zipFileName = "HdrHistogram.NET$semver.zip"
   $packageId = "HdrHistogram"
-  $signAssemblies = $false
-  $signKeyPath = "C:\Development\Releases\HdrHistogram.snk.pfx"
+  $buildEnv = "local" #Or TeamCity, AppVeyor
   $buildNuGet = $true
   $treatWarningsAsErrors = $false
   $baseDir  = resolve-path ..
   $buildDir = "$baseDir\Build"
   $sourceDir = "$baseDir\Src"
-  $docDir = "$baseDir\Doc"
   $releaseDir = "$baseDir\Release"
   $workingDir = "$baseDir\Working"
   $workingSourceDir = "$workingDir\Src"
+  $signAssemblies = $true
+  $signKeyPath = "$buildDir\HdrHistogram.snk"
   $builds = @(
      @{Name = "HdrHistogram"; TestsName = "HdrHistogram.UnitTests"; BuildFunction = "MSBuildBuild"; TestsFunction = "NUnitTests"; Constants=""; FinalDir="Net45"; NuGetDir = "net45"; Framework="net-4.0"}
   )
@@ -143,7 +143,6 @@ task Package -depends Build {
 
   robocopy $workingSourceDir $workingDir\Package\Source\Src /MIR /NFL /NDL /NJS /NC /NS /NP /XD bin obj TestResults AppPackages .vs artifacts /XF *.suo *.user *.lock.json | Out-Default
   robocopy $buildDir $workingDir\Package\Source\Build /MIR /NFL /NDL /NJS /NC /NS /NP /XF runbuild.txt | Out-Default
-  robocopy $docDir $workingDir\Package\Source\Doc /MIR /NFL /NDL /NJS /NC /NS /NP | Out-Default
   
   Compress-Archive -Path "$workingDir\Package\*" -DestinationPath "$workingDir\$zipFileName"
 }
@@ -220,23 +219,36 @@ function NUnitTests ($build) {
   $finalDir = $build.FinalDir
   $framework = $build.Framework
 
-  exec { .\working\nuget.exe install NUnit.ConsoleRunner -version 3.2.0 -OutputDirectory $workingSourceDir\packages }
   
-  Write-Host -ForegroundColor Green "Copying test assembly $name to deployed directory"
-  Write-Host
-  robocopy "$workingSourceDir\HdrHistogram.UnitTests\bin\Release\$finalDir" $workingDir\Deployed\Bin\$finalDir /MIR /NFL /NDL /NJS /NC /NS /NP /XO | Out-Default
 
-  Copy-Item -Path "$workingSourceDir\HdrHistogram.UnitTests\bin\Release\$finalDir\HdrHistogram.UnitTests.dll" -Destination $workingDir\Deployed\Bin\$finalDir\
+  if ($buildEnv -eq "AppVeyor") {
+    Write-Host "Skipping Explicit NUnit test as AppVeyor should discover them and run automatically"
+  }else{
 
-  Write-Host -ForegroundColor Green "Running NUnit tests " $name
-  Write-Host
-  $nUnitPath = "$workingSourceDir\packages\NUnit.ConsoleRunner.3.2.0\tools\nunit3-console.exe"  
-  exec { .\working\src\packages\NUnit.ConsoleRunner.3.2.0\tools\nunit3-console.exe `
-    $workingDir\Deployed\Bin\$finalDir\HdrHistogram.UnitTests.dll `
-    --framework=$framework `
-    --teamcity `
-    | Out-Default 
-  } "Error running $name tests"
+    exec { .\working\nuget.exe install NUnit.ConsoleRunner -version 3.2.0 -OutputDirectory $workingSourceDir\packages }
+  
+    Write-Host -ForegroundColor Green "Copying test assembly $name to deployed directory"
+    Write-Host
+    robocopy "$workingSourceDir\HdrHistogram.UnitTests\bin\Release\$finalDir" $workingDir\Deployed\Bin\$finalDir /MIR /NFL /NDL /NJS /NC /NS /NP /XO | Out-Default
+
+    Copy-Item -Path "$workingSourceDir\HdrHistogram.UnitTests\bin\Release\$finalDir\HdrHistogram.UnitTests.dll" -Destination $workingDir\Deployed\Bin\$finalDir\
+
+    Write-Host -ForegroundColor Green "Running NUnit tests '$name' for '$buildEnv' build platform"
+    Write-Host
+    $nUnitPath = "$workingSourceDir\packages\NUnit.ConsoleRunner.3.2.0\tools\nunit3-console.exe"  
+
+    $flag = ""
+    if ($buildEnv -eq "TeamCity") {
+      $flag = "--teamcity"
+    }
+
+    exec { .\working\src\packages\NUnit.ConsoleRunner.3.2.0\tools\nunit3-console.exe `
+      $workingDir\Deployed\Bin\$finalDir\HdrHistogram.UnitTests.dll `
+      --framework=$framework `
+      $flag `
+      | Out-Default 
+    } "Error running $name tests"
+  }
 }
 
 function GetConstants ($constants, $includeSigned) {
