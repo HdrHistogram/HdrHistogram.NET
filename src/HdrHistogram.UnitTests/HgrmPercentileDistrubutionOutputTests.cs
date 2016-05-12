@@ -25,6 +25,7 @@ namespace HdrHistogram.UnitTests
             histogram.OutputPercentileDistribution(writer, percentileTicksPerHalfDistance, scaling);
             var actual = writer.ToString();
 
+            
             Assert.AreEqual(expected, actual);
         }
 
@@ -61,7 +62,7 @@ namespace HdrHistogram.UnitTests
             using (var stream = GetEmbeddedFileStream(filename))
             {
                 var reader = new StreamReader(stream);
-                return reader.ReadToEnd();
+                return reader.ReadToEnd().Replace("\r\n", "\n");
             }
         }
 

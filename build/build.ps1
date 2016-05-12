@@ -198,7 +198,7 @@ function GetNuget () {
   $localNugetPath = "$workingDir\nuget.exe"
   #Check for existence of Nuget.exe on path, if not there, download and install from nuget.org
   $currentNuget = (Get-Command "nuget.exe" -ErrorAction SilentlyContinue)
-  if (($currentNuget -eq $null) -Or ($currentNuget.Version.Major -le 3)) { 
+  if (($currentNuget -eq $null) -Or ($currentNuget.Version.Major -lt 3)) { 
     Write-Host "Unable to find suitable nuget.exe in your PATH" -ForegroundColor Green  
     if ((Get-Command $localNugetPath -ErrorAction SilentlyContinue) -eq $null) {
       Write-Host "Downloading nuget.exe locally" -ForegroundColor Green
