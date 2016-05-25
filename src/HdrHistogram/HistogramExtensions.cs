@@ -149,7 +149,7 @@ namespace HdrHistogram
         /// Note this is a convenience method and can carry a cost.
         /// If the <paramref name="action"/> delegate is not cached, then it may incur an allocation cost for each invocation of <see cref="Record"/>
         /// </summary>
-        /// <param name="histogram">The Histogram to record the latency in.</param>
+        /// <param name="recorder">The <see cref="IRecorder"/> instance to record the latency in.</param>
         /// <param name="action">The functionality to execute and measure</param>
         /// <remarks>
         /// <para>
@@ -188,7 +188,7 @@ namespace HdrHistogram
         /// </example>
         /// </para>
         /// </remarks>
-        public static void Record(this HistogramBase histogram, Action action)
+        public static void Record(this IRecorder recorder, Action action)
         {
             var start = Stopwatch.GetTimestamp();
             action();
