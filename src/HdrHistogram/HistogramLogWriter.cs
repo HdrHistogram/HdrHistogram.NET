@@ -28,6 +28,11 @@ namespace HdrHistogram
             }
         }
 
+        public void Append(HistogramBase histogram)
+        {
+            WriteHistogram(histogram);
+        }
+
         /// <summary>
         /// Creates a <see cref="HistogramLogWriter"/> that writes to an underlying <see cref="Stream"/>.
         /// </summary>
@@ -58,7 +63,7 @@ namespace HdrHistogram
                 WriteHistogram(histogram);
             }
         }
-        
+
         /// <summary>
         /// Output a log format version to the log.
         /// </summary>
@@ -85,19 +90,19 @@ namespace HdrHistogram
             _log.Flush();
         }
 
-        private void WriteHistogram( HistogramBase histogram)
+        private void WriteHistogram(HistogramBase histogram)
         {
             var targetBuffer = ByteBuffer.Allocate(histogram.GetNeededByteBufferCapacity());
             var compressedLength = histogram.EncodeIntoCompressedByteBuffer(targetBuffer);
             byte[] compressedArray = new byte[compressedLength];
             targetBuffer.BlockGet(compressedArray, 0, 0, compressedLength);
 
-            var startTimeStampSec = histogram.StartTimeStamp/1000.0;
-            var endTimeStampSec = histogram.EndTimeStamp /1000.0;
+            var startTimeStampSec = histogram.StartTimeStamp / 1000.0;
+            var endTimeStampSec = histogram.EndTimeStamp / 1000.0;
             var intervalLength = endTimeStampSec - startTimeStampSec;
             var maxValueUnitRatio = 1000000.0;
-            var intervalMax = histogram.GetMaxValue()/maxValueUnitRatio;
-            
+            var intervalMax = histogram.GetMaxValue() / maxValueUnitRatio;
+
             var binary = Convert.ToBase64String(compressedArray);
             var payload = $"{startTimeStampSec:F3},{intervalLength:F3},{intervalMax:F3},{binary}";
             _log.WriteLine(payload);
