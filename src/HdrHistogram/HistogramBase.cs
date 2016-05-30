@@ -28,7 +28,7 @@ namespace HdrHistogram
     /// 36,000,000,000 while maintaining a value precision of 3 significant digits across that range.
     /// Value quantization within the range will thus be no larger than 1/1,000th (or 0.1%) of any value.
     /// This example Histogram could be used to track and analyze the counts of observed response times ranging between
-    /// 1 tick (100 nanoseconds) and 1 hour in magnitude, while maintaining a value resolution of 100 nanosecond up to 
+    /// 100 nanoseconds and 1 hour in magnitude, while maintaining a value resolution of 100 nanosecond up to 
     /// 100 microseconds, a resolution of 1 millisecond(or better) up to one second, and a resolution of 1 second 
     /// (or better) up to 1,000 seconds.
     /// At it's maximum tracked value(1 hour), it would still maintain a resolution of 3.6 seconds (or better).
@@ -122,8 +122,8 @@ namespace HdrHistogram
         /// <remarks>
         /// Providing a lowestTrackableValue is useful in situations where the units used for the histogram's values are much 
         /// smaller that the minimal accuracy required.
-        /// For example when tracking time values stated in ticks (100 nanoseconds), where the minimal accuracy required is a
-        /// microsecond, the proper value for lowestTrackableValue would be 10.
+        /// For example when tracking time values stated in nanoseconds, where the minimal accuracy required is a
+        /// microsecond, the proper value for <paramref name="lowestTrackableValue"/> would be 1000.
         /// </remarks>
         protected HistogramBase(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
         {
