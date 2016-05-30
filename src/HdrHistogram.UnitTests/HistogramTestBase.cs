@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Threading;
 using NUnit.Framework;
 
 namespace HdrHistogram.UnitTests
@@ -21,7 +23,7 @@ namespace HdrHistogram.UnitTests
             Assert.AreEqual(errorParamName, ex.ParamName);
             StringAssert.StartsWith(errorMessage, ex.Message);
         }
-        
+
 
         [TestCase(2, 2)]
         [TestCase(HighestTrackableValue, NumberOfSignificantValueDigits)]
@@ -123,6 +125,23 @@ namespace HdrHistogram.UnitTests
             Assert.AreEqual(1, longHistogram.TotalCount);
         }
 
+        [Test]
+        public void RecordAction_records_in_correct_units()
+        {
+            var pause = TimeSpan.FromSeconds(1);
+            var longHistogram = Create(HighestTrackableValue, NumberOfSignificantValueDigits);
+
+            longHistogram.Record(() => Thread.Sleep(pause));
+
+            var stringWriter = new StringWriter();
+            longHistogram.OutputPercentileDistribution(stringWriter, 5, OutputScalingFactor.TimeStampToMilliseconds, true);
+            //First column of second row.
+            var recordedMilliseconds = GetCellValue(stringWriter.ToString(), 0, 1);
+            var actual = double.Parse(recordedMilliseconds);
+            var expected = pause.TotalMilliseconds;
+            var delta = expected * 0.1;   //10% Variance to allow for slack in transitioning from Thread.Sleep
+            Assert.AreEqual(expected, actual, delta);
+        }
 
         [Test]
         public void Reset_sets_counts_to_zero()
@@ -265,5 +284,10 @@ namespace HdrHistogram.UnitTests
         protected abstract int WordSize { get; }
         protected abstract HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits);
         protected abstract HistogramBase Create(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits);
+
+        private static string GetCellValue(string csvData, int col, int row)
+        {
+            return csvData.Split('\n')[row].Split(',')[col];
+        }
     }
 }

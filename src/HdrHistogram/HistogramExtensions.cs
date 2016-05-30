@@ -72,7 +72,18 @@ namespace HdrHistogram
             return histogram.NextNonEquivalentValue(value) - 1;
         }
 
-
+        /// <summary>
+        /// Copy this histogram into the target histogram, overwriting it's contents.
+        /// </summary>
+        /// <param name="source">The source histogram</param>
+        /// <param name="targetHistogram">the histogram to copy into</param>
+        public static void CopyInto(this HistogramBase source, HistogramBase targetHistogram)
+        {
+            targetHistogram.Reset();
+            targetHistogram.Add(source);
+            targetHistogram.StartTimeStamp = source.StartTimeStamp;
+            targetHistogram.EndTimeStamp = source.EndTimeStamp;
+        }
 
         /// <summary>
         /// Provide a means of iterating through histogram values according to percentile levels. 
@@ -193,7 +204,7 @@ namespace HdrHistogram
             var start = Stopwatch.GetTimestamp();
             action();
             var elapsed = Stopwatch.GetTimestamp() - start;
-            histogram.RecordValue(elapsed);
+            recorder.RecordValue(elapsed);
         }
     }
 }
