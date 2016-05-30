@@ -4,7 +4,8 @@
     {
         static void Main(string[] args)
         {
-            SimpleHistogramExample.Run();
+            //SimpleHistogramExample.Run();
+            RecorderExample.Run();
         }
     }
 }

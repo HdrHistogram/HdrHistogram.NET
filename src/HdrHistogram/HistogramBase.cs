@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using HdrHistogram.Encoding;
 using HdrHistogram.Iteration;
 using HdrHistogram.Utilities;
@@ -34,14 +35,18 @@ namespace HdrHistogram
     /// At it's maximum tracked value(1 hour), it would still maintain a resolution of 3.6 seconds (or better).
     /// </para>
     /// </remarks>
-    public abstract class HistogramBase
+    public abstract class HistogramBase : IRecorder
     {
+        private static long _instanceIdSequencer = -1;
+
         private readonly int _subBucketHalfCountMagnitude;
         private readonly int _unitMagnitude;
         private readonly long _subBucketMask;
         private readonly int _bucketIndexOffset;
         private long _maxValue;
         private long _minNonZeroValue;
+
+        public long InstanceId { get; }
 
         /// <summary>
         /// Get the configured highestTrackableValue
@@ -105,6 +110,8 @@ namespace HdrHistogram
         /// </summary>
         protected abstract long MaxAllowableCount { get; }
 
+        
+
         /// <summary>
         /// Construct a histogram given the lowest and highest values to be tracked and a number of significant decimal digits.
         /// </summary>
@@ -126,11 +133,38 @@ namespace HdrHistogram
         /// microsecond, the proper value for <paramref name="lowestTrackableValue"/> would be 1000.
         /// </remarks>
         protected HistogramBase(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
+            :this(Interlocked.Decrement(ref _instanceIdSequencer), lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
+        {
+        }
+
+        /// <summary>
+        /// Construct a histogram given the lowest and highest values to be tracked and a number of significant decimal digits.
+        /// </summary>
+        /// <param name="instanceId">An identifier for this instance.</param>
+        /// <param name="lowestTrackableValue">The lowest value that can be tracked (distinguished from 0) by the histogram.
+        /// Must be a positive integer that is &gt;= 1.
+        /// May be internally rounded down to nearest power of 2.
+        /// </param>
+        /// <param name="highestTrackableValue">The highest value to be tracked by the histogram.
+        /// Must be a positive integer that is &gt;= (2 * lowestTrackableValue).
+        /// </param>
+        /// <param name="numberOfSignificantValueDigits">
+        /// The number of significant decimal digits to which the histogram will maintain value resolution and separation. 
+        /// Must be a non-negative integer between 0 and 5.
+        /// </param>
+        /// <remarks>
+        /// Providing a lowestTrackableValue is useful in situations where the units used for the histogram's values are much 
+        /// smaller that the minimal accuracy required.
+        /// For example when tracking time values stated in ticks (100 nanoseconds), where the minimal accuracy required is a
+        /// microsecond, the proper value for lowestTrackableValue would be 10.
+        /// </remarks>
+        protected HistogramBase(long instanceId, long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
         {
             if (lowestTrackableValue < 1) throw new ArgumentException("lowestTrackableValue must be >= 1", nameof(lowestTrackableValue));
             if (highestTrackableValue < 2 * lowestTrackableValue) throw new ArgumentException("highestTrackableValue must be >= 2 * lowestTrackableValue", nameof(highestTrackableValue));
             if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5)) throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5", nameof(numberOfSignificantValueDigits));
 
+            InstanceId = instanceId;
             LowestTrackableValue = lowestTrackableValue;
             HighestTrackableValue = highestTrackableValue;
             NumberOfSignificantValueDigits = numberOfSignificantValueDigits;

@@ -68,6 +68,12 @@ namespace HdrHistogram
         {
             _counts = new long[CountsArrayLength];
         }
+        public LongHistogram(long instanceId, long lowestTrackableValue, long highestTrackableValue,
+                         int numberOfSignificantValueDigits)
+            : base(instanceId, lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
+        {
+            _counts = new long[CountsArrayLength];
+        }
 
 
         /// <summary>
