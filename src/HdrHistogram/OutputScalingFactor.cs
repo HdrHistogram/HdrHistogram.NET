@@ -6,7 +6,7 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-using System;
+using System.Diagnostics;
 
 namespace HdrHistogram
 {
@@ -16,23 +16,40 @@ namespace HdrHistogram
     public static class OutputScalingFactor
     {
         /// <summary>
-        /// For use when values are recorded in ticks and output should be in ticks
+        /// For use when values are recorded and reported in the same unit of measurement.
         /// </summary>
         public const double None = 1.0;
+        
+        /// <summary>
+        /// For use when values are recorded with <seealso cref="Stopwatch.GetTimestamp()"/> and output should be reported in microseconds.
+        /// </summary>
+        public static readonly double TimeStampToMicroseconds = Stopwatch.Frequency / (1000d * 1000d);
 
         /// <summary>
-        /// For use when values are recorded in ticks and output should be measured in microseconds.
+        /// For use when values are recorded with <seealso cref="Stopwatch.GetTimestamp()"/> and output should be reported in milliseconds.
         /// </summary>
-        public const double TicksToMicroseconds = 10.0;
+        public static readonly double TimeStampToMilliseconds = Stopwatch.Frequency / 1000d;
 
         /// <summary>
-        /// For use when values are recorded in ticks and output should be measured in milliseconds.
+        /// For use when values are recorded with <seealso cref="Stopwatch.GetTimestamp()"/> and output should be reported in seconds.
         /// </summary>
-        public const double TicksToMilliseconds = TimeSpan.TicksPerMillisecond;
+        public static readonly double TimeStampToSeconds = Stopwatch.Frequency;
+    }
 
-        /// <summary>
-        /// For use when values are recorded in ticks and output should be measured in seconds.
-        /// </summary>
-        public const double TicksToSeconds = TimeSpan.TicksPerSecond;
+    public static class TimeStamp
+    {
+        public static long Seconds(int seconds)
+        {
+            return Stopwatch.Frequency*seconds;
+        }
+
+        public static long Minutes(int minutes)
+        {
+            return Stopwatch.Frequency * minutes * 60L;
+        }
+        public static long Hours(int hours)
+        {
+            return Stopwatch.Frequency * hours * 60L * 60L;
+        }
     }
 }

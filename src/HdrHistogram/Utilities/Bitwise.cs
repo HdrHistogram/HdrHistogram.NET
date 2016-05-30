@@ -31,7 +31,8 @@ namespace HdrHistogram.Utilities
         }
         public static int NumberOfLeadingZeros(long value)
         {
-            //Optimisation for 32 bit values. So for any value under 00:03:34.7 when measuring in ticks, we will hit a fast path.
+            //Optimisation for 32 bit values. So values under 00:16:41.0 when measuring with Stopwatch.GetTimestamp()*, we will hit a fast path.
+            //  * as at writing on Win10 .NET 4.6
             if (value < int.MaxValue)
                 return 63 - Log2((int)value);
             return NumberOfLeadingZerosLong(value);

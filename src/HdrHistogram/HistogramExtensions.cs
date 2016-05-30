@@ -111,7 +111,7 @@ namespace HdrHistogram
         public static void OutputPercentileDistribution(this HistogramBase histogram,
             TextWriter writer,
             int percentileTicksPerHalfDistance = 5,
-            double outputValueUnitScalingRatio = OutputScalingFactor.TicksToMilliseconds,
+            double outputValueUnitScalingRatio = OutputScalingFactor.None,
             bool useCsvFormat = false)
         {
             var formatter = useCsvFormat
@@ -144,7 +144,8 @@ namespace HdrHistogram
 
         /// <summary>
         /// Executes the action and records the time to complete the action. 
-        /// The time is recorded in ticks. 
+        /// The time is recorded in system clock ticks. 
+        /// This time may vary between frameworks and platforms, but is equivalent to <c>(1/Stopwatch.Frequency)</c> seconds.
         /// Note this is a convenience method and can carry a cost.
         /// If the <paramref name="action"/> delegate is not cached, then it may incur an allocation cost for each invocation of <see cref="Record"/>
         /// </summary>
@@ -152,9 +153,13 @@ namespace HdrHistogram
         /// <param name="action">The functionality to execute and measure</param>
         /// <remarks>
         /// <para>
-        /// Ticks are used as the unit of recording here as they are the smallest unit that .NET can measure
-        /// and require no conversion at time of recording. Instead conversion (scaling) can be done at time
-        /// of output to microseconds, milliseconds, seconds or other appropriate unit.
+        /// The units returned from <code>Stopwatch.GetTimestamp()</code> are used as the unit of 
+        /// recording here as they are the smallest unit that .NET can measure and require no 
+        /// conversion at time of recording. 
+        /// Instead conversion (scaling) can be done at time of output to microseconds, milliseconds,
+        /// seconds or other appropriate unit.
+        /// These units are sometimes refered to as ticks, but should not not to be confused with 
+        /// ticks used in <seealso cref="DateTime"/> or <seealso cref="TimeSpan"/>.
         /// </para>
         /// <para>
         /// If you are able to cache the <paramref name="action"/> delegate, then doing so is encouraged.
@@ -187,9 +192,8 @@ namespace HdrHistogram
         {
             var start = Stopwatch.GetTimestamp();
             action();
-            var elapsedTicks = (Stopwatch.GetTimestamp() - start);
-            histogram.RecordValue(elapsedTicks);
+            var elapsed = Stopwatch.GetTimestamp() - start;
+            histogram.RecordValue(elapsed);
         }
     }
-
 }

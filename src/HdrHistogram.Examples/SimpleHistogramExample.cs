@@ -20,7 +20,7 @@ namespace HdrHistogram.Examples
     /// </summary>
     static class SimpleHistogramExample
     {
-        private static readonly LongHistogram Histogram = new LongHistogram(TimeSpan.TicksPerHour, 3);
+        private static readonly LongHistogram Histogram = new LongHistogram(TimeStamp.Hours(1), 3);
         private static volatile Socket _socket;
         private static readonly Lazy<AddressFamily> AddressFamily = new Lazy<AddressFamily>(() => GetAddressFamily("google.com"));
 
@@ -57,20 +57,20 @@ namespace HdrHistogram.Examples
             var size = Histogram.GetEstimatedFootprintInBytes();
             Console.WriteLine("Histogram size = {0} bytes ({1:F2} MB)", size, size / 1024.0 / 1024.0);
 
-            Console.WriteLine("Recorded latencies [in ticks] for Create+Close of a DatagramSocket:");
+            Console.WriteLine("Recorded latencies [in system clock ticks] for Create+Close of a DatagramSocket:");
             Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.None);
             Console.WriteLine();
 
             Console.WriteLine("Recorded latencies [in usec] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TicksToMicroseconds);
+            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMicroseconds);
             Console.WriteLine();
 
             Console.WriteLine("Recorded latencies [in msec] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TicksToMilliseconds);
+            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds);
             Console.WriteLine();
 
             Console.WriteLine("Recorded latencies [in sec] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TicksToSeconds);
+            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToSeconds);
         }
 
         private static void CreateAndCloseDatagramSocket()

@@ -5,7 +5,7 @@ namespace HdrHistogram.UnitTests
 {
     public abstract class HistogramTestBase
     {
-        private const long HighestTrackableValue = TimeSpan.TicksPerHour; // e.g. for 1 hr in ticks
+        private const long HighestTrackableValue = 7716549600;//TimeStamp.Hours(1); // e.g. for 1 hr in system clock ticks (StopWatch.Frequency)
         private const int NumberOfSignificantValueDigits = 3;
         private const long TestValueLevel = 4;
 
