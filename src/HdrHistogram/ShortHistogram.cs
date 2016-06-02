@@ -68,6 +68,12 @@ namespace HdrHistogram
         {
             _counts = new short[CountsArrayLength];
         }
+        public ShortHistogram(long instanceId, long lowestTrackableValue, long highestTrackableValue,
+                         int numberOfSignificantValueDigits)
+            : base(instanceId, lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
+        {
+            _counts = new short[CountsArrayLength];
+        }
 
         /// <summary>
         /// Gets the total number of recorded values.
