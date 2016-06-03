@@ -66,6 +66,13 @@ namespace HdrHistogram
         {
             _counts = new int[CountsArrayLength];
         }
+        public IntHistogram(long instanceId, long lowestTrackableValue, long highestTrackableValue,
+                         int numberOfSignificantValueDigits)
+            : base(instanceId, lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
+        {
+            _counts = new int[CountsArrayLength];
+        }
+
 
 
         /// <summary>
