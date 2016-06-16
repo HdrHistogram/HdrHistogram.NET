@@ -13,6 +13,7 @@ namespace HdrHistogram
         private const string HistogramLogFormatVersion = "1.2";
 
         private readonly TextWriter _log;
+        private bool _hasHeaderWritten = false;
 
         /// <summary>
         /// Writes the provided histograms to the underlying <see cref="Stream"/> with a given overall start time.
@@ -27,12 +28,7 @@ namespace HdrHistogram
                 writer.Write(startTime, histograms);
             }
         }
-
-        public void Append(HistogramBase histogram)
-        {
-            WriteHistogram(histogram);
-        }
-
+        
         /// <summary>
         /// Creates a <see cref="HistogramLogWriter"/> that writes to an underlying <see cref="Stream"/>.
         /// </summary>
@@ -58,7 +54,24 @@ namespace HdrHistogram
             WriteLogFormatVersion();
             WriteStartTime(startTime);
             WriteLegend();
+            _hasHeaderWritten = true;
             foreach (var histogram in histograms)
+            {
+                WriteHistogram(histogram);
+            }
+        }
+
+        /// <summary>
+        /// Appends a Histogram to the log. 
+        /// </summary>
+        /// <param name="histogram">The histogram to write to the log.</param>
+        public void Append(HistogramBase histogram)
+        {
+            if (!_hasHeaderWritten)
+            {
+                Write(histogram.StartTimeStamp.ToDateFromMillisecondsSinceEpoch(), histogram);
+            }
+            else
             {
                 WriteHistogram(histogram);
             }

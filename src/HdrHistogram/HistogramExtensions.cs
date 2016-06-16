@@ -169,7 +169,7 @@ namespace HdrHistogram
         /// conversion at time of recording. 
         /// Instead conversion (scaling) can be done at time of output to microseconds, milliseconds,
         /// seconds or other appropriate unit.
-        /// These units are sometimes refered to as ticks, but should not not to be confused with 
+        /// These units are sometimes referred to as ticks, but should not not to be confused with 
         /// ticks used in <seealso cref="DateTime"/> or <seealso cref="TimeSpan"/>.
         /// </para>
         /// <para>

@@ -49,7 +49,7 @@ namespace HdrHistogram.Examples
         }
 
         /// <summary>
-        /// Write to the console the Memory footprint of the histogram instance and
+        /// Write to the console the memory footprint of the histogram instance and
         /// the percentile distribution of all the recorded values.
         /// </summary>
         private static void OutputMeasurements()
