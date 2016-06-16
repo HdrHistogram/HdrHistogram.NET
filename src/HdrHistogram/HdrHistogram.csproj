@@ -83,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.g.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="ShortHistogram.cs" />
+    <Compile Include="TimeStamp.cs" />
     <Compile Include="Utilities\ArrayExtensions.cs" />
     <Compile Include="Utilities\Bitwise.cs" />
     <Compile Include="LongHistogram.cs" />

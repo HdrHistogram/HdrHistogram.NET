@@ -35,21 +35,4 @@ namespace HdrHistogram
         /// </summary>
         public static readonly double TimeStampToSeconds = Stopwatch.Frequency;
     }
-
-    public static class TimeStamp
-    {
-        public static long Seconds(int seconds)
-        {
-            return Stopwatch.Frequency*seconds;
-        }
-
-        public static long Minutes(int minutes)
-        {
-            return Stopwatch.Frequency * minutes * 60L;
-        }
-        public static long Hours(int hours)
-        {
-            return Stopwatch.Frequency * hours * 60L * 60L;
-        }
-    }
 }
