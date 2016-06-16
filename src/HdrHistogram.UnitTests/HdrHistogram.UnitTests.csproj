@@ -64,7 +64,10 @@
     <Compile Include="Persistence\ShortHistogramLogReaderWriterTests.cs" />
     <Compile Include="Persistence\TestCaseGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Recording\RecorderTests.cs" />
+    <Compile Include="Recording\RecorderTestsBase.cs" />
+    <Compile Include="Recording\RecorderTestWithIntHistogram.cs" />
+    <Compile Include="Recording\RecorderTestWithLongHistogram.cs" />
+    <Compile Include="Recording\RecorderTestWithLShortHistogram.cs" />
     <Compile Include="ShortHistogramTests.cs" />
   </ItemGroup>
   <ItemGroup>
