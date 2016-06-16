@@ -2,7 +2,7 @@
 using HdrHistogram.Utilities;
 using NUnit.Framework;
 
-namespace HdrHistogram.UnitTests
+namespace HdrHistogram.UnitTests.Recording
 {
     [TestFixture]
     public class RecorderTests
