@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 
@@ -10,6 +12,14 @@ namespace HdrHistogram.UnitTests
         private const long HighestTrackableValue = 7716549600;//TimeStamp.Hours(1); // e.g. for 1 hr in system clock ticks (StopWatch.Frequency)
         private const int NumberOfSignificantValueDigits = 3;
         private const long TestValueLevel = 4;
+
+        private static readonly IDictionary<int, Func<long, long, int, HistogramBase>> WordSizeToFactory =
+            new Dictionary<int, Func<long, long, int, HistogramBase>>()
+            {
+                { 2, (low, high, sf) => new ShortHistogram(low, high, sf) },
+                { 4, (low,high,sf) => new IntHistogram(low, high, sf) },
+                { 8, (low,high,sf) => new LongHistogram(low, high, sf) }
+            };
 
         [TestCase(0, 1, NumberOfSignificantValueDigits, "lowestTrackableValue", "lowestTrackableValue must be >= 1")]
         [TestCase(1, 1, NumberOfSignificantValueDigits, "highestTrackableValue", "highestTrackableValue must be >= 2 * lowestTrackableValue")]
@@ -90,6 +100,37 @@ namespace HdrHistogram.UnitTests
         {
             var longHistogram = Create(HighestTrackableValue, NumberOfSignificantValueDigits);
             Assert.Throws<IndexOutOfRangeException>(() => longHistogram.RecordValue(HighestTrackableValue * 3));
+        }
+
+        [TestCase(5)]
+        [TestCase(100)]
+        public void RecordValueWithCount_increments_TotalCount(long multiplier)
+        {
+            var histogram = Create(HighestTrackableValue, NumberOfSignificantValueDigits);
+            for (int i = 1; i < 5; i++)
+            {
+                histogram.RecordValueWithCount(i, multiplier);
+                Assert.AreEqual(i * multiplier, histogram.TotalCount);
+            }
+        }
+
+        [TestCase(5)]
+        [TestCase(100)]
+        public void RecordValueWithCount_increments_CountAtValue(long multiplier)
+        {
+            var histogram = Create(HighestTrackableValue, NumberOfSignificantValueDigits);
+            for (int i = 1; i < 5; i++)
+            {
+                histogram.RecordValueWithCount(TestValueLevel, multiplier);
+                Assert.AreEqual(i * multiplier, histogram.GetCountAtValue(TestValueLevel));
+            }
+        }
+
+        [Test]
+        public void RecordValueWithCount_Overflow_ShouldThrowException()
+        {
+            var histogram = Create(HighestTrackableValue, NumberOfSignificantValueDigits);
+            Assert.Throws<IndexOutOfRangeException>(() => histogram.RecordValueWithCount(HighestTrackableValue * 3, 10));
         }
 
 
@@ -269,6 +310,34 @@ namespace HdrHistogram.UnitTests
             Assert.True(histogram.HasOverflowed());
         }
 
+        [Test]
+        public void Can_add_Histograms_with_larger_wordSize_when_values_are_in_range()
+        {
+            var largerHistogramFactory = WordSizeToFactory.Where(kvp => kvp.Key >= WordSize).Select(kvp => kvp.Value);
+            foreach (var sourceFactory in largerHistogramFactory)
+            {
+                CreateAndAdd(sourceFactory(1, HighestTrackableValue, NumberOfSignificantValueDigits));
+            }
+        }
+
+        [Test]
+        public void Copy_retains_all_public_properties()
+        {
+            var source = Create(1, HighestTrackableValue, NumberOfSignificantValueDigits);
+            var copy = source.Copy();
+            HistogramAssert.AreValueEqual(source, copy);
+        }
+
+        private void CreateAndAdd(HistogramBase source)
+        {
+            source.RecordValueWithCount(1, 100);
+            source.RecordValueWithCount(int.MaxValue - 1, 1000);
+
+            var target = Create(source.LowestTrackableValue, source.HighestTrackableValue, source.NumberOfSignificantValueDigits);
+            target.Add(source);
+
+            HistogramAssert.AreValueEqual(source, target);
+        }
 
         private static int GetBucketsNeededToCoverValue(int subBucketSize, long value)
         {

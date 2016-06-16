@@ -13,15 +13,15 @@ namespace HdrHistogram.UnitTests
 
         public static void AreValueEqual(HistogramBase expected, HistogramBase actual)
         {
-            Assert.AreEqual(expected.TotalCount, actual.TotalCount);
-            Assert.AreEqual(expected.StartTimeStamp, actual.StartTimeStamp);
-            Assert.AreEqual(expected.EndTimeStamp, actual.EndTimeStamp);
-            Assert.AreEqual(expected.LowestTrackableValue, actual.LowestTrackableValue);
-            Assert.AreEqual(expected.HighestTrackableValue, actual.HighestTrackableValue);
-            Assert.AreEqual(expected.NumberOfSignificantValueDigits, actual.NumberOfSignificantValueDigits);
+            Assert.AreEqual(expected.TotalCount, actual.TotalCount, "TotalCount property is not equal.");
+            Assert.AreEqual(expected.StartTimeStamp, actual.StartTimeStamp, "StartTimeStamp property is not equal.");
+            Assert.AreEqual(expected.EndTimeStamp, actual.EndTimeStamp, "EndTimeStamp property is not equal.");
+            Assert.AreEqual(expected.LowestTrackableValue, actual.LowestTrackableValue, "LowestTrackableValue property is not equal.");
+            Assert.AreEqual(expected.HighestTrackableValue, actual.HighestTrackableValue, "HighestTrackableValue property is not equal.");
+            Assert.AreEqual(expected.NumberOfSignificantValueDigits, actual.NumberOfSignificantValueDigits, "NumberOfSignificantValueDigits property is not equal.");
             var expectedValues = expected.AllValues().ToArray();
             var actualValues = actual.AllValues().ToArray();
-            CollectionAssert.AreEqual(expectedValues, actualValues, HistogramIterationValueComparer.Instance);
+            CollectionAssert.AreEqual(expectedValues, actualValues, HistogramIterationValueComparer.Instance, "Recorded values differ");
         }
     }
 }

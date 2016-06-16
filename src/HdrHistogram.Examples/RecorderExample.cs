@@ -14,10 +14,10 @@ namespace HdrHistogram.Examples
     /// </summary>
     static class RecorderExample
     {
-        private static readonly Recorder Recorder = new Recorder(1, TimeSpan.TicksPerHour, 3, (id, low, high, sf) => new LongHistogram(id, low, high, sf));
+        private static readonly Recorder Recorder = new Recorder(1, TimeStamp.Hours(1), 3, (id, low, high, sf) => new LongHistogram(id, low, high, sf));
         private static readonly Lazy<AddressFamily> AddressFamily = new Lazy<AddressFamily>(() => GetAddressFamily("google.com"));
         private static readonly TimeSpan RunPeriod = TimeSpan.FromSeconds(10);
-        private static readonly LongHistogram AccumulatingHistogram = new LongHistogram(TimeSpan.TicksPerHour, 3);
+        private static readonly LongHistogram AccumulatingHistogram = new LongHistogram(TimeStamp.Hours(1), 3);
         private const string LogPath = "DatagramSocket.histogram.log";        
         private static HistogramLogWriter _logWriter;
         private static FileStream _outputStream;

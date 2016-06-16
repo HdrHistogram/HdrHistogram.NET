@@ -78,6 +78,32 @@ namespace HdrHistogram.UnitTests.Persistence
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
+        [Test]
+        public void CanAppendHistogram()
+        {
+            var histogram1 = Create(highestTrackableValue: long.MaxValue - 1, numberOfSignificantValueDigits: 3);
+            histogram1.RecordValue(1);
+            histogram1.RecordValue((long.MaxValue / 2) + 1);
+            histogram1.SetTimes();
+            var histogram2 = Create(highestTrackableValue: long.MaxValue - 1, numberOfSignificantValueDigits: 3);
+            histogram2.RecordValue(2);
+            histogram2.SetTimes();
+
+            byte[] data;
+            using (var writerStream = new MemoryStream())
+            using(var log = new HistogramLogWriter(writerStream))
+            {
+                log.Append(histogram1);
+                log.Append(histogram2);
+                data = writerStream.ToArray();
+            }
+            var actualHistograms = data.ReadHistograms();
+
+            Assert.AreEqual(2, actualHistograms.Length);
+            HistogramAssert.AreValueEqual(histogram1, actualHistograms.First());
+            HistogramAssert.AreValueEqual(histogram2, actualHistograms.Skip(1).First());
+        }
+        
         [TestCase("jHiccup-2.0.7S.logV2.hlog")]
         public void CanReadv2Logs(string logPath)
         {
