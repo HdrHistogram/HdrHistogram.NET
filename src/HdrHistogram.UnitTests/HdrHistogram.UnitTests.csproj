@@ -70,8 +70,9 @@
     <Compile Include="Persistence\TestCaseGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recording\RecorderTestsBase.cs" />
-    <Compile Include="Recording\RecorderTestWithConcurrentHistogram.cs" />
+    <Compile Include="Recording\RecorderTestWithIntConcurrentHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithIntHistogram.cs" />
+    <Compile Include="Recording\RecorderTestWithLongConcurrentHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLongHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLShortHistogram.cs" />
     <Compile Include="ShortHistogramTests.cs" />
