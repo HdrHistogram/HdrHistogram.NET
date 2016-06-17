@@ -50,10 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConcurrentHistogramTestBase.cs" />
+    <Compile Include="HistogramEncodingTestBase.cs" />
     <Compile Include="IntConcurrentHistogramTests.cs" />
+    <Compile Include="IntHistogramEncodingTests.cs" />
     <Compile Include="LongConcurrentHistogramTests.cs" />
     <Compile Include="HistogramAssert.cs" />
-    <Compile Include="HistogramEncodingTest.cs" />
+    <Compile Include="LongHistogramEncodingTests.cs" />
     <Compile Include="HistogramIterationValueComparer.cs" />
     <Compile Include="Persistence\LongConcurrentHistogramLogReaderWriterTests.cs" />
     <Compile Include="Persistence\HistogramLogExtensions.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Recording\RecorderTestWithLongConcurrentHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLongHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLShortHistogram.cs" />
+    <Compile Include="ShortHistogramEncodingTests.cs" />
     <Compile Include="ShortHistogramTests.cs" />
     <Compile Include="TimeStampTests.cs" />
   </ItemGroup>

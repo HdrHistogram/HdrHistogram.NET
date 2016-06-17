@@ -27,7 +27,6 @@ namespace HdrHistogram.UnitTests
             histogram.OutputPercentileDistribution(writer, percentileTicksPerHalfDistance, scaling);
             var actual = writer.ToString();
 
-            
             Assert.AreEqual(expected, actual);
         }
 
@@ -68,7 +67,7 @@ namespace HdrHistogram.UnitTests
             }
         }
 
-        private static void LoadHistogram(HistogramBase histogram)
+        private static void LoadHistogram(IRecorder histogram)
         {
             for (int i = 0; i < 10000; i += 1000)
             {

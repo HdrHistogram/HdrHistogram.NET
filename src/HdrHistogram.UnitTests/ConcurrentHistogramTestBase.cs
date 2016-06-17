@@ -10,7 +10,7 @@ namespace HdrHistogram.UnitTests
         [Test]
         public void Can_support_multiple_concurrent_recorders()
         {
-            var target = Create(1, long.MaxValue - 1, 3);
+            var target = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             const int loopcount = 10 * 1000 * 1000;
             var concurrency = Environment.ProcessorCount;
             var expected = loopcount * concurrency;
