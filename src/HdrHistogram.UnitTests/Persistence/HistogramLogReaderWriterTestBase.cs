@@ -9,14 +9,18 @@ namespace HdrHistogram.UnitTests.Persistence
 {
     public abstract class HistogramLogReaderWriterTestBase
     {
+        private const long DefaultHighestTrackableValue = long.MaxValue - 1;
+        private const int DefaultSignificantDigits = 3;
+        //Used as the HighestTrackableValue when reading out test files that were generated from the original Java implementation.
+        private const long OneHourOfNanoseconds = 3600L * 1000 * 1000 * 1000;
+
         [Test]
         public void CanReadEmptyLog()
         {
             byte[] data;
             var startTimeWritten = DateTime.Now;
             var expectedStartTime = startTimeWritten.SecondsSinceUnixEpoch()
-                .Round(3)
-                .ToDateFromSecondsSinceEpoch();
+                .Round(3);
 
             using (var writerStream = new MemoryStream())
             {
@@ -28,13 +32,13 @@ namespace HdrHistogram.UnitTests.Persistence
             {
                 var reader = new HistogramLogReader(readerStream);
                 CollectionAssert.IsEmpty(reader.ReadHistograms().ToList());
-                var actualStartTime = reader.GetStartTime();
+                var actualStartTime = reader.GetStartTime().SecondsSinceUnixEpoch().Round(3);
                 Assert.AreEqual(expectedStartTime, actualStartTime);
             }
         }
 
-        [TestCase(3600L * 1000 * 1000, 3, 1000)]
-        [TestCase(long.MaxValue / 2, 3, 1000)]
+        [TestCase(3600L * 1000 * 1000, DefaultSignificantDigits, 1000)]
+        [TestCase(long.MaxValue / 2, DefaultSignificantDigits, 1000)]
         public void CanRoundTripSingleHistogram(long highestTrackableValue, int significantDigits, int multiplier)
         {
             var histogram = CreatePopulatedHistogram(highestTrackableValue, significantDigits, multiplier);
@@ -50,9 +54,7 @@ namespace HdrHistogram.UnitTests.Persistence
         protected void RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
         {
             var value = 1;
-            var highestTrackableValue = long.MaxValue - 1L;
-            var significantDigits = 3;
-            var histogram = Create(highestTrackableValue, significantDigits);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram.RecordValueWithCount(value, count);
 
             histogram.SetTimes();
@@ -66,7 +68,7 @@ namespace HdrHistogram.UnitTests.Persistence
         [Test]
         public void CanRoundTripSingleHistogramsWithSparseValues()
         {
-            var histogram = Create(highestTrackableValue: long.MaxValue - 1, numberOfSignificantValueDigits: 3);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram.RecordValue(1);
             histogram.RecordValue((long.MaxValue / 2) + 1);
 
@@ -81,11 +83,11 @@ namespace HdrHistogram.UnitTests.Persistence
         [Test]
         public void CanAppendHistogram()
         {
-            var histogram1 = Create(highestTrackableValue: long.MaxValue - 1, numberOfSignificantValueDigits: 3);
+            var histogram1 = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram1.RecordValue(1);
             histogram1.RecordValue((long.MaxValue / 2) + 1);
             histogram1.SetTimes();
-            var histogram2 = Create(highestTrackableValue: long.MaxValue - 1, numberOfSignificantValueDigits: 3);
+            var histogram2 = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram2.RecordValue(2);
             histogram2.SetTimes();
 
@@ -111,7 +113,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var reader = new HistogramLogReader(readerStream);
             int histogramCount = 0;
             long totalCount = 0;
-            var accumulatedHistogram = Create(85899345920838, 3);
+            var accumulatedHistogram = Create(85899345920838, DefaultSignificantDigits);
             foreach (var histogram in reader.ReadHistograms())
             {
                 histogramCount++;
@@ -141,7 +143,7 @@ namespace HdrHistogram.UnitTests.Persistence
 
             int histogramCount = 0;
             long totalCount = 0;
-            var accumulatedHistogram = Create(3600L * 1000 * 1000 * 1000, 3);
+            var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
             var histograms = ((IHistogramLogV1Reader)reader).ReadHistograms()
                 .Skip(skip)
                 .Take(take);
@@ -174,7 +176,7 @@ namespace HdrHistogram.UnitTests.Persistence
             int histogramCount = 0;
             long totalCount = 0;
 
-            HistogramBase accumulatedHistogram = Create(3600L * 1000 * 1000 * 1000, 3);
+            HistogramBase accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
             var histograms = reader.ReadHistograms()
                 .Skip(skip)
                 .Take(take);
@@ -204,7 +206,7 @@ namespace HdrHistogram.UnitTests.Persistence
             int histogramCount = 0;
             long totalCount = 0;
 
-            HistogramBase accumulatedHistogram = Create(3600L * 1000 * 1000 * 1000, 3);
+            HistogramBase accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
             var histograms = reader.ReadHistograms()
                 .Where(h => h.StartTimeStamp >= reader.GetStartTime().MillisecondsSinceUnixEpoch())
                 .Skip(skip)

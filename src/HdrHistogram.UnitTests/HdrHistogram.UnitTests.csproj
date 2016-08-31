@@ -49,11 +49,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentHistogramTestBase.cs" />
+    <Compile Include="HistogramEncodingTestBase.cs" />
+    <Compile Include="IntConcurrentHistogramTests.cs" />
+    <Compile Include="IntHistogramEncodingTests.cs" />
+    <Compile Include="LongConcurrentHistogramTests.cs" />
     <Compile Include="HistogramAssert.cs" />
-    <Compile Include="HistogramEncodingTest.cs" />
+    <Compile Include="LongHistogramEncodingTests.cs" />
     <Compile Include="HistogramIterationValueComparer.cs" />
+    <Compile Include="Persistence\LongConcurrentHistogramLogReaderWriterTests.cs" />
     <Compile Include="Persistence\HistogramLogExtensions.cs" />
     <Compile Include="Persistence\HistogramLogReaderWriterTestBase.cs" />
+    <Compile Include="Persistence\IntConcurrentHistogramLogReaderWriterTests.cs" />
     <Compile Include="Persistence\IntHistogramLogReaderWriterTests.cs" />
     <Compile Include="HistogramTestBase.cs" />
     <Compile Include="IntHistogramTests.cs" />
@@ -65,9 +72,12 @@
     <Compile Include="Persistence\TestCaseGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recording\RecorderTestsBase.cs" />
+    <Compile Include="Recording\RecorderTestWithIntConcurrentHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithIntHistogram.cs" />
+    <Compile Include="Recording\RecorderTestWithLongConcurrentHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLongHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLShortHistogram.cs" />
+    <Compile Include="ShortHistogramEncodingTests.cs" />
     <Compile Include="ShortHistogramTests.cs" />
     <Compile Include="TimeStampTests.cs" />
   </ItemGroup>

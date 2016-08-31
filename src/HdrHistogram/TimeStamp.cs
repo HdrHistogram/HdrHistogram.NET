@@ -12,9 +12,9 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="seconds">A number seconds to represent.</param>
         /// <returns>The number of system timer ticks that represent the <paramref name="seconds"/>.</returns>
-        public static long Seconds(int seconds)
+        public static long Seconds(long seconds)
         {
-            return Stopwatch.Frequency*seconds;
+            return Stopwatch.Frequency * seconds;
         }
 
         /// <summary>
@@ -22,9 +22,9 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="minutes">A number minutes to represent.</param>
         /// <returns>The number of system timer ticks that represent the <paramref name="minutes"/>.</returns>
-        public static long Minutes(int minutes)
+        public static long Minutes(long minutes)
         {
-            return Stopwatch.Frequency * minutes * 60L;
+            return minutes * Seconds(60);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace HdrHistogram
         /// <returns>The number of system timer ticks that represent the <paramref name="hours"/>.</returns>
         public static long Hours(int hours)
         {
-            return Stopwatch.Frequency * hours * 60L * 60L;
+            return hours * Minutes(60);
         }
     }
 }
