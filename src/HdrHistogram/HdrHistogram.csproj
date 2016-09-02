@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Histogram.cs" />
+    <Compile Include="HistogramFactoryDelegate.cs" />
     <Compile Include="IntConcurrentHistogram.cs" />
     <Compile Include="LongConcurrentHistogram.cs" />
     <Compile Include="HistogramEncoding.cs" />

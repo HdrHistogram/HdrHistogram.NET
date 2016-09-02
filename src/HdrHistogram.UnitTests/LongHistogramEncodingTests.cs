@@ -7,7 +7,11 @@ namespace HdrHistogram.UnitTests
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantDigits)
         {
-            return new LongHistogram(highestTrackableValue, numberOfSignificantDigits);
+            //return new LongHistogram(highestTrackableValue, numberOfSignificantDigits);
+            return HistogramFactory.With64BitBucketSize()
+                .WithValuesUpTo(highestTrackableValue)
+                .WithPrecisionOf(numberOfSignificantDigits)
+                .Create();
         }
     }
 }

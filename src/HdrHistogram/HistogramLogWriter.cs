@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using HdrHistogram.Utilities;
 
 namespace HdrHistogram
@@ -14,6 +15,7 @@ namespace HdrHistogram
 
         private readonly TextWriter _log;
         private bool _hasHeaderWritten = false;
+        private int _isDisposed = 0;
 
         /// <summary>
         /// Writes the provided histograms to the underlying <see cref="Stream"/> with a given overall start time.
@@ -127,7 +129,10 @@ namespace HdrHistogram
         /// </summary>
         public void Dispose()
         {
-            using (_log) { }
+            if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) == 0)
+            {
+                using (_log) { }
+            }
         }
     }
 }

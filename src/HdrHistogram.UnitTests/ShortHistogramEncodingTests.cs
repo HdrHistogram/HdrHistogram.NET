@@ -7,7 +7,11 @@ namespace HdrHistogram.UnitTests
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantDigits)
         {
-            return new ShortHistogram(highestTrackableValue, numberOfSignificantDigits);
+            //return new ShortHistogram(highestTrackableValue, numberOfSignificantDigits);
+            return HistogramFactory.With16BitBucketSize()
+                .WithValuesUpTo(highestTrackableValue)
+                .WithPrecisionOf(numberOfSignificantDigits)
+                .Create();
         }
 
         protected override void LoadFullRange(IRecorder source)
@@ -19,4 +23,4 @@ namespace HdrHistogram.UnitTests
             source.RecordValue(DefaultHighestTrackableValue);
         }
     }
-}
+}   
