@@ -22,6 +22,10 @@ namespace HdrHistogram.UnitTests
                 { 8, (low,high,sf) => new LongHistogram(low, high, sf) }
             };
 
+        protected abstract int WordSize { get; }
+        protected abstract HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits);
+        protected abstract HistogramBase Create(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits);
+
         [TestCase(0, 1, DefaultSignificantFigures, "lowestTrackableValue", "lowestTrackableValue must be >= 1")]
         [TestCase(DefautltLowestDiscernibleValue, 1, DefaultSignificantFigures, "highestTrackableValue", "highestTrackableValue must be >= 2 * lowestTrackableValue")]
         [TestCase(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, 6, "numberOfSignificantValueDigits", "numberOfSignificantValueDigits must be between 0 and 5")]
@@ -40,26 +44,26 @@ namespace HdrHistogram.UnitTests
         [TestCase(DefaultHighestTrackableValue, DefaultSignificantFigures)]
         public void TestConstructionArgumentGets(long highestTrackableValue, int numberOfSignificantValueDigits)
         {
-            var longHistogram = Create(highestTrackableValue, numberOfSignificantValueDigits);
-            Assert.AreEqual(1, longHistogram.LowestTrackableValue);
-            Assert.AreEqual(highestTrackableValue, longHistogram.HighestTrackableValue);
-            Assert.AreEqual(numberOfSignificantValueDigits, longHistogram.NumberOfSignificantValueDigits);
+            var histogram = Create(highestTrackableValue, numberOfSignificantValueDigits);
+            Assert.AreEqual(1, histogram.LowestTrackableValue);
+            Assert.AreEqual(highestTrackableValue, histogram.HighestTrackableValue);
+            Assert.AreEqual(numberOfSignificantValueDigits, histogram.NumberOfSignificantValueDigits);
         }
 
         [TestCase(1, 2, 2)]
         [TestCase(10, DefaultHighestTrackableValue, DefaultSignificantFigures)]
         public void TestConstructionArgumentGets(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
         {
-            var longHistogram = Create(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits);
-            Assert.AreEqual(lowestTrackableValue, longHistogram.LowestTrackableValue);
-            Assert.AreEqual(highestTrackableValue, longHistogram.HighestTrackableValue);
-            Assert.AreEqual(numberOfSignificantValueDigits, longHistogram.NumberOfSignificantValueDigits);
+            var histogram = Create(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits);
+            Assert.AreEqual(lowestTrackableValue, histogram.LowestTrackableValue);
+            Assert.AreEqual(highestTrackableValue, histogram.HighestTrackableValue);
+            Assert.AreEqual(numberOfSignificantValueDigits, histogram.NumberOfSignificantValueDigits);
         }
 
         [Test]
         public void TestGetEstimatedFootprintInBytes2()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
             var largestValueWithSingleUnitResolution = 2 * (long)Math.Pow(10, DefaultSignificantFigures);
             var subBucketCountMagnitude = (int)Math.Ceiling(Math.Log(largestValueWithSingleUnitResolution) / Math.Log(2));
             var subBucketSize = (int)Math.Pow(2, (subBucketCountMagnitude));
@@ -70,37 +74,37 @@ namespace HdrHistogram.UnitTests
             var length = (bucketCount + 1) * (subBucketSize / 2);
             var expectedSize = header + (width * length);
 
-            Assert.AreEqual(expectedSize, longHistogram.GetEstimatedFootprintInBytes());
+            Assert.AreEqual(expectedSize, histogram.GetEstimatedFootprintInBytes());
         }
 
 
         [Test]
         public void RecordValue_increments_TotalCount()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
             for (int i = 1; i < 5; i++)
             {
-                longHistogram.RecordValue(i);
-                Assert.AreEqual(i, longHistogram.TotalCount);
+                histogram.RecordValue(i);
+                Assert.AreEqual(i, histogram.TotalCount);
             }
         }
 
         [Test]
         public void RecordValue_increments_CountAtValue()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
             for (int i = 1; i < 5; i++)
             {
-                longHistogram.RecordValue(TestValueLevel);
-                Assert.AreEqual(i, longHistogram.GetCountAtValue(TestValueLevel));
+                histogram.RecordValue(TestValueLevel);
+                Assert.AreEqual(i, histogram.GetCountAtValue(TestValueLevel));
             }
         }
 
         [Test]
         public void RecordValue_Overflow_ShouldThrowException()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            Assert.Throws<IndexOutOfRangeException>(() => longHistogram.RecordValue(DefaultHighestTrackableValue * 3));
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Assert.Throws<IndexOutOfRangeException>(() => histogram.RecordValue(DefaultHighestTrackableValue * 3));
         }
 
         [TestCase(5)]
@@ -161,22 +165,22 @@ namespace HdrHistogram.UnitTests
         [Test]
         public void RecordAction_increments_TotalCount()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
 
-            longHistogram.Record(() => { });
-            Assert.AreEqual(1, longHistogram.TotalCount);
+            histogram.Record(() => { });
+            Assert.AreEqual(1, histogram.TotalCount);
         }
 
         [Test]
         public void RecordAction_records_in_correct_units()
         {
             var pause = TimeSpan.FromSeconds(1);
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
 
-            longHistogram.Record(() => Thread.Sleep(pause));
+            histogram.Record(() => Thread.Sleep(pause));
 
             var stringWriter = new StringWriter();
-            longHistogram.OutputPercentileDistribution(stringWriter, 
+            histogram.OutputPercentileDistribution(stringWriter, 
                 percentileTicksPerHalfDistance: 5, 
                 outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds, 
                 useCsvFormat: true);
@@ -192,47 +196,47 @@ namespace HdrHistogram.UnitTests
         [Test]
         public void Reset_sets_counts_to_zero()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            longHistogram.RecordValue(TestValueLevel);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(TestValueLevel);
 
-            longHistogram.Reset();
+            histogram.Reset();
 
-            Assert.AreEqual(0L, longHistogram.GetCountAtValue(TestValueLevel));
-            Assert.AreEqual(0L, longHistogram.TotalCount);
+            Assert.AreEqual(0L, histogram.GetCountAtValue(TestValueLevel));
+            Assert.AreEqual(0L, histogram.TotalCount);
         }
 
 
         [Test]
         public void Add_should_sum_the_counts_from_two_histograms()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
             var other = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            longHistogram.RecordValue(TestValueLevel);
-            longHistogram.RecordValue(TestValueLevel * 1000);
+            histogram.RecordValue(TestValueLevel);
+            histogram.RecordValue(TestValueLevel * 1000);
             other.RecordValue(TestValueLevel);
             other.RecordValue(TestValueLevel * 1000);
 
-            longHistogram.Add(other);
+            histogram.Add(other);
 
-            Assert.AreEqual(2L, longHistogram.GetCountAtValue(TestValueLevel));
-            Assert.AreEqual(2L, longHistogram.GetCountAtValue(TestValueLevel * 1000));
-            Assert.AreEqual(4L, longHistogram.TotalCount);
+            Assert.AreEqual(2L, histogram.GetCountAtValue(TestValueLevel));
+            Assert.AreEqual(2L, histogram.GetCountAtValue(TestValueLevel * 1000));
+            Assert.AreEqual(4L, histogram.TotalCount);
         }
 
         [Test]
         public void Add_should_allow_small_range_hsitograms_to_be_added()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
 
-            longHistogram.RecordValue(TestValueLevel);
-            longHistogram.RecordValue(TestValueLevel * 1000);
+            histogram.RecordValue(TestValueLevel);
+            histogram.RecordValue(TestValueLevel * 1000);
 
             var biggerOther = Create(DefaultHighestTrackableValue * 2, DefaultSignificantFigures);
             biggerOther.RecordValue(TestValueLevel);
             biggerOther.RecordValue(TestValueLevel * 1000);
 
             // Adding the smaller histogram to the bigger one should work:
-            biggerOther.Add(longHistogram);
+            biggerOther.Add(histogram);
             Assert.AreEqual(2L, biggerOther.GetCountAtValue(TestValueLevel));
             Assert.AreEqual(2L, biggerOther.GetCountAtValue(TestValueLevel * 1000));
             Assert.AreEqual(4L, biggerOther.TotalCount);
@@ -241,10 +245,10 @@ namespace HdrHistogram.UnitTests
         [Test]
         public void Add_throws_if_other_has_a_larger_range()
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
             var biggerOther = Create(DefaultHighestTrackableValue * 2, DefaultSignificantFigures);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => { longHistogram.Add(biggerOther); });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { histogram.Add(biggerOther); });
         }
 
         [TestCase(1, 1)]
@@ -254,8 +258,8 @@ namespace HdrHistogram.UnitTests
         [TestCase(8, 10000)]
         public void SizeOfEquivalentValueRangeForValue(int expected, int value)
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            Assert.AreEqual(expected, longHistogram.SizeOfEquivalentValueRange(value));
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Assert.AreEqual(expected, histogram.SizeOfEquivalentValueRange(value));
             //Validate the scaling too.
 
             var scaledHistogram = Create(1024, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -266,8 +270,8 @@ namespace HdrHistogram.UnitTests
         [TestCase(10008, 10009)]
         public void LowestEquivalentValue_returns_the_smallest_value_that_would_be_assigned_to_the_same_count(int expected, int value)
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            Assert.AreEqual(expected, longHistogram.LowestEquivalentValue(value));
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Assert.AreEqual(expected, histogram.LowestEquivalentValue(value));
             //Validate the scaling too
             var scaledHistogram = Create(1024, DefaultHighestTrackableValue, DefaultSignificantFigures);
             Assert.AreEqual(expected * 1024, scaledHistogram.LowestEquivalentValue(value * 1024));
@@ -281,8 +285,8 @@ namespace HdrHistogram.UnitTests
         [TestCase(10015, 10008)]
         public void HighestEquivalentValue_returns_the_smallest_value_that_would_be_assigned_to_the_same_count(int expected, int value)
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            Assert.AreEqual(expected, longHistogram.HighestEquivalentValue(value));
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Assert.AreEqual(expected, histogram.HighestEquivalentValue(value));
             //Validate the scaling too
             var scaledHistogram = Create(1024, DefaultHighestTrackableValue, DefaultSignificantFigures);
             Assert.AreEqual(expected * 1024 + 1023, scaledHistogram.HighestEquivalentValue(value * 1024));
@@ -295,8 +299,8 @@ namespace HdrHistogram.UnitTests
         [TestCase(10004, 10007, 0)]
         public void TestMedianEquivalentValue(int expected, int value, int scaledHeader)
         {
-            var longHistogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            Assert.AreEqual(expected, longHistogram.MedianEquivalentValue(value));
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Assert.AreEqual(expected, histogram.MedianEquivalentValue(value));
             //Validate the scaling too
             var scaledHistogram = Create(1024, DefaultHighestTrackableValue, DefaultSignificantFigures);
             Assert.AreEqual(expected * 1024 + scaledHeader, scaledHistogram.MedianEquivalentValue(value * 1024));
@@ -355,9 +359,6 @@ namespace HdrHistogram.UnitTests
             }
             return bucketsNeeded;
         }
-        protected abstract int WordSize { get; }
-        protected abstract HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits);
-        protected abstract HistogramBase Create(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits);
 
         private static string GetCellValue(string csvData, int col, int row)
         {

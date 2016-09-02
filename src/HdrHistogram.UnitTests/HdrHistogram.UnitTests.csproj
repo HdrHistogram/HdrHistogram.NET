@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ConcurrentHistogramTestBase.cs" />
     <Compile Include="HistogramEncodingTestBase.cs" />
+    <Compile Include="HistogramFactoryTests.cs" />
     <Compile Include="IntConcurrentHistogramTests.cs" />
     <Compile Include="IntHistogramEncodingTests.cs" />
     <Compile Include="LongConcurrentHistogramTests.cs" />
@@ -76,7 +77,7 @@
     <Compile Include="Recording\RecorderTestWithIntHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLongConcurrentHistogram.cs" />
     <Compile Include="Recording\RecorderTestWithLongHistogram.cs" />
-    <Compile Include="Recording\RecorderTestWithLShortHistogram.cs" />
+    <Compile Include="Recording\RecorderTestWithShortHistogram.cs" />
     <Compile Include="ShortHistogramEncodingTests.cs" />
     <Compile Include="ShortHistogramTests.cs" />
     <Compile Include="TimeStampTests.cs" />

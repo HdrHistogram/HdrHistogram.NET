@@ -5,7 +5,10 @@
         static void Main(string[] args)
         {
             //SimpleHistogramExample.Run();
-            RecorderExample.Run();
+            using (var example = new RecorderExample())
+            {
+                example.Run();
+            }
         }
     }
 }

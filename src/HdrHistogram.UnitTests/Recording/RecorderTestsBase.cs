@@ -10,7 +10,8 @@ namespace HdrHistogram.UnitTests.Recording
         private const long DefaultHighestTrackableValue = 7716549600;//TimeStamp.Hours(1); // e.g. for 1 hr in system clock ticks (StopWatch.Frequency)
         private const int DefaultSignificantFigures = 3;
 
-        protected abstract HistogramBase Create(long id, long min, long max, int sf);
+        protected abstract HistogramBase CreateHistogram(long id, long min, long max, int sf);
+        protected abstract Recorder Create(long min, long max, int sf);
 
         [TestCase(0, 1, DefaultSignificantFigures, "lowestTrackableValue", "lowestTrackableValue must be >= 1")]
         [TestCase(1, 1, DefaultSignificantFigures, "highestTrackableValue", "highestTrackableValue must be >= 2 * lowestTrackableValue")]
@@ -21,11 +22,9 @@ namespace HdrHistogram.UnitTests.Recording
            string errorParamName, string errorMessage)
         {
             var ex = Assert.Throws<ArgumentException>(() => 
-                new Recorder(
-                    lowestTrackableValue, 
+                Create(lowestTrackableValue, 
                     highestTrackableValue, 
-                    numberOfSignificantValueDigits, 
-                    Create));
+                    numberOfSignificantValueDigits));
             Assert.AreEqual(errorParamName, ex.ParamName);
             StringAssert.StartsWith(errorMessage, ex.Message);
         }
@@ -33,7 +32,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void GetIntervalHistogram_returns_alternating_instances_from_factory()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             var a = recorder.GetIntervalHistogram();
             var b = recorder.GetIntervalHistogram(a);
             var c = recorder.GetIntervalHistogram(b);
@@ -48,7 +47,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void GetIntervalHistogram_returns_current_histogram_values()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1);
             recorder.RecordValue(10);
             recorder.RecordValue(100);
@@ -61,7 +60,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void GetIntervalHistogram_causes_recording_to_happen_on_new_histogram()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1);
             var histogramPrimary = recorder.GetIntervalHistogram();
             Assert.AreEqual(1, histogramPrimary.GetCountAtValue(1));
@@ -78,7 +77,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void GetIntervalHistogram_resets_recycled_histogram()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1);
             recorder.RecordValue(10);
             recorder.RecordValue(100);
@@ -100,7 +99,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void RecordValue_increments_TotalCount()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1000);
             var histogram = recorder.GetIntervalHistogram();
             Assert.AreEqual(1, histogram.TotalCount);
@@ -109,7 +108,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void RecordValue_increments_CountAtValue()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1000);
             recorder.RecordValue(1000);
             recorder.RecordValue(1000);
@@ -121,14 +120,14 @@ namespace HdrHistogram.UnitTests.Recording
         public void RecordValue_Overflow_ShouldThrowException()
         {
             var highestTrackableValue = DefaultHighestTrackableValue;
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, highestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, highestTrackableValue, DefaultSignificantFigures);
             Assert.Throws<IndexOutOfRangeException>(() => recorder.RecordValue(highestTrackableValue * 3));
         }
 
         [Test]
         public void RecordValueWithCount_increments_TotalCount()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValueWithCount(1000, 10);
             var histogram = recorder.GetIntervalHistogram();
             Assert.AreEqual(10, histogram.TotalCount);
@@ -137,7 +136,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void RecordValueWithCount_increments_CountAtValue()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValueWithCount(1000, 10);
             recorder.RecordValueWithCount(1000, 10);
             recorder.RecordValueWithCount(5000, 20);
@@ -150,7 +149,7 @@ namespace HdrHistogram.UnitTests.Recording
         public void RecordValueWithCount_Overflow_ShouldThrowException()
         {
             var highestTrackableValue = DefaultHighestTrackableValue;
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, highestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, highestTrackableValue, DefaultSignificantFigures);
             Assert.Throws<IndexOutOfRangeException>(() => recorder.RecordValueWithCount(highestTrackableValue * 3, 100));
         }
 
@@ -158,7 +157,7 @@ namespace HdrHistogram.UnitTests.Recording
         public void RecordValueWithExpectedInterval()
         {
             var TestValueLevel = 4L;
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             var valueHistogram = new LongHistogram(DefaultHighestTrackableValue, DefaultSignificantFigures);
 
             recorder.RecordValueWithExpectedInterval(TestValueLevel, TestValueLevel / 4);
@@ -182,7 +181,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void RecordAction_increments_TotalCount()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             
             recorder.Record(() => { });
 
@@ -193,7 +192,7 @@ namespace HdrHistogram.UnitTests.Recording
         [Test]
         public void Reset_clears_counts_for_instances()
         {
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1);
             recorder.RecordValue(10);
             recorder.RecordValue(100);
@@ -229,7 +228,7 @@ namespace HdrHistogram.UnitTests.Recording
             Assert.AreEqual(1, targetHistogram.GetCountAtValue(10));
             Assert.AreEqual(1, targetHistogram.GetCountAtValue(100));
 
-            var recorder = new Recorder(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1000);
             recorder.RecordValue(10000);
             recorder.RecordValue(100000);
@@ -251,8 +250,8 @@ namespace HdrHistogram.UnitTests.Recording
         public void Using_external_histogram_for_recycling_throws()
         {
             const int id = -1000;
-            var externallyCreatedHistogram = Create(id, DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
-            var recorder = new Recorder(1, DefaultHighestTrackableValue, DefaultSignificantFigures, Create);
+            var externallyCreatedHistogram = CreateHistogram(id, DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var recorder = Create(1, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1000);
 
             Assert.Throws<InvalidOperationException>(() => recorder.GetIntervalHistogram(externallyCreatedHistogram));
