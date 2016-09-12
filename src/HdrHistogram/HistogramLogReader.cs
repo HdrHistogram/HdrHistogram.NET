@@ -15,7 +15,8 @@ namespace HdrHistogram
         private static readonly Regex StartTimeMatcher = new Regex(@"#\[StartTime: (?<seconds>\d*\.\d{1,3}) ", RegexOptions.Compiled);
         private static readonly Regex BaseTimeMatcher = new Regex(@"#\[BaseTime: (?<seconds>\d*\.\d{1,3}) ", RegexOptions.Compiled);
         //Content lines - format =  startTimestamp, intervalLength, maxTime, histogramPayload
-        private static readonly Regex LogLineMatcher = new Regex(@"(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
+        private static readonly Regex UntaggedLogLineMatcher = new Regex(@"(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
+        private static readonly Regex TaggedLogLineMatcher = new Regex(@"((?<tag>Tag=.+),)?(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
         private readonly TextReader _log;
         private double _startTimeInSeconds;
 
@@ -77,7 +78,8 @@ namespace HdrHistogram
                 {
                     //Content lines - format =  startTimestamp, intervalLength, maxTime, histogramPayload
 
-                    var match = LogLineMatcher.Match(line);
+                    var match = TaggedLogLineMatcher.Match(line);
+                    var tag = ParseTag(match.Groups["tag"].Value);
                     var logTimeStampInSec = ParseDouble(match, "startTime");
                     var intervalLength = ParseDouble(match, "interval");
                     var maxTime = ParseDouble(match, "max");    //Ignored as it can be inferred -LC
@@ -99,7 +101,8 @@ namespace HdrHistogram
                             // StartTime), we assume that timestamps in the log are not absolute
                             baseTimeInSeconds = _startTimeInSeconds;
                         }
-                        else {
+                        else
+                        {
                             // Timestamps are absolute
                             baseTimeInSeconds = 0.0;
                         }
@@ -113,13 +116,14 @@ namespace HdrHistogram
                     byte[] bytes = Convert.FromBase64String(payload);
                     var buffer = ByteBuffer.Allocate(bytes);
                     var histogram = DecodeHistogram(buffer, 0);
+                    histogram.Tag = tag;
                     histogram.StartTimeStamp = (long)(absoluteStartTimeStampSec * 1000.0);
                     histogram.EndTimeStamp = (long)(absoluteEndTimeStampSec * 1000.0);
                     yield return histogram;
                 }
             }
         }
-
+        
         IEnumerable<HistogramBase> IHistogramLogV1Reader.ReadHistograms()
         {
             _startTimeInSeconds = 0;
@@ -152,11 +156,12 @@ namespace HdrHistogram
                 {
                     //Content lines - format =  startTimestamp, intervalLength, maxTime, histogramPayload
 
-                    var match = LogLineMatcher.Match(line);
+                    var match = UntaggedLogLineMatcher.Match(line);
                     var logTimeStampInSec = ParseDouble(match, "startTime");
                     var intervalLength = ParseDouble(match, "interval");
                     var maxTime = ParseDouble(match, "max");    //Ignored as it can be inferred -LC
                     var payload = match.Groups["payload"].Value;
+                    
 
                     if (!hasStartTime)
                     {
@@ -173,7 +178,8 @@ namespace HdrHistogram
                             // StartTime), we assume that timestamps in the log are not absolute
                             baseTimeInSeconds = _startTimeInSeconds;
                         }
-                        else {
+                        else
+                        {
                             // Timestamps are absolute
                             baseTimeInSeconds = 0.0;
                         }
@@ -253,6 +259,16 @@ namespace HdrHistogram
         {
             var legend = "\"StartTimestamp\",\"EndTimestamp\",\"Interval_Max\",\"Interval_Compressed_Histogram\"";
             return line.Equals(legend);
+        }
+
+        private static string ParseTag(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            value = value.Substring(4);
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            return value;
         }
 
         private static double ParseStartTime(string line)

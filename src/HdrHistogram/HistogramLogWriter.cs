@@ -11,7 +11,7 @@ namespace HdrHistogram
     /// <seealso cref="HistogramLogReader"/>
     public sealed class HistogramLogWriter : IDisposable
     {
-        private const string HistogramLogFormatVersion = "1.2";
+        private const string HistogramLogFormatVersion = "1.3";
 
         private readonly TextWriter _log;
         private bool _hasHeaderWritten = false;
@@ -119,7 +119,9 @@ namespace HdrHistogram
             var intervalMax = histogram.GetMaxValue() / maxValueUnitRatio;
 
             var binary = Convert.ToBase64String(compressedArray);
-            var payload = $"{startTimeStampSec:F3},{intervalLength:F3},{intervalMax:F3},{binary}";
+            var payload = histogram.Tag == null
+                ? $"{startTimeStampSec:F3},{intervalLength:F3},{intervalMax:F3},{binary}"
+                : $"Tag={histogram.Tag},{startTimeStampSec:F3},{intervalLength:F3},{intervalMax:F3},{binary}";
             _log.WriteLine(payload);
             _log.Flush();
         }

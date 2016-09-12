@@ -14,6 +14,7 @@ namespace HdrHistogram.UnitTests
         public static void AreValueEqual(HistogramBase expected, HistogramBase actual)
         {
             Assert.AreEqual(expected.TotalCount, actual.TotalCount, "TotalCount property is not equal.");
+            Assert.AreEqual(expected.Tag, actual.Tag, "Tag property is not equal.");
             Assert.AreEqual(expected.StartTimeStamp, actual.StartTimeStamp, "StartTimeStamp property is not equal.");
             Assert.AreEqual(expected.EndTimeStamp, actual.EndTimeStamp, "EndTimeStamp property is not equal.");
             Assert.AreEqual(expected.LowestTrackableValue, actual.LowestTrackableValue, "LowestTrackableValue property is not equal.");

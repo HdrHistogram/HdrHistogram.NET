@@ -50,7 +50,7 @@ namespace HdrHistogram.UnitTests.Persistence
             Assert.AreEqual(1, actualHistograms.Length);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
-        
+
         protected void RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
         {
             var value = 1;
@@ -65,10 +65,12 @@ namespace HdrHistogram.UnitTests.Persistence
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
-        [Test]
-        public void CanRoundTripSingleHistogramsWithSparseValues()
+        [TestCase("ATag")]
+        [TestCase("AnotherTag")]
+        public void CanRoundTripSingleHistogramsWithSparseValues(string tag)
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
+            histogram.Tag = tag;
             histogram.RecordValue(1);
             histogram.RecordValue((long.MaxValue / 2) + 1);
 
@@ -77,6 +79,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var actualHistograms = data.ReadHistograms();
 
             Assert.AreEqual(1, actualHistograms.Length);
+            Assert.AreEqual(tag, actualHistograms[0].Tag);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
@@ -93,7 +96,7 @@ namespace HdrHistogram.UnitTests.Persistence
 
             byte[] data;
             using (var writerStream = new MemoryStream())
-            using(var log = new HistogramLogWriter(writerStream))
+            using (var log = new HistogramLogWriter(writerStream))
             {
                 log.Append(histogram1);
                 log.Append(histogram2);
@@ -105,7 +108,40 @@ namespace HdrHistogram.UnitTests.Persistence
             HistogramAssert.AreValueEqual(histogram1, actualHistograms.First());
             HistogramAssert.AreValueEqual(histogram2, actualHistograms.Skip(1).First());
         }
-        
+
+        [TestCase("tagged-Log.logV2.hlog")]
+        public void CanReadV2TaggedLogs(string logPath)
+        {
+            var readerStream = GetEmbeddedFileStream(logPath);
+            var reader = new HistogramLogReader(readerStream);
+            int histogramCount = 0;
+            long totalCount = 0;
+            var accumulatedHistogramWithNoTag = Create(85899345920838, DefaultSignificantDigits);
+            var accumulatedHistogramWithTagA = Create(85899345920838, DefaultSignificantDigits);
+            foreach (var histogram in reader.ReadHistograms())
+            {
+                histogramCount++;
+                Assert.IsInstanceOf<HistogramBase>(histogram, "Expected integer value histograms in log file");
+
+                totalCount += histogram.TotalCount;
+                if (string.IsNullOrEmpty(histogram.Tag))
+                {
+                    accumulatedHistogramWithNoTag.Add(histogram);
+                }
+                else if (histogram.Tag == "A")
+                {
+                    accumulatedHistogramWithTagA.Add(histogram);
+                }
+            }
+
+            Assert.AreEqual(42, histogramCount);
+            Assert.AreEqual(32290, totalCount);
+
+            HistogramAssert.AreValueEqual(accumulatedHistogramWithNoTag, accumulatedHistogramWithTagA);
+        }
+
+
+
         [TestCase("jHiccup-2.0.7S.logV2.hlog")]
         public void CanReadv2Logs(string logPath)
         {
@@ -129,7 +165,7 @@ namespace HdrHistogram.UnitTests.Persistence
             Assert.AreEqual(1796210687, accumulatedHistogram.GetMaxValue());
             Assert.AreEqual(1441812279.474, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
-        
+
         [TestCase("jHiccup-2.0.1.logV0.hlog", 0, int.MaxValue, 81, 61256, 1510998015, 1569718271, 1438869961.225)]
         [TestCase("jHiccup-2.0.1.logV0.hlog", 19, 25, 25, 18492, 459007, 623103, 1438869961.225)]
         [TestCase("jHiccup-2.0.1.logV0.hlog", 45, 34, 34, 25439, 1209008127, 1234173951, 1438869961.225)]
