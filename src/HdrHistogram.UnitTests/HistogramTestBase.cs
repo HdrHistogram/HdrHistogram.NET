@@ -337,6 +337,18 @@ namespace HdrHistogram.UnitTests
             HistogramAssert.AreValueEqual(source, copy);
         }
 
+        [TestCase("No spaces")]
+        [TestCase("No,commas")]
+        [TestCase("\r")]
+        [TestCase("\n")]
+        [TestCase(" ")]
+        [TestCase(" ")]
+        public void Setting_invalid_value_to_Tag_throws(string invalidTagValue)
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Assert.Throws<ArgumentException>(() => histogram.Tag = invalidTagValue);
+        }
+
         private void CreateAndAdd(HistogramBase source)
         {
             source.RecordValueWithCount(1, 100);
