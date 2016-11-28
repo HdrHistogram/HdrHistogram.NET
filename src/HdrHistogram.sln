@@ -1,12 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram", "HdrHistogram\HdrHistogram.csproj", "{655D9C4C-5BBD-4494-9828-AE427A1DDD01}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F2800CBA-6CFC-45FE-AA8F-25E4FF912E41}"
 	ProjectSection(SolutionItems) = preProject
+		..\global.json = ..\global.json
 		..\LICENSE.txt = ..\LICENSE.txt
 		..\README.md = ..\README.md
 	EndProjectSection
@@ -15,16 +14,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{48A302
 	ProjectSection(SolutionItems) = preProject
 		..\build\build.cmd = ..\build\build.cmd
 		..\build\build.ps1 = ..\build\build.ps1
-		..\build\HdrHistogram.nuspec = ..\build\HdrHistogram.nuspec
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.UnitTests", "HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj", "{2D189069-FE39-42AE-8169-71ABC4D5A87B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D3EBE9D9-B40D-4D2F-B76D-16A34FB09A94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.Examples", "HdrHistogram.Examples\HdrHistogram.Examples.csproj", "{E210C748-4792-4658-9345-CC073C29EC0B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram", "HdrHistogram\HdrHistogram.xproj", "{DFBAE224-AF34-4D34-B788-8D9B61009A1F}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram.Examples", "HdrHistogram.Examples\HdrHistogram.Examples.xproj", "{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.Benchmarking", "HdrHistogram.Benchmarking\HdrHistogram.Benchmarking.csproj", "{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram.UnitTests", "HdrHistogram.UnitTests\HdrHistogram.UnitTests.xproj", "{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,28 +32,28 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{655D9C4C-5BBD-4494-9828-AE427A1DDD01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{655D9C4C-5BBD-4494-9828-AE427A1DDD01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{655D9C4C-5BBD-4494-9828-AE427A1DDD01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{655D9C4C-5BBD-4494-9828-AE427A1DDD01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D189069-FE39-42AE-8169-71ABC4D5A87B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D189069-FE39-42AE-8169-71ABC4D5A87B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D189069-FE39-42AE-8169-71ABC4D5A87B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D189069-FE39-42AE-8169-71ABC4D5A87B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E210C748-4792-4658-9345-CC073C29EC0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E210C748-4792-4658-9345-CC073C29EC0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E210C748-4792-4658-9345-CC073C29EC0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E210C748-4792-4658-9345-CC073C29EC0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFBAE224-AF34-4D34-B788-8D9B61009A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFBAE224-AF34-4D34-B788-8D9B61009A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFBAE224-AF34-4D34-B788-8D9B61009A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFBAE224-AF34-4D34-B788-8D9B61009A1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2D189069-FE39-42AE-8169-71ABC4D5A87B} = {D3EBE9D9-B40D-4D2F-B76D-16A34FB09A94}
 		{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B} = {D3EBE9D9-B40D-4D2F-B76D-16A34FB09A94}
+		{2C6B7BF1-4EB2-4A46-A389-23EADFED543B} = {D3EBE9D9-B40D-4D2F-B76D-16A34FB09A94}
 	EndGlobalSection
 EndGlobal

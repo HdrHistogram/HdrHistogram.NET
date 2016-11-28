@@ -91,6 +91,8 @@ csx
 *.build.csdef
 
 # Others
+.vs/
+*project.lock.json
 [Bb]in
 [Oo]bj
 sql

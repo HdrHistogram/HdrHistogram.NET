@@ -1,0 +1,36 @@
+{  
+  "authors": [ "Gil Tene", "Lee Campbell" ],
+  "dependencies": {
+    "NETStandard.Library": "1.6.1"
+  },
+  "buildOptions": {
+    "keyFile": "../../build/HdrHistogram.snk",
+    "xmlDoc":  true 
+  },
+  "description": "HdrHistogram supports low latency recording and analyzing of sampled data value counts across a configurable integer value range with configurable value precision within the range.",
+  "frameworks": {
+    "netstandard1.6": {
+      "dependencies": {
+        "System.Net.Primitives": "4.3.0",
+        "System.Threading.Thread": "4.3.0"
+      },
+      "imports": [
+        "dotnet5.6",
+        "portable-net45+win8"
+      ]
+    },
+    "net461": {}
+  },
+  "language": "en-US",
+  "packOptions": {    
+    "owners": [ "Lee Campbell" ],
+    "requireLicenseAcceptance": false,
+    "releaseNotes": "HdrHistogram targeted at .NET Standard and .NET 4.6.1",
+    "tags": [ "HdrHistogram", "HdrHistogram.NET", "Histogram", "Instrumentation" ],
+    "projectUrl": "https://github.com/HdrHistogram/HdrHistogram.NET",
+    "licenseUrl": "https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/LICENSE.txt",
+    "iconUrl": "http://hdrhistogram.github.io/HdrHistogram.NET/HdrHistogram-icon-64x64.png"
+  },
+  "title": "HdrHistogram",
+  "version": "2.0.0-*"
+}

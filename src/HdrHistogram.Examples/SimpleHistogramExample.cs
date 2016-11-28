@@ -84,13 +84,13 @@ namespace HdrHistogram.Examples
             }
             finally
             {
-                _socket.Close();
+                _socket.Dispose();
             }
         }
 
         private static AddressFamily GetAddressFamily(string url)
         {
-            var hostIpAddress = Dns.GetHostEntry(url).AddressList[0];
+            var hostIpAddress = Dns.GetHostEntryAsync(url).GetAwaiter().GetResult().AddressList[0];
             var hostIpEndPoint = new IPEndPoint(hostIpAddress, 80);
             return hostIpEndPoint.AddressFamily;
         }
