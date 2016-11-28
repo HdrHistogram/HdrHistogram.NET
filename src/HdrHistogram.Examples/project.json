@@ -17,7 +17,7 @@
         "dnxcore50"
       ]
     },
-    "net461": {}
+    "net452": {}
   },
   "dependencies": {
     "HdrHistogram": {
