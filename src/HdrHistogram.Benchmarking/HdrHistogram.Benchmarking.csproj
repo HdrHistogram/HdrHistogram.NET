@@ -44,7 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="HdrHistogram">
-      <HintPath>..\HdrHistogram\bin\Debug\net461\HdrHistogram.dll</HintPath>
+      <HintPath>..\HdrHistogram\bin\Debug\net452\HdrHistogram.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Diagnostics.Tracing.TraceEvent, Version=1.0.41.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\lib\net40\Microsoft.Diagnostics.Tracing.TraceEvent.dll</HintPath>

@@ -12,19 +12,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{48A302F0-0D3C-4616-B4D0-7B64CE75AB1D}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build.cmd = ..\build\build.cmd
-		..\build\build.ps1 = ..\build\build.ps1
+		..\build.cmd = ..\build.cmd
+		..\scripts\default.ps1 = ..\scripts\default.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D3EBE9D9-B40D-4D2F-B76D-16A34FB09A94}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram", "HdrHistogram\HdrHistogram.xproj", "{DFBAE224-AF34-4D34-B788-8D9B61009A1F}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram", "src\HdrHistogram\HdrHistogram.xproj", "{DFBAE224-AF34-4D34-B788-8D9B61009A1F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram.Examples", "HdrHistogram.Examples\HdrHistogram.Examples.xproj", "{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram.Examples", "src\HdrHistogram.Examples\HdrHistogram.Examples.xproj", "{8E9AF44F-38EC-43BA-B9F0-06D33E214AA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.Benchmarking", "HdrHistogram.Benchmarking\HdrHistogram.Benchmarking.csproj", "{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.Benchmarking", "src\HdrHistogram.Benchmarking\HdrHistogram.Benchmarking.csproj", "{8AAE86BE-5ABC-4902-B48B-20DCDBB93C7B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram.UnitTests", "HdrHistogram.UnitTests\HdrHistogram.UnitTests.xproj", "{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HdrHistogram.UnitTests", "test\HdrHistogram.UnitTests\HdrHistogram.UnitTests.xproj", "{2C6B7BF1-4EB2-4A46-A389-23EADFED543B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

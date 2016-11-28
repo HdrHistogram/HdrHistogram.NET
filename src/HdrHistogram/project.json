@@ -1,10 +1,10 @@
-{  
-  "authors": [ "Gil Tene", "Lee Campbell" ],
+{
+  "authors": [ "Gil Tene", "Lee Campbell" ],  
   "dependencies": {
     "NETStandard.Library": "1.6.1"
   },
   "buildOptions": {
-    "keyFile": "../../build/HdrHistogram.snk",
+    "keyFile": "../../HdrHistogram.snk",
     "xmlDoc":  true 
   },
   "description": "HdrHistogram supports low latency recording and analyzing of sampled data value counts across a configurable integer value range with configurable value precision within the range.",
