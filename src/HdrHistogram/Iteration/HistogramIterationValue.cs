@@ -63,8 +63,7 @@ namespace HdrHistogram.Iteration
         /// <returns>Returns <c>true</c> if it is the last value, else <c>false</c>.</returns>
         public bool IsLastValue()
         {
-            //return PercentileLevelIteratedTo == 100.0D;
-            return Math.Abs(PercentileLevelIteratedTo - 100.0D) < 0.0001;
+            return Math.Abs(PercentileLevelIteratedTo - 100.0D) < double.Epsilon;
         }
 
         // Set is all-or-nothing to avoid the potential for accidental omission of some values...

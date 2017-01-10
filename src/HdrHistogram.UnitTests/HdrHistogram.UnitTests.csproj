@@ -123,6 +123,7 @@
     <EmbeddedResource Include="Resources\jHiccup-2.0.7S.logV2.hlog" />
     <EmbeddedResource Include="Resources\ycsb.logV1.hlog" />
     <EmbeddedResource Include="Resources\tagged-Log.logV2.hlog" />
+    <EmbeddedResource Include="Resources\IsLastValueBug.hgrm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HdrHistogram\HdrHistogram.csproj">

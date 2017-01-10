@@ -49,6 +49,35 @@ namespace HdrHistogram.UnitTests
 
             Assert.AreEqual(expected, actual);
         }
+
+        [Test] //BUG https://github.com/HdrHistogram/HdrHistogram.NET/issues/39
+        public void OnlySingleValueFlaggedAsLastValue()
+        {
+            var expected = GetEmbeddedFileText("IsLastValueBug.hgrm");
+
+            var histogram = new LongHistogram(highestTrackableValue: 36000000000, numberOfSignificantValueDigits:3);
+            histogram.RecordValueWithCount(1L, 7604459);
+            histogram.RecordValueWithCount(383, 2395524);
+            histogram.RecordValueWithCount(453, 2);
+            histogram.RecordValueWithCount(511, 2);
+            histogram.RecordValueWithCount(537, 3);
+            histogram.RecordValueWithCount(672, 1);
+            histogram.RecordValueWithCount(777, 1);
+            histogram.RecordValueWithCount(18143, 1);
+            histogram.RecordValueWithCount(208127, 1);
+            histogram.RecordValueWithCount(224639, 1);
+            histogram.RecordValueWithCount(229759, 1);
+            histogram.RecordValueWithCount(230271, 1);
+            histogram.RecordValueWithCount(258943, 1);
+            histogram.RecordValueWithCount(275711, 1);
+            histogram.RecordValueWithCount(282111, 1);
+
+            var writer = new StringWriter();
+            histogram.OutputPercentileDistribution(writer);
+            var actual = writer.ToString();
+
+            Assert.AreEqual(expected, actual);
+        }
         
         private Stream GetEmbeddedFileStream(string filename)
         {
