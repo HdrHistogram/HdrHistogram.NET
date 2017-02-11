@@ -35,7 +35,7 @@ build_script:
 
     $uploadPath = "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)"
 
-    $testResults = (Resolve-Path .\TestResult.xml)
+    $testResults = (Resolve-Path .\Working\NunitTestResults.xml)
 
     Write-Host "Sending $testResults to $uploadPath"
 
