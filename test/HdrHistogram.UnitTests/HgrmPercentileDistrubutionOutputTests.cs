@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace HdrHistogram.UnitTests
@@ -82,7 +83,7 @@ namespace HdrHistogram.UnitTests
         private Stream GetEmbeddedFileStream(string filename)
         {
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);
-            return GetType()
+            return GetType().GetTypeInfo()
                 .Assembly
                 .GetManifestResourceStream(fileName);
         }

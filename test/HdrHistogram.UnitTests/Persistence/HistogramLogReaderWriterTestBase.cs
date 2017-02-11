@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using HdrHistogram.Utilities;
 using NUnit.Framework;
 
@@ -282,7 +283,7 @@ namespace HdrHistogram.UnitTests.Persistence
         private Stream GetEmbeddedFileStream(string filename)
         {
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);
-            return GetType()
+            return GetType().GetTypeInfo()
                 .Assembly
                 .GetManifestResourceStream(fileName);
         }

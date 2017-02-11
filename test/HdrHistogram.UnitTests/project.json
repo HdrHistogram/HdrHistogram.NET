@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0-*",
+  "testRunner": "nunit",
+  "runtimes": {
+    "win7-x64": {},
+    "ubuntu.14.04-x64": {},
+    "win10-x64": {}
+  },
+
+  "buildOptions": {
+    "debugType": "portable",
+    "embed": {
+      "include": ["Resources/*.csv", "Resources/*.hgrm", "Resources/*.hlog"]
+    }
+  },
+
+  "dependencies": {
+    "dotnet-test-nunit": "3.4.0-beta-3",
+    "HdrHistogram": {
+      "target": "project"      
+    },
+    "nunit": "3.5.0"
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dotnet5.6",
+        "portable-net45+win8"
+      ]
+    }
+  }
+}

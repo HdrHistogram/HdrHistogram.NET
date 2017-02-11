@@ -253,7 +253,7 @@ namespace HdrHistogram
         /// To compensate for the loss of sampled values when a recorded value is larger than the expected interval between value samples, 
         /// Histogram will auto-generate an additional series of decreasingly-smaller (down to the expectedIntervalBetweenValueSamples) value records.
         /// <para>
-        /// Note: This is a at-recording correction method, as opposed to the post-recording correction method provided by <see cref="CopyCorrectedForCoordinatedOmission"/>.
+        /// Note: This is a at-recording correction method, as opposed to the post-recording correction method provided by currently unimplemented <c>CopyCorrectedForCoordinatedOmission</c> method.
         /// The two methods are mutually exclusive, and only one of the two should be be used on a given data set to correct for the same coordinated omission issue.
         /// </para>
         /// See notes in the description of the Histogram calls for an illustration of why this corrective behavior is important.
