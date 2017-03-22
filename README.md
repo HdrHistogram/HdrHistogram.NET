@@ -1,21 +1,21 @@
 <img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/build/HdrHistogram-icon-64x64.png">
-#HdrHistogram
+# HdrHistogram
 **A High Dynamic Range (HDR) Histogram**
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/HdrHistogram/HdrHistogram?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/q0o5faahigq6u4qe/branch/master?svg=true)](https://ci.appveyor.com/project/LeeCampbell/hdrhistogram-net/branch/master) [![Build status](https://ci.appveyor.com/api/projects/status/q0o5faahigq6u4qe?svg=true)](https://ci.appveyor.com/project/LeeCampbell/hdrhistogram-net)
 
-##What is it
+## What is it
 HdrHistogram.NET is the official port of the Java HdrHistogram library.
 All official implementations of HdrHistogram can be found at https://github.com/HdrHistogram
 
-##Why would I use it?
+## Why would I use it?
 You would use it to efficiently capture large number of response times measurements.
 
 Often when measuring response times, one could make the common mistake of reporting on the mean value or the 90th percentile.
 Gil Tene (the original author of the Java HdrHistogram) illustrates in numerous presentations (such as [here](http://www.infoq.com/presentations/latency-pitfalls) and [here](https://www.youtube.com/watch?v=9MKY4KypBzg)) on why this is a mistake.
 Instead you want to collect all of the data and then be able to report your measurements across the range of measurements.
 
-##How would I use it?
+## How would I use it?
 The library is available as a package from Nuget as [HdrHistogram](https://www.nuget.org/packages/HdrHistogram/)
 
 Generally you want to be able to record at the finest accuracy the response-time of a given function of your software. 
@@ -156,7 +156,7 @@ Instead of paying to cost of converting recorded values at the time of recording
 Use the helper methods to convert recorded values to standard units at output time, when performance is less critical.
 
 
-###Example of reporting results as a chart
+### Example of reporting results as a chart
 You can also have HdrHistogram output the results in a file format that can be charted.
 This is especially useful when comparing measurements.
 
@@ -180,7 +180,7 @@ You can use either
 If you use the local tool, there are example result files in the _.\GoogleChartsExample_ directory.
 The tool also allows you to export to png.
 
-##So what is so special about this way of recording response times?
+## So what is so special about this way of recording response times?
 
 * itself is low latency
 * tiny foot print due to just storing a dynamic range of buckets and counts
@@ -247,7 +247,7 @@ histogram.OutputPercentileDistribution(
 
 
 
-###How would I contribute to this project?
+### How would I contribute to this project?
 We welcome pull requests!
 If you do choose to contribute, please first raise an issue so we are not caught off guard by the pull request.
 Next can you please ensure that your PR (Pull Request) has a comment in it describing what it achieves and the issues that it closes.
@@ -401,7 +401,7 @@ The total footprint can be conservatively estimated by:
 
 A conservative (high) estimate of a Histogram's footprint in bytes is available via the `GetEstimatedFootprintInBytes()` method.
 
-##Terminology
+## Terminology
 
   * **Latency** : The time that something is latent i.e. not being processed.
  This maybe due to being in a queue.
