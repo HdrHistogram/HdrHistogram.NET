@@ -1,0 +1,53 @@
+version: 1.{build}.0
+pull_requests:
+  do_not_increment_build_number: true
+image: WMF 5
+build_script:
+- ps: >-
+    Write-Host $env:APPVEYOR_BUILD_VERSION
+
+    Write-Host $env:APPVEYOR_PULL_REQUEST_NUMBER
+
+    Write-Host $env:APPVEYOR_PULL_REQUEST_TITLE
+
+    Write-Host $env:APPVEYOR_REPO_NAME
+
+    Write-Host $env:APPVEYOR_REPO_BRANCH
+
+    Write-Host $env:APPVEYOR_REPO_COMMIT
+
+    Write-Host $env:APPVEYOR_JOB_ID
+
+
+    $semver = $env:APPVEYOR_BUILD_VERSION;
+
+    if($env:APPVEYOR_PULL_REQUEST_NUMBER -ge 0) {
+      $semver = "$semver-PR$env:APPVEYOR_PULL_REQUEST_NUMBER";
+    }
+
+
+    Import-Module .\build\psake.psm1
+
+    Invoke-psake .\build\build.ps1 -taskList Test,Package -properties @{"semver"="$semver";}
+
+
+    Write-Host "Uploading test results"
+
+    $uploadPath = "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)"
+
+    $testResults = (Resolve-Path .\TestResult.xml)
+
+    Write-Host "Sending $testResults to $uploadPath"
+
+
+    $wc = New-Object 'System.Net.WebClient'
+
+    $wc.UploadFile($uploadPath, $testResults)
+test: off
+artifacts:
+- path: Working\Nuget\*.nupkg
+notifications:
+- provider: GitHubPullRequest
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
