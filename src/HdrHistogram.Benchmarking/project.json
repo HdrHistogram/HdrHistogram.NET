@@ -1,0 +1,25 @@
+{
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "debugType": "portable"
+  },
+  "frameworks": {
+   "net452": {
+    "dependencies": {
+      "BenchmarkDotNet.Diagnostics.Windows": "0.10.2",
+      "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41"
+    }
+    }
+  },
+  "dependencies": {
+    "HdrHistogram": {
+      "target": "project"
+    }
+  },
+  "runtimes": {
+    "win7-x64": {},
+    "ubuntu.14.04-x64": {},
+    "win10-x64": {}
+  },
+  "version": "1.0.0-*"
+}

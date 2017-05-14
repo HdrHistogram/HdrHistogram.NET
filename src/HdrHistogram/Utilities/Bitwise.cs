@@ -17,7 +17,7 @@ namespace HdrHistogram.Utilities
     //http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
     //
     //Ideally newer versions of .NET will expose the CPU instructions to do this  Intel SSE 'lzcnt' (Leading Zero Count), or give access to the BitScanReverse VC++ functions (https://msdn.microsoft.com/en-us/library/fbxyd7zd.aspx)
-    internal static class Bitwise
+    public static class Bitwise
     {
         private static readonly int[] Lookup;
 
