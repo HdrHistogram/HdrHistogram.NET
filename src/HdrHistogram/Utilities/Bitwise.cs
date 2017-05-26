@@ -8,6 +8,7 @@
 
 using System;
 
+
 namespace HdrHistogram.Utilities
 {
     //Code has been tested and taken from :
@@ -17,7 +18,11 @@ namespace HdrHistogram.Utilities
     //http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
     //
     //Ideally newer versions of .NET will expose the CPU instructions to do this  Intel SSE 'lzcnt' (Leading Zero Count), or give access to the BitScanReverse VC++ functions (https://msdn.microsoft.com/en-us/library/fbxyd7zd.aspx)
-    internal static class Bitwise
+
+    /// <summary>
+    /// Exposes optimised methods to get Leading Zero Count.
+    /// </summary>
+    public static class Bitwise
     {
         private static readonly int[] Lookup;
 
@@ -29,6 +34,12 @@ namespace HdrHistogram.Utilities
                 Lookup[i] = (int)(Math.Log(i) / Math.Log(2));
             }
         }
+
+        /// <summary>
+        /// Returns the Leading Zero Count (lzc) of the <paramref name="value"/> for its binary representation.
+        /// </summary>
+        /// <param name="value">The value to find the number of leading zeros</param>
+        /// <returns>The number of leading zeros.</returns>
         public static int NumberOfLeadingZeros(long value)
         {
             //Optimisation for 32 bit values. So values under 00:16:41.0 when measuring with Stopwatch.GetTimestamp()*, we will hit a fast path.

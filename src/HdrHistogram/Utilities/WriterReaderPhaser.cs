@@ -181,7 +181,11 @@ namespace HdrHistogram.Utilities
                 {
                     if (yieldPeriod == TimeSpan.Zero)
                     {
-                        Thread.Yield();
+                        #if NET425
+							Thread.Yield();
+						else
+							Task.Yield().GetAwaiter().GetResult();
+						#endif
                     }
                     else
                     {

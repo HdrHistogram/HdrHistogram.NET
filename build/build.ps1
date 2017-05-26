@@ -1,53 +1,38 @@
 # The bones of this build script taken from the James Newton-King's JSON.NET project (https://github.com/JamesNK/Newtonsoft.Json/blob/81103079e241fb055af2e81c51cdd56c52410fbf/Build/build.ps1)
-#  Requires PowerShell 5 (https://www.microsoft.com/en-us/download/details.aspx?id=50395)
+# They have then been heavily modified again based on Allan Hardy's (https://github.com/alhardy) work.
 #  Requires 
+#	dotnet cli tools
 #    either NuGet v3 or higher on the path -AND- local caches of the NuGet package dependencies
 #    -OR- a connection to the internet (to download NuGet and to restore packages)
 #
 #  To run, from a PowerShell console
-#    PS .\HdrHistogram.NET> Import-Module .\build\psake.psm
+#    PS .\HdrHistogram.NET> Import-Module .\build\psake.psm1
 #    PS .\HdrHistogram.NET> Invoke-psake %~dp0.\build.ps1
 #
 #  Modifications to the origin script taken from JSON.NET project are:
 #    -No dependency on 7Zip. So the binary is not checked into source control
 #    -NuGet is not in source control. We look for an installed version, else download it
-#    -Currently no support for dotNetCore so no dependency on KVM (which I think is deprecated now anyway, in favor of dotnet cli)
-#    -Only a semver* version property is set. Other Versions (assembly, file, NuGet) are inferred from this. *semver==Semantic Version see http://semver.org/
-#    -Requires PS version 5 to extract and compress archives.
 #    -Sandcastle documentation generation has been removed.
 properties { 
-  $semver = "1.0.0-beta"
-  $zipFileName = "HdrHistogram.NET$semver.zip"
-  $packageId = "HdrHistogram"
+  $semver = "1.0.0"
   $buildEnv = "local" #Or TeamCity, AppVeyor
-  $buildNuGet = $true
-  $treatWarningsAsErrors = $false
   $baseDir  = resolve-path ..
-  $buildDir = "$baseDir\Build"
-  $sourceDir = "$baseDir\Src"
-  $releaseDir = "$baseDir\Release"
+  $sourceDir = "$baseDir\src"
+  $testsDir = "$baseDir\test"
   $workingDir = "$baseDir\Working"
-  $workingSourceDir = "$workingDir\Src"
-  $signAssemblies = $true
-  $signKeyPath = "$buildDir\HdrHistogram.snk"
-  $builds = @(
-     @{Name = "HdrHistogram"; TestsName = "HdrHistogram.UnitTests"; BuildFunction = "MSBuildBuild"; TestsFunction = "NUnitTests"; Constants=""; FinalDir="Net45"; NuGetDir = "net45"; Framework="net-4.0"}
-  )
+  $workingSourceDir = "$workingDir\src"
+  $workingTestsDir = "$workingDir\test"
+  $packableProjectDirectories = @("$workingSourceDir\HdrHistogram")
+  $packageOutputDir = "$workingDir\Nuget"
+  $testOutputPath = "$workingDir\NunitTestResults.xml"
+  $localNugetPath = "$workingDir\nuget.exe"
+  $nugetDependecies = "$workingDir\packages"
+  $jsonlib= "$nugetDependecies\Newtonsoft.Json\lib\net45\Newtonsoft.Json.dll"
 }
 
-framework '4.6x86'
+task default -depends Package
 
-task default -depends Test
-
-task VerifyDependencies {
-  if($PSVersionTable.PSVersion.Major -lt 5) {
-    #Compress-Archive and Expand-Archive are PS5 feature. Means we don't need a binary dependency on 7Zip or have to hand code .NET or Shell compression.
-    Write-Error "This build script requires PowerShell 5 or greater"
-  }
-}
-
-# Ensure a clean working directory
-task Clean -depends VerifyDependencies {
+task Clean {
   Write-Host "Setting location to $baseDir"
   Set-Location $baseDir
   
@@ -59,143 +44,59 @@ task Clean -depends VerifyDependencies {
   
   Write-Host "Creating working directory $workingDir"
   New-Item -Path $workingDir -ItemType Directory
-  
-  GetNuget
 }
 
-# Build each solution, optionally signed
-task Build -depends Clean { 
+task CreateWorkingDir -depends Clean {
   Write-Host "Copying source to working source directory $workingSourceDir"
-  robocopy $sourceDir $workingSourceDir /MIR /NP /XD bin obj TestResults AppPackages $packageDirs .vs artifacts /XF *.suo *.user *.lock.json | Out-Default
-
-  Write-Host -ForegroundColor Green "Updating assembly version"
-  Write-Host
-  Update-AssemblyInfoFiles $workingSourceDir $semver
+  robocopy $sourceDir $workingSourceDir /MIR /NP /XD /NJH /NJS /NFL /NDL bin obj TestResults AppPackages $packageDirs .vs artifacts /XF *.suo *.user *.lock.json | Out-Default
   
-  foreach ($build in $builds) {
-    $name = $build.Name
-    if ($name -ne $null) {
-      Write-Host -ForegroundColor Green "Building " $name
-      Write-Host -ForegroundColor Green "Signed " $signAssemblies
-      Write-Host -ForegroundColor Green "Key " $signKeyPath
+  Write-Host "Copying tests to working test directory $workingTestsDir"
+  robocopy $testsDir $workingTestsDir /MIR /NP /XD /NJH /NJS /NFL /NDL bin obj TestResults AppPackages $packageDirs .vs artifacts /XF *.suo *.user *.lock.json | Out-Default
+  
+  Write-Host "Copying HdrHistogram.snk to working directory"
+  Copy-Item "$baseDir\HdrHistogram.snk" $workingDir
+  
+  Write-Host "Copying global.json to working directory"
+  Copy-Item "$baseDir\global.json" $workingDir
+}
 
-      & $build.BuildFunction $build
-    }
+task Patch -depends CreateWorkingDir { 
+  Get-Nuget
+  Get-JsonNet
+  Write-Host -ForegroundColor Green "Patching semantic version number --> $semver"
+  Write-Host
+  Patch-Versions $workingSourceDir $semver
+}
+
+task Build -depends Patch { 
+  $srcProjects = Get-ChildItem "$workingDir\src\**\project.json" | foreach { $_.FullName }
+  $testProjects= Get-ChildItem "$workingDir\test\**\project.json" | foreach { $_.FullName }
+  
+  Set-Location $workingDir
+  exec { dotnet restore }
+  Set-Location $baseDir
+  
+  $srcProjects + $testProjects | foreach {
+	exec { dotnet build "$_" --configuration Release }
   }
 }
 
-# Optional build documentation, add files to final zip
+task Test -depends Build {
+	Get-ChildItem "$workingDir\test\**\" | 
+	foreach { $_.FullName }	| 
+	foreach {
+		Write-Output "Running tests for '$_'"
+		exec { dotnet test "$_" "-result:$testOutputPath" }
+	}
+}
+
 task Package -depends Build {
-  foreach ($build in $builds) {
-    $name = $build.TestsName
-    $finalDir = $build.FinalDir
-    
-    robocopy "$workingSourceDir\HdrHistogram\bin\Release\$finalDir" $workingDir\Package\Bin\$finalDir *.dll *.pdb *.xml /NFL /NDL /NJS /NC /NS /NP /XO /XF *.CodeAnalysisLog.xml | Out-Default
-  }
-  
-  if ($buildNuGet) {
-    New-Item -Path $workingDir\NuGet -ItemType Directory
-
-    $nuspecPath = "$workingDir\NuGet\HdrHistogram.nuspec"
-    Copy-Item -Path "$buildDir\HdrHistogram.nuspec" -Destination $nuspecPath -recurse
-
-    Write-Host "Updating nuspec file at $nuspecPath" -ForegroundColor Green
-    Write-Host
-
-    $xml = [xml](Get-Content $nuspecPath)
-    Edit-XmlNodes -doc $xml -xpath "//*[local-name() = 'id']" -value $packageId
-    Edit-XmlNodes -doc $xml -xpath "//*[local-name() = 'version']" -value $semver
-
-    Write-Host $xml.OuterXml
-
-    $xml.save($nuspecPath)
-    
-    Write-Host "Copying build artefacts to NuGet target structure" -ForegroundColor Green
-    foreach ($build in $builds) {
-      if ($build.NuGetDir) {
-        $name = $build.TestsName
-        $finalDir = $build.FinalDir
-        $frameworkDirs = $build.NuGetDir.Split(",")
-        
-        foreach ($frameworkDir in $frameworkDirs) {
-          $artefactSource = "$workingSourceDir\HdrHistogram\bin\Release\$finalDir"
-          $artefactTarget = "$workingDir\NuGet\lib\$frameworkDir"
-      
-          Write-Host "Copying build artefacts from '$artefactSource' to '$artefactTarget'" -ForegroundColor Green
-      
-          robocopy $artefactSource $artefactTarget *.dll *.pdb *.xml /NFL /NDL /NJS /NC /NS /NP /XO /XF *.CodeAnalysisLog.xml | Out-Default
-        }
-      }
-    }
-  
-    robocopy $workingSourceDir $workingDir\NuGet\src *.cs /S /NFL /NDL /NJS /NC /NS /NP /XD obj .vs artifacts | Out-Default
-
-    Write-Host "Building NuGet package with ID $packageId and version $semver from '$nuspecPath'" -ForegroundColor Green
-    Write-Host
-    Write-Host "Using NuGet from $nugetPath"
-
-    exec { .\working\nuget.exe pack $nuspecPath -Symbols } "Error packing $nuspecPath"
-    move -Path .\*.nupkg -Destination $workingDir\NuGet
-  }
-  
-  Copy-Item -Path $baseDir\readme.md -Destination $workingDir\Package\
-  Copy-Item -Path $baseDir\license.txt -Destination $workingDir\Package\
-
-  robocopy $workingSourceDir $workingDir\Package\Source\Src /MIR /NFL /NDL /NJS /NC /NS /NP /XD bin obj TestResults AppPackages .vs artifacts /XF *.suo *.user *.lock.json | Out-Default
-  robocopy $buildDir $workingDir\Package\Source\Build /MIR /NFL /NDL /NJS /NC /NS /NP /XF runbuild.txt | Out-Default
-  
-  Compress-Archive -Path "$workingDir\Package\*" -DestinationPath "$workingDir\$zipFileName"
+	$packableProjectDirectories | foreach {
+		exec { dotnet pack "$_" --configuration Release -o "$packageOutputDir" }
+	}
 }
 
-# Unzip package to a location
-task Deploy -depends Package {
-  Expand-Archive -Path "$workingDir\$zipFileName" -DestinationPath "$workingDir\Deployed"
-}
-
-# Run tests on deployed files
-task Test -depends Deploy {
-  foreach ($build in $builds) {
-    if ($build.TestsFunction -ne $null) {
-      & $build.TestsFunction $build
-    }
-  }
-}
-
-function MSBuildBuild ($build) {
-  $name = $build.Name
-  $finalDir = $build.FinalDir
-  
-  Write-Host
-  Write-Host "Restoring $workingSourceDir\$name.sln" -ForegroundColor Green
-  [Environment]::SetEnvironmentVariable("EnableNuGetPackageRestore", "true", "Process")
-  exec { .\working\nuget.exe restore "$workingSourceDir\$name.sln" `
-    -verbosity detailed `
-    -configfile $workingSourceDir\nuget.config `
-    | Out-Default 
-  } "Error restoring $name"
-
-  $constants = GetConstants $build.Constants $signAssemblies
-
-  Write-Host
-  Write-Host "Building $workingSourceDir\$name.sln" -ForegroundColor Green
-  exec { msbuild "/t:Clean;Rebuild" `
-    /p:Configuration=Release `
-    "/p:CopyNuGetImplementations=true" `
-    "/p:Platform=Any CPU" `
-    "/p:PlatformTarget=AnyCPU" `
-    /p:OutputPath=bin\Release\$finalDir\ `
-    /p:AssemblyOriginatorKeyFile=$signKeyPath `
-    "/p:SignAssembly=$signAssemblies" `
-    "/p:TreatWarningsAsErrors=$treatWarningsAsErrors" `
-    "/p:VisualStudioVersion=14.0" `
-    /p:DefineConstants=`"$constants`" `
-    "$workingSourceDir\$name.sln" `
-    | Out-Default 
-  } "Error building $name"
-}
-
-function GetNuget () {
-  $localNugetPath = "$workingDir\nuget.exe"
+function Get-Nuget () {
   #Check for existence of Nuget.exe on path, if not there, download and install from nuget.org
   $currentNuget = (Get-Command "nuget.exe" -ErrorAction SilentlyContinue)
   if (($currentNuget -eq $null) -Or ($currentNuget.Version.Major -lt 3)) { 
@@ -214,91 +115,28 @@ function GetNuget () {
   }
 }
 
-function NUnitTests ($build) {
-  $name = $build.TestsName
-  $finalDir = $build.FinalDir
-  $framework = $build.Framework
-
-  
-
-  if ($buildEnv -eq "AppVeyor") {
-    Write-Host "Skipping Explicit NUnit test as AppVeyor should discover them and run automatically"
-  }else{
-
-    exec { .\working\nuget.exe install NUnit.ConsoleRunner -version 3.2.0 -OutputDirectory $workingSourceDir\packages }
-  
-    Write-Host -ForegroundColor Green "Copying test assembly $name to deployed directory"
-    Write-Host
-    robocopy "$workingSourceDir\HdrHistogram.UnitTests\bin\Release\$finalDir" $workingDir\Deployed\Bin\$finalDir /MIR /NFL /NDL /NJS /NC /NS /NP /XO | Out-Default
-
-    Copy-Item -Path "$workingSourceDir\HdrHistogram.UnitTests\bin\Release\$finalDir\HdrHistogram.UnitTests.dll" -Destination $workingDir\Deployed\Bin\$finalDir\
-
-    Write-Host -ForegroundColor Green "Running NUnit tests '$name' for '$buildEnv' build platform"
-    Write-Host
-    $nUnitPath = "$workingSourceDir\packages\NUnit.ConsoleRunner.3.2.0\tools\nunit3-console.exe"  
-
-    $flag = ""
-    if ($buildEnv -eq "TeamCity") {
-      $flag = "--teamcity"
-    }
-
-    exec { .\working\src\packages\NUnit.ConsoleRunner.3.2.0\tools\nunit3-console.exe `
-      $workingDir\Deployed\Bin\$finalDir\HdrHistogram.UnitTests.dll `
-      --framework=$framework `
-      $flag `
-      | Out-Default 
-    } "Error running $name tests"
-  }
+function Get-JsonNet() {
+	& "$localNugetPath" install newtonsoft.json -Version 9.0.1 -ExcludeVersion -o $nugetDependecies
 }
 
-function GetConstants ($constants, $includeSigned) {
-  $signed = switch($includeSigned) { $true { ";SIGNED" } default { "" } }
+#HACK While we wait for `dotnet pack` to support setting the version, not just "bizzarely" the version-suffix. -LC
+# https://github.com/dotnet/cli/issues/5568
+function Patch-Versions ([string] $workingSourceDir, [string]$semver) {
+	[Reflection.Assembly]::LoadFile($jsonlib) | out-null
+	
+	$packableProjectDirectories | foreach {
+		Write-Host "Patching project.json"
+		
+		$json = (Get-Content "$_\project.json" | Out-String)
+		$config = [Newtonsoft.Json.Linq.JObject]::Parse($json)
+		$version = $config.Item("version").ToString()
+		$config.Item("version") = New-Object -TypeName Newtonsoft.Json.Linq.JValue -ArgumentList "$semver"
 
-  return "CODE_ANALYSIS;TRACE;$constants$signed"
-}
-
-function Update-AssemblyInfoFiles ([string] $workingSourceDir, [string]$semver) {
-  $majorMinor = GetMajorMinor($semver)
-  $majorMinorPatch = GetMajorMinorPatch($semver)
-  $assemblyVersionNumber = "$majorMinor.0.0"
-  $fileVersionNumber = "$majorMinorPatch.0"
-  $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
-  $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
-  $assemblyVersion = 'AssemblyVersion("' + $assemblyVersionNumber + '")';
-  $fileVersion = 'AssemblyFileVersion("' + $fileVersionNumber + '")';
-    
-  Get-ChildItem -Path $workingSourceDir -r -filter AssemblyInfo.cs | ForEach-Object {
-    $filename = $_.Directory.ToString() + '\' + $_.Name
-    Write-Host $filename + ' -> ' + $fileVersionNumber
-    
-    (Get-Content $filename) | ForEach-Object {
-        % {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
-        % {$_ -replace $fileVersionPattern, $fileVersion }
-    } | Set-Content $filename
-  }
-}
-
-function Edit-XmlNodes {
-  param (
-      [xml] $doc,
-      [string] $xpath = $(throw "xpath is a required parameter"),
-      [string] $value = $(throw "value is a required parameter")
-  )
-    
-  $nodes = $doc.SelectNodes($xpath)
-  $count = $nodes.Count
-
-  Write-Host "Found $count nodes with path '$xpath'"
-    
-  foreach ($node in $nodes) {
-    if ($node -ne $null) {
-      if ($node.NodeType -eq "Element") {
-          $node.InnerXml = $value
-      } else {
-          $node.Value = $value
-      }
-    }
-  }
+		$config.ToString() | Out-File "$_\project.json"
+		
+		$after = (Get-Content "$_\project.json" | Out-String)
+		Write-Host $after
+	}
 }
 
 function Execute-Command ($command) {
@@ -319,21 +157,4 @@ function Execute-Command ($command) {
       $currentRetry = $currentRetry + 1
     }
   } while (!$success)
-}
-
-function GetMajorMinorPatch ([string] $semver) {
-  $semverPattern = '(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(-(?<label>.*))?'
-  $matches = [regex]::matches($semver, $semverPattern)
-  $major = $matches.captures.groups['major'].Value;
-  $minor = $matches.captures.groups['minor'].Value;
-  $patch = $matches.captures.groups['patch'].Value;
-  return "$major.$minor.$patch";
-}
-
-function GetMajorMinor ([string] $semver) {
-  $semverPattern = '(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(-(?<label>.*))?'
-  $matches = [regex]::matches($semver, $semverPattern)
-  $major = $matches.captures.groups['major'].Value;
-  $minor = $matches.captures.groups['minor'].Value;
-  return "$major.$minor";
 }
