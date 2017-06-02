@@ -4,7 +4,7 @@ using HdrHistogram.Iteration;
 
 namespace HdrHistogram.UnitTests
 {
-    public class HistogramIterationValueComparer : IComparer<HistogramIterationValue>, IComparer
+    public sealed class HistogramIterationValueComparer : IComparer<HistogramIterationValue>, IComparer
     {
         public static readonly HistogramIterationValueComparer Instance = new HistogramIterationValueComparer();
 
@@ -36,7 +36,7 @@ namespace HdrHistogram.UnitTests
 
         public int Compare(object x, object y)
         {
-            return Compare((HistogramIterationValue)x,(HistogramIterationValue)y);
+            return Compare((HistogramIterationValue)x, (HistogramIterationValue)y);
         }
     }
 }

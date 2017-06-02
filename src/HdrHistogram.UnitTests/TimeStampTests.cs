@@ -1,27 +1,28 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
 namespace HdrHistogram.UnitTests
 {
-    [TestFixture]
     public class TimeStampTests
     {
-        [Test]
+        [Fact]
         public void TimeStamp_values_are_accurate()
         {
             var delay = TimeSpan.FromSeconds(1);
             var expected = TimeStamp.Seconds(delay.Seconds);
+            long minAccepted = (long)(expected * 0.95);
+            long maxAccepted = (long)(expected * 1.05);
 
             var start = Stopwatch.GetTimestamp();
-            Thread.Sleep(delay);
+            Spin.Wait(delay);
             var end = Stopwatch.GetTimestamp();
             var actual = end - start;
-            
-            Assert.AreEqual(expected, actual, expected * 0.05);
-            Assert.AreEqual(TimeStamp.Seconds(60), TimeStamp.Minutes(1));
-            Assert.AreEqual(TimeStamp.Minutes(60), TimeStamp.Hours(1));
-        }        
+
+            actual.Should().BeInRange(minAccepted, maxAccepted);
+            Assert.Equal(TimeStamp.Seconds(60), TimeStamp.Minutes(1));
+            Assert.Equal(TimeStamp.Minutes(60), TimeStamp.Hours(1));
+        }
     }
 }

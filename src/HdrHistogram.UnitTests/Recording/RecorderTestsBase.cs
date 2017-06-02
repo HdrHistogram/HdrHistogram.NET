@@ -1,6 +1,6 @@
 ﻿using System;
 using HdrHistogram.Utilities;
-using NUnit.Framework;
+using Xunit;
 
 namespace HdrHistogram.UnitTests.Recording
 {
@@ -13,10 +13,11 @@ namespace HdrHistogram.UnitTests.Recording
         protected abstract HistogramBase CreateHistogram(long id, long min, long max, int sf);
         protected abstract Recorder Create(long min, long max, int sf);
 
-        [TestCase(0, 1, DefaultSignificantFigures, "lowestTrackableValue", "lowestTrackableValue must be >= 1")]
-        [TestCase(1, 1, DefaultSignificantFigures, "highestTrackableValue", "highestTrackableValue must be >= 2 * lowestTrackableValue")]
-        [TestCase(1, DefaultHighestTrackableValue, 6, "numberOfSignificantValueDigits", "numberOfSignificantValueDigits must be between 0 and 5")]
-        [TestCase(1, DefaultHighestTrackableValue, -1, "numberOfSignificantValueDigits", "numberOfSignificantValueDigits must be between 0 and 5")]
+        [Theory]
+        [InlineData(0, 1, DefaultSignificantFigures, "lowestTrackableValue", "lowestTrackableValue must be >= 1")]
+        [InlineData(1, 1, DefaultSignificantFigures, "highestTrackableValue", "highestTrackableValue must be >= 2 * lowestTrackableValue")]
+        [InlineData(1, DefaultHighestTrackableValue, 6, "numberOfSignificantValueDigits", "numberOfSignificantValueDigits must be between 0 and 5")]
+        [InlineData(1, DefaultHighestTrackableValue, -1, "numberOfSignificantValueDigits", "numberOfSignificantValueDigits must be between 0 and 5")]
         public void ConstructorShouldRejectInvalidParameters(
            long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits,
            string errorParamName, string errorMessage)
@@ -25,11 +26,11 @@ namespace HdrHistogram.UnitTests.Recording
                 Create(lowestTrackableValue, 
                     highestTrackableValue, 
                     numberOfSignificantValueDigits));
-            Assert.AreEqual(errorParamName, ex.ParamName);
-            StringAssert.StartsWith(errorMessage, ex.Message);
+            Assert.Equal(errorParamName, ex.ParamName);
+            Assert.StartsWith(errorMessage, ex.Message);
         }
 
-        [Test]
+        [Fact]
         public void GetIntervalHistogram_returns_alternating_instances_from_factory()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -38,13 +39,13 @@ namespace HdrHistogram.UnitTests.Recording
             var c = recorder.GetIntervalHistogram(b);
             var d = recorder.GetIntervalHistogram(c);
 
-            Assert.AreNotSame(a, b);
-            Assert.AreSame(a, c);
-            Assert.AreNotSame(a, d);
-            Assert.AreSame(b, d);
+            Assert.NotSame(a, b);
+            Assert.Same(a, c);
+            Assert.NotSame(a, d);
+            Assert.Same(b, d);
         }
 
-        [Test]
+        [Fact]
         public void GetIntervalHistogram_returns_current_histogram_values()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -52,29 +53,29 @@ namespace HdrHistogram.UnitTests.Recording
             recorder.RecordValue(10);
             recorder.RecordValue(100);
             var histogram = recorder.GetIntervalHistogram();
-            Assert.AreEqual(1, histogram.GetCountAtValue(1));
-            Assert.AreEqual(1, histogram.GetCountAtValue(10));
-            Assert.AreEqual(1, histogram.GetCountAtValue(100));
+            Assert.Equal(1, histogram.GetCountAtValue(1));
+            Assert.Equal(1, histogram.GetCountAtValue(10));
+            Assert.Equal(1, histogram.GetCountAtValue(100));
         }
 
-        [Test]
+        [Fact]
         public void GetIntervalHistogram_causes_recording_to_happen_on_new_histogram()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1);
             var histogramPrimary = recorder.GetIntervalHistogram();
-            Assert.AreEqual(1, histogramPrimary.GetCountAtValue(1));
+            Assert.Equal(1, histogramPrimary.GetCountAtValue(1));
 
             recorder.RecordValue(10);
             recorder.RecordValue(100);
             var histogramSecondary = recorder.GetIntervalHistogram(histogramPrimary);
 
-            Assert.AreEqual(0, histogramSecondary.GetCountAtValue(1));
-            Assert.AreEqual(1, histogramSecondary.GetCountAtValue(10));
-            Assert.AreEqual(1, histogramSecondary.GetCountAtValue(100));
+            Assert.Equal(0, histogramSecondary.GetCountAtValue(1));
+            Assert.Equal(1, histogramSecondary.GetCountAtValue(10));
+            Assert.Equal(1, histogramSecondary.GetCountAtValue(100));
         }
 
-        [Test]
+        [Fact]
         public void GetIntervalHistogram_resets_recycled_histogram()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -88,24 +89,24 @@ namespace HdrHistogram.UnitTests.Recording
             recorder.RecordValue(100);
             var histogramSecondary = recorder.GetIntervalHistogram(histogramPrimary);
 
-            Assert.AreEqual(0, histogramPrimary.GetCountAtValue(1));
-            Assert.AreEqual(0, histogramPrimary.GetCountAtValue(10));
-            Assert.AreEqual(0, histogramPrimary.GetCountAtValue(100));
-            Assert.AreEqual(1, histogramSecondary.GetCountAtValue(1));
-            Assert.AreEqual(1, histogramSecondary.GetCountAtValue(10));
-            Assert.AreEqual(1, histogramSecondary.GetCountAtValue(100));
+            Assert.Equal(0, histogramPrimary.GetCountAtValue(1));
+            Assert.Equal(0, histogramPrimary.GetCountAtValue(10));
+            Assert.Equal(0, histogramPrimary.GetCountAtValue(100));
+            Assert.Equal(1, histogramSecondary.GetCountAtValue(1));
+            Assert.Equal(1, histogramSecondary.GetCountAtValue(10));
+            Assert.Equal(1, histogramSecondary.GetCountAtValue(100));
         }
 
-        [Test]
+        [Fact]
         public void RecordValue_increments_TotalCount()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1000);
             var histogram = recorder.GetIntervalHistogram();
-            Assert.AreEqual(1, histogram.TotalCount);
+            Assert.Equal(1, histogram.TotalCount);
         }
 
-        [Test]
+        [Fact]
         public void RecordValue_increments_CountAtValue()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -113,10 +114,10 @@ namespace HdrHistogram.UnitTests.Recording
             recorder.RecordValue(1000);
             recorder.RecordValue(1000);
             var histogram = recorder.GetIntervalHistogram();
-            Assert.AreEqual(3, histogram.GetCountAtValue(1000));
+            Assert.Equal(3, histogram.GetCountAtValue(1000));
         }
 
-        [Test]
+        [Fact]
         public void RecordValue_Overflow_ShouldThrowException()
         {
             var highestTrackableValue = DefaultHighestTrackableValue;
@@ -124,16 +125,16 @@ namespace HdrHistogram.UnitTests.Recording
             Assert.Throws<IndexOutOfRangeException>(() => recorder.RecordValue(highestTrackableValue * 3));
         }
 
-        [Test]
+        [Fact]
         public void RecordValueWithCount_increments_TotalCount()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValueWithCount(1000, 10);
             var histogram = recorder.GetIntervalHistogram();
-            Assert.AreEqual(10, histogram.TotalCount);
+            Assert.Equal(10, histogram.TotalCount);
         }
 
-        [Test]
+        [Fact]
         public void RecordValueWithCount_increments_CountAtValue()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -141,11 +142,11 @@ namespace HdrHistogram.UnitTests.Recording
             recorder.RecordValueWithCount(1000, 10);
             recorder.RecordValueWithCount(5000, 20);
             var histogram = recorder.GetIntervalHistogram();
-            Assert.AreEqual(20, histogram.GetCountAtValue(1000));
-            Assert.AreEqual(20, histogram.GetCountAtValue(5000));
+            Assert.Equal(20, histogram.GetCountAtValue(1000));
+            Assert.Equal(20, histogram.GetCountAtValue(5000));
         }
 
-        [Test]
+        [Fact]
         public void RecordValueWithCount_Overflow_ShouldThrowException()
         {
             var highestTrackableValue = DefaultHighestTrackableValue;
@@ -153,7 +154,7 @@ namespace HdrHistogram.UnitTests.Recording
             Assert.Throws<IndexOutOfRangeException>(() => recorder.RecordValueWithCount(highestTrackableValue * 3, 100));
         }
 
-        [Test]
+        [Fact]
         public void RecordValueWithExpectedInterval()
         {
             var TestValueLevel = 4L;
@@ -165,20 +166,20 @@ namespace HdrHistogram.UnitTests.Recording
 
             var intervalHistogram = recorder.GetIntervalHistogram();
             // The data will include corrected samples:
-            Assert.AreEqual(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 1) / 4));
-            Assert.AreEqual(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 2) / 4));
-            Assert.AreEqual(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 3) / 4));
-            Assert.AreEqual(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 4) / 4));
-            Assert.AreEqual(4L, intervalHistogram.TotalCount);
+            Assert.Equal(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 1) / 4));
+            Assert.Equal(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 2) / 4));
+            Assert.Equal(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 3) / 4));
+            Assert.Equal(1L, intervalHistogram.GetCountAtValue((TestValueLevel * 4) / 4));
+            Assert.Equal(4L, intervalHistogram.TotalCount);
             // But the raw data will not:
-            Assert.AreEqual(0L, valueHistogram.GetCountAtValue((TestValueLevel * 1) / 4));
-            Assert.AreEqual(0L, valueHistogram.GetCountAtValue((TestValueLevel * 2) / 4));
-            Assert.AreEqual(0L, valueHistogram.GetCountAtValue((TestValueLevel * 3) / 4));
-            Assert.AreEqual(1L, valueHistogram.GetCountAtValue((TestValueLevel * 4) / 4));
-            Assert.AreEqual(1L, valueHistogram.TotalCount);
+            Assert.Equal(0L, valueHistogram.GetCountAtValue((TestValueLevel * 1) / 4));
+            Assert.Equal(0L, valueHistogram.GetCountAtValue((TestValueLevel * 2) / 4));
+            Assert.Equal(0L, valueHistogram.GetCountAtValue((TestValueLevel * 3) / 4));
+            Assert.Equal(1L, valueHistogram.GetCountAtValue((TestValueLevel * 4) / 4));
+            Assert.Equal(1L, valueHistogram.TotalCount);
         }
 
-        [Test]
+        [Fact]
         public void RecordAction_increments_TotalCount()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -186,10 +187,10 @@ namespace HdrHistogram.UnitTests.Recording
             recorder.Record(() => { });
 
             var longHistogram = recorder.GetIntervalHistogram();
-            Assert.AreEqual(1, longHistogram.TotalCount);
+            Assert.Equal(1, longHistogram.TotalCount);
         }
 
-        [Test]
+        [Fact]
         public void Reset_clears_counts_for_instances()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -206,11 +207,11 @@ namespace HdrHistogram.UnitTests.Recording
             var histogramSecondary = recorder.GetIntervalHistogram(histogramPrimary);
 
 
-            Assert.AreEqual(0, histogramPrimary.TotalCount);
-            Assert.AreEqual(0, histogramSecondary.TotalCount);
+            Assert.Equal(0, histogramPrimary.TotalCount);
+            Assert.Equal(0, histogramSecondary.TotalCount);
         }
 
-        [Test]
+        [Fact]
         public void GetIntervalHistogramInto_copies_data_over_provided_Histogram()
         {
             var originalStart = DateTime.Today.AddDays(-1).MillisecondsSinceUnixEpoch();
@@ -223,10 +224,10 @@ namespace HdrHistogram.UnitTests.Recording
             targetHistogram.EndTimeStamp = originalEnd;
 
 
-            Assert.AreEqual(3, targetHistogram.TotalCount);
-            Assert.AreEqual(1, targetHistogram.GetCountAtValue(1));
-            Assert.AreEqual(1, targetHistogram.GetCountAtValue(10));
-            Assert.AreEqual(1, targetHistogram.GetCountAtValue(100));
+            Assert.Equal(3, targetHistogram.TotalCount);
+            Assert.Equal(1, targetHistogram.GetCountAtValue(1));
+            Assert.Equal(1, targetHistogram.GetCountAtValue(10));
+            Assert.Equal(1, targetHistogram.GetCountAtValue(100));
 
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
             recorder.RecordValue(1000);
@@ -235,18 +236,18 @@ namespace HdrHistogram.UnitTests.Recording
             
             recorder.GetIntervalHistogramInto(targetHistogram);
             
-            Assert.AreEqual(3, targetHistogram.TotalCount);
-            Assert.AreEqual(0, targetHistogram.GetCountAtValue(1));
-            Assert.AreEqual(0, targetHistogram.GetCountAtValue(10));
-            Assert.AreEqual(0, targetHistogram.GetCountAtValue(100));
-            Assert.AreEqual(1, targetHistogram.GetCountAtValue(1000));
-            Assert.AreEqual(1, targetHistogram.GetCountAtValue(10000));
-            Assert.AreEqual(1, targetHistogram.GetCountAtValue(100000));
-            Assert.AreNotEqual(originalStart, targetHistogram.StartTimeStamp);
-            Assert.AreNotEqual(originalEnd, targetHistogram.EndTimeStamp);
+            Assert.Equal(3, targetHistogram.TotalCount);
+            Assert.Equal(0, targetHistogram.GetCountAtValue(1));
+            Assert.Equal(0, targetHistogram.GetCountAtValue(10));
+            Assert.Equal(0, targetHistogram.GetCountAtValue(100));
+            Assert.Equal(1, targetHistogram.GetCountAtValue(1000));
+            Assert.Equal(1, targetHistogram.GetCountAtValue(10000));
+            Assert.Equal(1, targetHistogram.GetCountAtValue(100000));
+            Assert.NotEqual(originalStart, targetHistogram.StartTimeStamp);
+            Assert.NotEqual(originalEnd, targetHistogram.EndTimeStamp);
         }
 
-        [Test]
+        [Fact]
         public void Using_external_histogram_for_recycling_throws()
         {
             const int id = -1000;

@@ -1,6 +1,7 @@
 gh-pages
 Working/
 build/runbuild.txt
+BenchmarkDotNet.Artifacts/
 
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 [Bb]in/

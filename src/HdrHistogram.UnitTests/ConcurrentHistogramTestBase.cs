@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace HdrHistogram.UnitTests
 {
     public abstract class ConcurrentHistogramTestBase : HistogramTestBase
     {
-        [Test]
+        [Fact]
         public void Can_support_multiple_concurrent_recorders()
         {
             var target = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -25,7 +25,7 @@ namespace HdrHistogram.UnitTests
                 .ToArray();
             Parallel.Invoke(actions);
 
-            Assert.AreEqual(expected, target.TotalCount);
+            Assert.Equal(expected, target.TotalCount);
         }
     }
 }

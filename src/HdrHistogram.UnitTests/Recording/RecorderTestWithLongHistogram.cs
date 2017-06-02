@@ -1,8 +1,8 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace HdrHistogram.UnitTests.Recording
 {
-    [TestFixture]
+    
     public sealed class RecorderTestWithLongHistogram : RecorderTestsBase
     {
         protected override HistogramBase CreateHistogram(long id, long min, long max, int sf)

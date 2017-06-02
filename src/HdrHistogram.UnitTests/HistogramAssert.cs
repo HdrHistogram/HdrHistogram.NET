@@ -1,5 +1,8 @@
-﻿using System.Linq;
-using NUnit.Framework;
+﻿using System;
+using System.Linq;
+using FluentAssertions;
+using HdrHistogram.Iteration;
+using Xunit;
 
 namespace HdrHistogram.UnitTests
 {
@@ -7,22 +10,46 @@ namespace HdrHistogram.UnitTests
     {
         public static void AreEqual(HistogramBase expected, HistogramBase actual)
         {
-            Assert.AreEqual(expected.GetType(), actual.GetType());
+            Assert.Equal(expected.GetType(), actual.GetType());
             AreValueEqual(expected, actual);
         }
 
         public static void AreValueEqual(HistogramBase expected, HistogramBase actual)
         {
-            Assert.AreEqual(expected.TotalCount, actual.TotalCount, "TotalCount property is not equal.");
-            Assert.AreEqual(expected.Tag, actual.Tag, "Tag property is not equal.");
-            Assert.AreEqual(expected.StartTimeStamp, actual.StartTimeStamp, "StartTimeStamp property is not equal.");
-            Assert.AreEqual(expected.EndTimeStamp, actual.EndTimeStamp, "EndTimeStamp property is not equal.");
-            Assert.AreEqual(expected.LowestTrackableValue, actual.LowestTrackableValue, "LowestTrackableValue property is not equal.");
-            Assert.AreEqual(expected.HighestTrackableValue, actual.HighestTrackableValue, "HighestTrackableValue property is not equal.");
-            Assert.AreEqual(expected.NumberOfSignificantValueDigits, actual.NumberOfSignificantValueDigits, "NumberOfSignificantValueDigits property is not equal.");
+            expected.TotalCount.Should().Be(actual.TotalCount, "TotalCount property is not equal.");
+            expected.Tag.Should().Be(actual.Tag, "Tag property is not equal.");
+            expected.StartTimeStamp.Should().Be(actual.StartTimeStamp, "StartTimeStamp property is not equal.");
+            expected.EndTimeStamp.Should().Be(actual.EndTimeStamp, "EndTimeStamp property is not equal.");
+            expected.LowestTrackableValue.Should().Be(actual.LowestTrackableValue, "LowestTrackableValue property is not equal.");
+            expected.HighestTrackableValue.Should().Be(actual.HighestTrackableValue, "HighestTrackableValue property is not equal.");
+            expected.NumberOfSignificantValueDigits.Should().Be(actual.NumberOfSignificantValueDigits, "NumberOfSignificantValueDigits property is not equal.");
+
             var expectedValues = expected.AllValues().ToArray();
             var actualValues = actual.AllValues().ToArray();
-            CollectionAssert.AreEqual(expectedValues, actualValues, HistogramIterationValueComparer.Instance, "Recorded values differ");
+            CollectionEquals(expectedValues, actualValues);
+        }
+
+        private static void CollectionEquals(HistogramIterationValue[] expected, HistogramIterationValue[] actual)
+        {
+            if (expected == null && actual == null)
+                return;
+            if(expected == null)
+                throw new Exception("Expected null array");
+            if (actual == null)
+                throw new Exception("Unexpected null array");
+
+            if(expected.Length != actual.Length)
+                throw new Exception($"Expected length of {expected.Length}, but recieved {actual.Length}");
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                var e = expected[i];
+                var a = actual[i];
+                if (HistogramIterationValueComparer.Instance.Compare(e, a) != 0)
+                {
+                    throw new Exception($"Values differ at index {i}. Expected {e}, but recieved {a}");
+                }
+            }
         }
     }
 }

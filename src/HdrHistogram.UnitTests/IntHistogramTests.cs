@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace HdrHistogram.UnitTests
 {
-    [TestFixture]
+    
     public class IntHistogramTests : HistogramTestBase
     {
         protected override int WordSize => sizeof(int);

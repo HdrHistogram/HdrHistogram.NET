@@ -3,7 +3,6 @@ using BenchmarkDotNet.Attributes;
 
 namespace HdrHistogram.Benchmarking.Recording
 {
-    [Config(typeof(ExhuastiveJobWithMemoryDiagnosisConfig))]
     public class Recording32BitBenchmark
     {
         private readonly long[] _testValues;

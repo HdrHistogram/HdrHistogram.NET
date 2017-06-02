@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HdrHistogram.Utilities
 {
@@ -83,7 +84,7 @@ namespace HdrHistogram.Utilities
         {
             return GetAndIncrement(ref _startEpoch);
         }
-        
+
         /// <summary>
         /// Indicate exit from a critical section containing a write operation.
         /// </summary>
@@ -105,7 +106,7 @@ namespace HdrHistogram.Utilities
                 GetAndIncrement(ref _evenEndEpoch);
             }
         }
-        
+
         /// <summary>
         /// Enter to a critical section containing a read operation (mutually excludes against other <see cref="ReaderLock()"/> calls).
         /// <see cref="ReaderLock"/> DOES NOT provide synchronization against <see cref="WriterCriticalSectionEnter"/> calls.
@@ -123,7 +124,7 @@ namespace HdrHistogram.Utilities
         {
             Monitor.Exit(_readerLock);
         }
-        
+
 
         /// <summary>
         /// Flip a phase in the <see cref="WriterReaderPhaser"/> instance, <see cref="FlipPhase(System.TimeSpan)"/> can only be called while holding the <see cref="ReaderLock()"/>.
@@ -179,13 +180,15 @@ namespace HdrHistogram.Utilities
                 }
                 if (!caughtUp)
                 {
+                    //TODO: Revist this and check if a SpinWiat is actually preferable here? -LC
                     if (yieldPeriod == TimeSpan.Zero)
                     {
-                        Thread.Yield();
+                        Task.Yield().GetAwaiter().GetResult();
                     }
                     else
                     {
-                        Thread.Sleep(yieldPeriod);
+                        //Thread.Sleep(yieldPeriod);
+                        Task.Delay(yieldPeriod).GetAwaiter().GetResult();
                     }
                 }
             } while (!caughtUp);

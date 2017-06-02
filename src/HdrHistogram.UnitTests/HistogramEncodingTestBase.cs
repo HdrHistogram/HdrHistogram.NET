@@ -1,6 +1,6 @@
 ﻿using HdrHistogram.Encoding;
 using HdrHistogram.Utilities;
-using NUnit.Framework;
+using Xunit;
 
 namespace HdrHistogram.UnitTests
 {
@@ -12,7 +12,7 @@ namespace HdrHistogram.UnitTests
 
         private static readonly HistogramEncoderV2 EncoderV2 = new Encoding.HistogramEncoderV2();
 
-        [Test]
+        [Fact]
         public void Given_a_populated_Histogram_When_encoded_and_decoded_Then_data_is_preserved()
         {
             var source = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -21,7 +21,7 @@ namespace HdrHistogram.UnitTests
             HistogramAssert.AreValueEqual(source, result);
         }
 
-        [Test]
+        [Fact]
         public void Given_a_populated_Histogram_When_encoded_and_decoded_with_compression_Then_data_is_preserved()
         {
             var source = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -30,7 +30,7 @@ namespace HdrHistogram.UnitTests
             HistogramAssert.AreValueEqual(source, result);
         }
 
-        [Test]
+        [Fact]
         public void Given_a_Histogram_populated_with_full_range_of_values_When_encoded_and_decoded_Then_data_is_preserved()
         {
             var source = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
@@ -39,7 +39,7 @@ namespace HdrHistogram.UnitTests
             HistogramAssert.AreValueEqual(source, result);
         }
 
-        [Test]
+        [Fact]
         public void Given_a_Histogram_populated_with_full_range_of_values_When_encoded_and_decoded_with_compression_Then_data_is_preserved()
         {
             var source = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);

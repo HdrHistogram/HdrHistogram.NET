@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace HdrHistogram.UnitTests
 {
-    [TestFixture]
+    
     public class LongConcurrentHistogramTests : ConcurrentHistogramTestBase
     {
         protected override int WordSize => sizeof(long);

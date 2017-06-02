@@ -2,8 +2,9 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using HdrHistogram.Utilities;
-using NUnit.Framework;
+using Xunit;
 
 namespace HdrHistogram.UnitTests.Persistence
 {
@@ -14,7 +15,7 @@ namespace HdrHistogram.UnitTests.Persistence
         //Used as the HighestTrackableValue when reading out test files that were generated from the original Java implementation.
         private const long OneHourOfNanoseconds = 3600L * 1000 * 1000 * 1000;
 
-        [Test]
+        [Fact]
         public void CanReadEmptyLog()
         {
             byte[] data;
@@ -31,14 +32,15 @@ namespace HdrHistogram.UnitTests.Persistence
             using (var readerStream = new MemoryStream(data))
             {
                 var reader = new HistogramLogReader(readerStream);
-                CollectionAssert.IsEmpty(reader.ReadHistograms().ToList());
+                Assert.Empty(reader.ReadHistograms().ToList());
                 var actualStartTime = reader.GetStartTime().SecondsSinceUnixEpoch().Round(3);
-                Assert.AreEqual(expectedStartTime, actualStartTime);
+                Assert.Equal(expectedStartTime, actualStartTime);
             }
         }
 
-        [TestCase(3600L * 1000 * 1000, DefaultSignificantDigits, 1000)]
-        [TestCase(long.MaxValue / 2, DefaultSignificantDigits, 1000)]
+        [Theory]
+        [InlineData(3600L * 1000 * 1000, DefaultSignificantDigits, 1000)]
+        [InlineData(long.MaxValue / 2, DefaultSignificantDigits, 1000)]
         public void CanRoundTripSingleHistogram(long highestTrackableValue, int significantDigits, int multiplier)
         {
             var histogram = CreatePopulatedHistogram(highestTrackableValue, significantDigits, multiplier);
@@ -47,7 +49,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var data = histogram.WriteLog();
             var actualHistograms = data.ReadHistograms();
 
-            Assert.AreEqual(1, actualHistograms.Length);
+            Assert.Equal(1, actualHistograms.Length);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
@@ -61,12 +63,13 @@ namespace HdrHistogram.UnitTests.Persistence
             var data = histogram.WriteLog();
             var actualHistograms = data.ReadHistograms();
 
-            Assert.AreEqual(1, actualHistograms.Length);
+            Assert.Equal(1, actualHistograms.Length);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
-        [TestCase("ATag")]
-        [TestCase("AnotherTag")]
+        [Theory]
+        [InlineData("ATag")]
+        [InlineData("AnotherTag")]
         public void CanRoundTripSingleHistogramsWithSparseValues(string tag)
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
@@ -78,12 +81,12 @@ namespace HdrHistogram.UnitTests.Persistence
             var data = histogram.WriteLog();
             var actualHistograms = data.ReadHistograms();
 
-            Assert.AreEqual(1, actualHistograms.Length);
-            Assert.AreEqual(tag, actualHistograms[0].Tag);
+            Assert.Equal(1, actualHistograms.Length);
+            Assert.Equal(tag, actualHistograms[0].Tag);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
-        [Test]
+        [Fact]
         public void CanAppendHistogram()
         {
             var histogram1 = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
@@ -104,12 +107,13 @@ namespace HdrHistogram.UnitTests.Persistence
             }
             var actualHistograms = data.ReadHistograms();
 
-            Assert.AreEqual(2, actualHistograms.Length);
+            Assert.Equal(2, actualHistograms.Length);
             HistogramAssert.AreValueEqual(histogram1, actualHistograms.First());
             HistogramAssert.AreValueEqual(histogram2, actualHistograms.Skip(1).First());
         }
 
-        [TestCase("tagged-Log.logV2.hlog")]
+        [Theory]
+        [InlineData("tagged-Log.logV2.hlog")]
         public void CanReadV2TaggedLogs(string logPath)
         {
             var readerStream = GetEmbeddedFileStream(logPath);
@@ -121,7 +125,7 @@ namespace HdrHistogram.UnitTests.Persistence
             foreach (var histogram in reader.ReadHistograms())
             {
                 histogramCount++;
-                Assert.IsInstanceOf<HistogramBase>(histogram, "Expected integer value histograms in log file");
+                Assert.IsAssignableFrom<HistogramBase>(histogram);// "Expected integer value histograms in log file");
 
                 totalCount += histogram.TotalCount;
                 if (string.IsNullOrEmpty(histogram.Tag))
@@ -134,15 +138,15 @@ namespace HdrHistogram.UnitTests.Persistence
                 }
             }
 
-            Assert.AreEqual(42, histogramCount);
-            Assert.AreEqual(32290, totalCount);
+            Assert.Equal(42, histogramCount);
+            Assert.Equal(32290, totalCount);
 
             HistogramAssert.AreValueEqual(accumulatedHistogramWithNoTag, accumulatedHistogramWithTagA);
         }
 
 
-
-        [TestCase("jHiccup-2.0.7S.logV2.hlog")]
+        [Theory]
+        [InlineData("jHiccup-2.0.7S.logV2.hlog")]
         public void CanReadv2Logs(string logPath)
         {
             var readerStream = GetEmbeddedFileStream(logPath);
@@ -153,22 +157,23 @@ namespace HdrHistogram.UnitTests.Persistence
             foreach (var histogram in reader.ReadHistograms())
             {
                 histogramCount++;
-                Assert.IsInstanceOf<HistogramBase>(histogram, "Expected integer value histograms in log file");
+                Assert.IsAssignableFrom<HistogramBase>(histogram);//, "Expected integer value histograms in log file");
 
                 totalCount += histogram.TotalCount;
                 accumulatedHistogram.Add(histogram);
             }
 
-            Assert.AreEqual(62, histogramCount);
-            Assert.AreEqual(48761, totalCount);
-            Assert.AreEqual(1745879039, accumulatedHistogram.GetValueAtPercentile(99.9));
-            Assert.AreEqual(1796210687, accumulatedHistogram.GetMaxValue());
-            Assert.AreEqual(1441812279.474, reader.GetStartTime().SecondsSinceUnixEpoch());
+            Assert.Equal(62, histogramCount);
+            Assert.Equal(48761, totalCount);
+            Assert.Equal(1745879039, accumulatedHistogram.GetValueAtPercentile(99.9));
+            Assert.Equal(1796210687, accumulatedHistogram.GetMaxValue());
+            Assert.Equal(1441812279.474, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
 
-        [TestCase("jHiccup-2.0.1.logV0.hlog", 0, int.MaxValue, 81, 61256, 1510998015, 1569718271, 1438869961.225)]
-        [TestCase("jHiccup-2.0.1.logV0.hlog", 19, 25, 25, 18492, 459007, 623103, 1438869961.225)]
-        [TestCase("jHiccup-2.0.1.logV0.hlog", 45, 34, 34, 25439, 1209008127, 1234173951, 1438869961.225)]
+        [Theory]
+        [InlineData("jHiccup-2.0.1.logV0.hlog", 0, int.MaxValue, 81, 61256, 1510998015, 1569718271, 1438869961.225)]
+        [InlineData("jHiccup-2.0.1.logV0.hlog", 19, 25, 25, 18492, 459007, 623103, 1438869961.225)]
+        [InlineData("jHiccup-2.0.1.logV0.hlog", 45, 34, 34, 25439, 1209008127, 1234173951, 1438869961.225)]
         public void CanReadv0Logs(string logPath, int skip, int take,
             int expectedHistogramCount, int expectedCombinedValueCount,
             int expectedCombined999, long expectedCombinedMaxLength,
@@ -189,19 +194,20 @@ namespace HdrHistogram.UnitTests.Persistence
                 totalCount += histogram.TotalCount;
                 accumulatedHistogram.Add(histogram);
             }
-            Assert.AreEqual(expectedHistogramCount, histogramCount);
-            Assert.AreEqual(expectedCombinedValueCount, totalCount);
-            Assert.AreEqual(expectedCombined999, accumulatedHistogram.GetValueAtPercentile(99.9));
-            Assert.AreEqual(expectedCombinedMaxLength, accumulatedHistogram.GetMaxValue());
-            Assert.AreEqual(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
+            Assert.Equal(expectedHistogramCount, histogramCount);
+            Assert.Equal(expectedCombinedValueCount, totalCount);
+            Assert.Equal(expectedCombined999, accumulatedHistogram.GetValueAtPercentile(99.9));
+            Assert.Equal(expectedCombinedMaxLength, accumulatedHistogram.GetMaxValue());
+            Assert.Equal(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
 
-        [TestCase("jHiccup-2.0.6.logV1.hlog", 0, int.MaxValue, 88, 65964, 1829765119, 1888485375, 1438867590.285)]
-        [TestCase("jHiccup-2.0.6.logV1.hlog", 5, 15, 15, 11213, 1019740159, 1032323071, 1438867590.285)]
-        [TestCase("jHiccup-2.0.6.logV1.hlog", 50, 29, 29, 22630, 1871708159, 1888485375, 1438867590.285)]
-        [TestCase("ycsb.logV1.hlog", 0, int.MaxValue, 602, 300056, 1214463, 1546239, 1438613579.295)]
-        [TestCase("ycsb.logV1.hlog", 0, 180, 180, 89893, 1375231, 1546239, 1438613579.295)]
-        [TestCase("ycsb.logV1.hlog", 180, 520, 422, 210163, 530, 17775, 1438613579.295)]
+        [Theory]
+        [InlineData("jHiccup-2.0.6.logV1.hlog", 0, int.MaxValue, 88, 65964, 1829765119, 1888485375, 1438867590.285)]
+        [InlineData("jHiccup-2.0.6.logV1.hlog", 5, 15, 15, 11213, 1019740159, 1032323071, 1438867590.285)]
+        [InlineData("jHiccup-2.0.6.logV1.hlog", 50, 29, 29, 22630, 1871708159, 1888485375, 1438867590.285)]
+        [InlineData("ycsb.logV1.hlog", 0, int.MaxValue, 602, 300056, 1214463, 1546239, 1438613579.295)]
+        [InlineData("ycsb.logV1.hlog", 0, 180, 180, 89893, 1375231, 1546239, 1438613579.295)]
+        [InlineData("ycsb.logV1.hlog", 180, 520, 422, 210163, 530, 17775, 1438613579.295)]
         public void CanReadv1Logs(string logPath, int skip, int take,
             int expectedHistogramCount, int expectedCombinedValueCount,
             int expectedCombined999, long expectedCombinedMaxLength,
@@ -223,15 +229,16 @@ namespace HdrHistogram.UnitTests.Persistence
                 accumulatedHistogram.Add(histogram);
             }
 
-            Assert.AreEqual(expectedHistogramCount, histogramCount);
-            Assert.AreEqual(expectedCombinedValueCount, totalCount);
-            Assert.AreEqual(expectedCombined999, accumulatedHistogram.GetValueAtPercentile(99.9));
-            Assert.AreEqual(expectedCombinedMaxLength, accumulatedHistogram.GetMaxValue());
-            Assert.AreEqual(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
+            Assert.Equal(expectedHistogramCount, histogramCount);
+            Assert.Equal(expectedCombinedValueCount, totalCount);
+            Assert.Equal(expectedCombined999, accumulatedHistogram.GetValueAtPercentile(99.9));
+            Assert.Equal(expectedCombinedMaxLength, accumulatedHistogram.GetMaxValue());
+            Assert.Equal(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
 
-        [TestCase("ycsb.logV1.hlog", 0, 180, 180, 90033, 1375231, 1546239, 1438613579.295)]
-        [TestCase("ycsb.logV1.hlog", 180, 520, 421, 209686, 530, 17775, 1438613579.295)]
+        [Theory]
+        [InlineData("ycsb.logV1.hlog", 0, 180, 180, 90033, 1375231, 1546239, 1438613579.295)]
+        [InlineData("ycsb.logV1.hlog", 180, 520, 421, 209686, 530, 17775, 1438613579.295)]
         public void CanReadv1Logs_Skip_PreStart(string logPath, int skip, int take,
             int expectedHistogramCount, int expectedCombinedValueCount,
             int expectedCombined999, long expectedCombinedMaxLength,
@@ -254,11 +261,11 @@ namespace HdrHistogram.UnitTests.Persistence
                 accumulatedHistogram.Add(histogram);
             }
 
-            Assert.AreEqual(expectedHistogramCount, histogramCount);
-            Assert.AreEqual(expectedCombinedValueCount, totalCount);
-            Assert.AreEqual(expectedCombined999, accumulatedHistogram.GetValueAtPercentile(99.9));
-            Assert.AreEqual(expectedCombinedMaxLength, accumulatedHistogram.GetMaxValue());
-            Assert.AreEqual(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
+            Assert.Equal(expectedHistogramCount, histogramCount);
+            Assert.Equal(expectedCombinedValueCount, totalCount);
+            Assert.Equal(expectedCombined999, accumulatedHistogram.GetValueAtPercentile(99.9));
+            Assert.Equal(expectedCombinedMaxLength, accumulatedHistogram.GetMaxValue());
+            Assert.Equal(expectedStartTime, reader.GetStartTime().SecondsSinceUnixEpoch());
         }
 
         private HistogramBase CreatePopulatedHistogram(long highestTrackableValue, int significantDigits, int multiplier)
@@ -282,7 +289,7 @@ namespace HdrHistogram.UnitTests.Persistence
         private Stream GetEmbeddedFileStream(string filename)
         {
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);
-            return GetType()
+            return GetType().GetTypeInfo()
                 .Assembly
                 .GetManifestResourceStream(fileName);
         }

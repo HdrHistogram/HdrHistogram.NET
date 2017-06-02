@@ -1,8 +1,10 @@
-using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace HdrHistogram.UnitTests.Persistence
 {
-    [TestFixture]
+    
     public sealed class ShortHistogramLogReaderWriterTests : HistogramLogReaderWriterTestBase
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits)
@@ -10,10 +12,17 @@ namespace HdrHistogram.UnitTests.Persistence
             return new ShortHistogram(highestTrackableValue, numberOfSignificantValueDigits);
         }
         
-        [Test, TestCaseSource(typeof(TestCaseGenerator), nameof(TestCaseGenerator.PowersOfTwo), new object[] { 15 })]
+        [Theory]
+        [MemberData(nameof(PowersOfTwo))]
         public void CanRoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
         {
             RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(count);
+        }
+
+        public static IEnumerable<object[]> PowersOfTwo()
+        {
+            return TestCaseGenerator.PowersOfTwo(15)
+                .Select(v => new object[1] { v });
         }
     }
 }
