@@ -1,51 +1,39 @@
-version: 1.{build}.0
+version: 2.{build}.0
 pull_requests:
   do_not_increment_build_number: true
-image: WMF 5
+image: Visual Studio 2017
 build_script:
 - ps: >-
     Write-Host $env:APPVEYOR_BUILD_VERSION
-
+    
     Write-Host $env:APPVEYOR_PULL_REQUEST_NUMBER
-
+    
     Write-Host $env:APPVEYOR_PULL_REQUEST_TITLE
-
+    
     Write-Host $env:APPVEYOR_REPO_NAME
-
+    
     Write-Host $env:APPVEYOR_REPO_BRANCH
-
+    
     Write-Host $env:APPVEYOR_REPO_COMMIT
-
+    
     Write-Host $env:APPVEYOR_JOB_ID
 
-
     $semver = $env:APPVEYOR_BUILD_VERSION;
-
+    
     if($env:APPVEYOR_PULL_REQUEST_NUMBER -ge 0) {
       $semver = "$semver-PR$env:APPVEYOR_PULL_REQUEST_NUMBER";
     }
 
+    dotnet restore
 
-    Import-Module .\build\psake.psm1
+    dotnet build -c=Release /p:Version=$semver
+    
+    dotnet test .\HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj /p:Configuration=Release
 
-    Invoke-psake .\build\build.ps1 -taskList Test,Package -properties @{"semver"="$semver";}
-
-
-    Write-Host "Uploading test results"
-
-    $uploadPath = "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)"
-
-    $testResults = (Resolve-Path .\TestResult.xml)
-
-    Write-Host "Sending $testResults to $uploadPath"
-
-
-    $wc = New-Object 'System.Net.WebClient'
-
-    $wc.UploadFile($uploadPath, $testResults)
+    dotnet pack .\HdrHistogram\HdrHistogram.csproj -c=Release --include-symbols /p:Version=$semver
 test: off
 artifacts:
-- path: Working\Nuget\*.nupkg
+- path: .\HdrHistogram\bin\Release\*.nupkg
 notifications:
 - provider: GitHubPullRequest
   on_build_success: true
