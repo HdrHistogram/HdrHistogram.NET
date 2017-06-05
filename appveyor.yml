@@ -28,9 +28,9 @@ build_script:
 
     dotnet build -c=Release /p:Version=$semver
     
-    dotnet test .\HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj /p:Configuration=Release
+    dotnet test .\HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj --no-build /p:Configuration=Release
 
-    dotnet pack .\HdrHistogram\HdrHistogram.csproj -c=Release --include-symbols /p:Version=$semver
+    dotnet pack .\HdrHistogram\HdrHistogram.csproj -c=Release --no-build --include-symbols /p:Version=$semver
 test: off
 artifacts:
 - path: .\HdrHistogram\bin\Release\*.nupkg
