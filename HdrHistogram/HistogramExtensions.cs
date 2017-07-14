@@ -206,5 +206,49 @@ namespace HdrHistogram
             var elapsed = Stopwatch.GetTimestamp() - start;
             recorder.RecordValue(elapsed);
         }
+
+        /// <summary>
+        /// Records the elapsed time till the returned token is disposed.
+        /// This can be useful to testing large blocks of code, or wrapping around and <c>await</c> clause.
+        /// </summary>
+        /// <param name="recorder">The <see cref="IRecorder"/> instance to record the latency in.</param>
+        /// <returns>Returns a token to be disposed once the scope </returns>
+        /// <remarks>
+        /// This can be helpful for recording a scope of work.
+        /// It also has the benefit of allowing a simple way to record an awaitable method.
+        /// <example>
+        /// This example shows how an awaitable method can be cleanly instrumented using C# using scope.
+        /// <code>
+        /// using(recorder.RecordScope())
+        /// {
+        ///     await SomeExpensiveCall();
+        /// }
+        /// </code>
+        /// </example>
+        /// It should be noted that this method returns a token and as such allocates an object.
+        /// This should taken into consideration, specifically the cost of the allocation and GC would affect the program.
+        /// </remarks>
+        public static IDisposable RecordScope(this IRecorder recorder)
+        {
+            return new Timer(recorder);
+        }
+
+        private sealed class Timer : IDisposable
+        {
+            private readonly IRecorder _recorder;
+            private readonly long _start;
+
+            public Timer(IRecorder recorder)
+            {
+                _recorder = recorder;
+                _start = Stopwatch.GetTimestamp();
+            }
+
+            public void Dispose()
+            {
+                var elapsed = Stopwatch.GetTimestamp() - _start;
+                _recorder.RecordValue(elapsed);
+            }
+        }
     }
 }

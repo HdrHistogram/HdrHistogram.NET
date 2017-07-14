@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using HdrHistogram.Utilities;
 using Xunit;
 
@@ -22,9 +23,9 @@ namespace HdrHistogram.UnitTests.Recording
            long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits,
            string errorParamName, string errorMessage)
         {
-            var ex = Assert.Throws<ArgumentException>(() => 
-                Create(lowestTrackableValue, 
-                    highestTrackableValue, 
+            var ex = Assert.Throws<ArgumentException>(() =>
+                Create(lowestTrackableValue,
+                    highestTrackableValue,
                     numberOfSignificantValueDigits));
             Assert.Equal(errorParamName, ex.ParamName);
             Assert.StartsWith(errorMessage, ex.Message);
@@ -183,7 +184,7 @@ namespace HdrHistogram.UnitTests.Recording
         public void RecordAction_increments_TotalCount()
         {
             var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
-            
+
             recorder.Record(() => { });
 
             var longHistogram = recorder.GetIntervalHistogram();
@@ -233,9 +234,9 @@ namespace HdrHistogram.UnitTests.Recording
             recorder.RecordValue(1000);
             recorder.RecordValue(10000);
             recorder.RecordValue(100000);
-            
+
             recorder.GetIntervalHistogramInto(targetHistogram);
-            
+
             Assert.Equal(3, targetHistogram.TotalCount);
             Assert.Equal(0, targetHistogram.GetCountAtValue(1));
             Assert.Equal(0, targetHistogram.GetCountAtValue(10));
@@ -258,6 +259,15 @@ namespace HdrHistogram.UnitTests.Recording
             Assert.Throws<InvalidOperationException>(() => recorder.GetIntervalHistogram(externallyCreatedHistogram));
 
             recorder.GetIntervalHistogramInto(externallyCreatedHistogram);
+        }
+
+        [Fact]
+        public void RecordScope_increments_TotalCount()
+        {
+            var recorder = Create(DefautltLowestDiscernibleValue, DefaultHighestTrackableValue, DefaultSignificantFigures);
+            using (recorder.RecordScope()) { }
+            var histogram = recorder.GetIntervalHistogram();
+            Assert.Equal(1, histogram.TotalCount);
         }
     }
 }
