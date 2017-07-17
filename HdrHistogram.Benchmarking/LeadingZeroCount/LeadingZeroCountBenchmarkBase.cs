@@ -56,6 +56,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
                 {"DeBruijn128Bits", LeadingZeroCount.DeBruijn128Bits.GetLeadingZeroCount},
                 {"BBarry32BitIfShiftLookupWith64BitShiftBranch", LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch.GetLeadingZeroCount},
                 {"BBarry32BitIfShiftLookupWith64BitShiftBranch_2", LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_2.GetLeadingZeroCount},
+                {"BBarry32BitIfShiftLookupWith64BitShiftBranch_3", LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_3.GetLeadingZeroCount},
                 {"BBarryIfShiftLookup", LeadingZeroCount.BBarryIfShiftLookup.GetLeadingZeroCount},
             };
             ValidateImplementations(expectedData, functions);
@@ -190,6 +191,16 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
         [Benchmark]
+        public int BBarry_imp2()
+        {
+            var sum = 0;
+            for (int i = 0; i < _testValues.Length; i++)
+            {
+                sum += LeadingZeroCount.BBarryIfShiftLookup.GetLeadingZeroCount(_testValues[i]);
+            }
+            return sum;
+        }
+        [Benchmark]
         public int BBarry_imp3()
         {
             var sum = 0;
@@ -200,15 +211,16 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
         [Benchmark]
-        public int BBarry_imp2()
+        public int BBarry_imp4()
         {
             var sum = 0;
             for (int i = 0; i < _testValues.Length; i++)
             {
-                sum += LeadingZeroCount.BBarryIfShiftLookup.GetLeadingZeroCount(_testValues[i]);
+                sum += LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_3.GetLeadingZeroCount(_testValues[i]);
             }
             return sum;
         }
+
 
         private class CalculationExpectation
         {
