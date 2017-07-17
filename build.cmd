@@ -7,9 +7,15 @@ if [%1]==[] (
 )
 
 dotnet restore -v=q
+IF %ERRORLEVEL% NEQ 0 GOTO EOF
 
 dotnet build -v=q -c=Release /p:Version=%SemVer%
+IF %ERRORLEVEL% NEQ 0 GOTO EOF
 
 dotnet test .\HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj -v=q --no-build -c=Release
+IF %ERRORLEVEL% NEQ 0 GOTO EOF
 
 dotnet pack .\HdrHistogram\HdrHistogram.csproj --no-build --include-symbols -c=Release /p:Version=%SemVer%
+IF %ERRORLEVEL% NEQ 0 GOTO EOF
+
+.\HdrHistogram.Benchmarking\bin\Release\net47\HdrHistogram.Benchmarking.exe *
