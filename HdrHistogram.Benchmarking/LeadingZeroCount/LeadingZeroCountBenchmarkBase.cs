@@ -27,10 +27,23 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
     /// </remarks>
     public abstract class LeadingZeroCountBenchmarkBase
     {
+        private readonly int _maxBit;
         private readonly long[] _testValues;
 
         protected LeadingZeroCountBenchmarkBase(int maxBit)
         {
+            _maxBit = maxBit;
+            
+
+            //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
+            var expectedData = GenerateTestData(maxBit);
+            _testValues = expectedData.Select(d => d.Value).ToArray();
+        }
+
+        [BenchmarkDotNet.Attributes.GlobalSetup]
+        public void OneOffValidationOfImplementations()
+        {
+            var expectedData = GenerateTestData(_maxBit);
             var functions = new Dictionary<string, Func<long, int>>
             {
                 {"CurrentImpl", Bitwise.NumberOfLeadingZeros},
@@ -41,13 +54,11 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
                 {"DeBruijn64BitsBitScanner", LeadingZeroCount.DeBruijn64BitsBitScanner.GetLeadingZeroCount},
                 {"DeBruijnMultiplication", LeadingZeroCount.DeBruijnMultiplication.GetLeadingZeroCount},
                 {"DeBruijn128Bits", LeadingZeroCount.DeBruijn128Bits.GetLeadingZeroCount},
+                {"BBarry32BitIfShiftLookupWith64BitShiftBranch", LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch.GetLeadingZeroCount},
+                {"BBarry32BitIfShiftLookupWith64BitShiftBranch_2", LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_2.GetLeadingZeroCount},
+                {"BBarryIfShiftLookup", LeadingZeroCount.BBarryIfShiftLookup.GetLeadingZeroCount},
             };
-
-            //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
-            var expectedData = GenerateTestData(maxBit);
             ValidateImplementations(expectedData, functions);
-            
-            _testValues = expectedData.Select(d => d.Value).ToArray();
         }
         
         private static CalculationExpectation[] GenerateTestData(int maxBit)
@@ -157,7 +168,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             }
             return sum;
         }
-        
+
         [Benchmark]
         public int StringManipulation()
         {
@@ -168,7 +179,37 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             }
             return sum;
         }
-        
+        [Benchmark]
+        public int BBarry_imp1()
+        {
+            var sum = 0;
+            for (int i = 0; i < _testValues.Length; i++)
+            {
+                sum += LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch.GetLeadingZeroCount(_testValues[i]);
+            }
+            return sum;
+        }
+        [Benchmark]
+        public int BBarry_imp3()
+        {
+            var sum = 0;
+            for (int i = 0; i < _testValues.Length; i++)
+            {
+                sum += LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_2.GetLeadingZeroCount(_testValues[i]);
+            }
+            return sum;
+        }
+        [Benchmark]
+        public int BBarry_imp2()
+        {
+            var sum = 0;
+            for (int i = 0; i < _testValues.Length; i++)
+            {
+                sum += LeadingZeroCount.BBarryIfShiftLookup.GetLeadingZeroCount(_testValues[i]);
+            }
+            return sum;
+        }
+
         private class CalculationExpectation
         {
             public long Value { get; }
