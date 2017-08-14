@@ -1,4 +1,4 @@
-<img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/build/HdrHistogram-icon-64x64.png">
+<img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/HdrHistogram-icon-64x64.png">
 
 # HdrHistogram
 **A High Dynamic Range (HDR) Histogram**
