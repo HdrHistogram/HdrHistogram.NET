@@ -34,8 +34,13 @@ namespace HdrHistogram.Iteration
         protected int CurrentSubBucketIndex { get; private set; }
         protected long TotalCountToCurrentIndex { get; private set; }
         protected long CountAtThisValue { get; private set; }
-
-        public HistogramIterationValue Current { get; private set; }
+        
+        private HistogramIterationValue _current;
+        public HistogramIterationValue Current 
+        { 
+            get         => _current.Clone(); 
+            private set => _current = value; 
+        }
 
         protected AbstractHistogramEnumerator(HistogramBase histogram)
         {
