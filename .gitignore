@@ -111,3 +111,7 @@ Backup*/
 UpgradeLog*.XML
 
 Thumbs.db
+.vs/HdrHistogram/v15/Server/sqlite3/storage.ide-wal
+.vs/HdrHistogram/v15/Server/sqlite3/storage.ide-shm
+.vs/HdrHistogram/v15/Server/sqlite3/storage.ide
+.vs/HdrHistogram/v15/Server/sqlite3/db.lock
