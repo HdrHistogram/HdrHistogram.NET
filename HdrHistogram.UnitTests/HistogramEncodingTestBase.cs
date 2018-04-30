@@ -1,6 +1,8 @@
 ﻿using HdrHistogram.Encoding;
 using HdrHistogram.Utilities;
 using Xunit;
+using FluentAssertions;
+using System.Linq;
 
 namespace HdrHistogram.UnitTests
 {
@@ -19,6 +21,22 @@ namespace HdrHistogram.UnitTests
             Load(source);
             var result = EncodeDecode(source);
             HistogramAssert.AreValueEqual(source, result);
+        }
+
+        [Fact]
+        public void Given_a_populated_Histogram_iterating_over_buckets_gives_all_buckets()
+        {
+            var source = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            Load(source);
+            Iteration.HistogramIterationValue lastSeen = null;
+            foreach ( var v in source.AllValues().ToList() )
+            {
+                if ( lastSeen != null )
+                {
+                    v.Should().NotBe( lastSeen );
+                }
+                lastSeen = v;
+            }
         }
 
         [Fact]

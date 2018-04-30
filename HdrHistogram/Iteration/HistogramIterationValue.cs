@@ -103,5 +103,7 @@ namespace HdrHistogram.Iteration
                     ", Percentile:" + Percentile +
                     ", PercentileLevelIteratedTo:" + PercentileLevelIteratedTo;
         }
+
+        public HistogramIterationValue Clone() => (HistogramIterationValue) this.MemberwiseClone();
     }
 }

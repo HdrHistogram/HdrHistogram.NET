@@ -255,6 +255,12 @@ Next can you please ensure that your PR (Pull Request) has a comment in it descr
 Ideally if it is fixing an issue or a bug, there would be a Unit Test proving the fix and a reference to the Issues in the PR comments.
 
 
+### How to run tests?
+If you are having trouble running xunit tests out of the box, it is possible to run them using a version of the command line below. 
+You'll just need to fill in the correct value of $(SolutionDir), which should be as defined in Visual Studio.
+PS> dotnet C:\Users\%USERNAME%\.nuget\packages\xunit.runner.console\2.3.1\tools\netcoreapp2.0\xunit.console.dll $(SolutionDir)\HdrHistogram.UnitTests\bin\Debug\netcoreapp1.1\HdrHistogram.UnitTests.dll
+
+
 HdrHistogram Details
 ----------------------------------------------
 
