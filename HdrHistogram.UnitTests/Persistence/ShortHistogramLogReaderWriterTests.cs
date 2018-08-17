@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace HdrHistogram.UnitTests.Persistence
@@ -14,9 +15,9 @@ namespace HdrHistogram.UnitTests.Persistence
         
         [Theory]
         [MemberData(nameof(PowersOfTwo))]
-        public void CanRoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
+        public async Task CanRoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
         {
-            RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(count);
+            await RoundTripSingleHistogramsWithFullRangesOfCountsAndValuesAsync(count);
         }
 
         public static IEnumerable<object[]> PowersOfTwo()

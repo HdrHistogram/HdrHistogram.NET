@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HdrHistogram.Utilities;
 
 namespace HdrHistogram.UnitTests.Persistence
@@ -17,13 +18,13 @@ namespace HdrHistogram.UnitTests.Persistence
             return actualHistograms;
         }
 
-        public static byte[] WriteLog(this HistogramBase histogram)
+        public static async Task<byte[]> WriteLogAsync(this HistogramBase histogram)
         {
             var startTimeWritten = histogram.StartTimeStamp.ToDateFromMillisecondsSinceEpoch();
             byte[] data;
             using (var writerStream = new MemoryStream())
             {
-                HistogramLogWriter.Write(writerStream, startTimeWritten, histogram);
+                await HistogramLogWriter.WriteAsync(writerStream, startTimeWritten, histogram);
                 data = writerStream.ToArray();
             }
             return data;
