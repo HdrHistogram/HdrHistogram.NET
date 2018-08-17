@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using HdrHistogram.Utilities;
 
 namespace HdrHistogram
@@ -23,11 +24,11 @@ namespace HdrHistogram
         /// <param name="outputStream">The <see cref="Stream"/> to write to.</param>
         /// <param name="startTime">The start time of the set of histograms.</param>
         /// <param name="histograms">The histograms to include in the output.</param>
-        public static void Write(Stream outputStream, DateTime startTime, params HistogramBase[] histograms)
+        public static async Task WriteAsync(Stream outputStream, DateTime startTime, params HistogramBase[] histograms)
         {
             using (var writer = new HistogramLogWriter(outputStream))
             {
-                writer.Write(startTime, histograms);
+                await writer.WriteAsync(startTime, histograms).ConfigureAwait(false);
             }
         }
         
@@ -51,15 +52,15 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="startTime">The start time of the set of histograms.</param>
         /// <param name="histograms">The histograms to include in the output.</param>
-        public void Write(DateTime startTime, params HistogramBase[] histograms)
+        public async Task WriteAsync(DateTime startTime, params HistogramBase[] histograms)
         {
-            WriteLogFormatVersion();
-            WriteStartTime(startTime);
-            WriteLegend();
+            await WriteLogFormatVersionAsync().ConfigureAwait(false);
+            await WriteStartTimeAsync(startTime).ConfigureAwait(false);
+            await WriteLegendAsync().ConfigureAwait(false);
             _hasHeaderWritten = true;
             foreach (var histogram in histograms)
             {
-                WriteHistogram(histogram);
+                await WriteHistogramAsync(histogram).ConfigureAwait(false);
             }
         }
 
@@ -67,45 +68,45 @@ namespace HdrHistogram
         /// Appends a Histogram to the log. 
         /// </summary>
         /// <param name="histogram">The histogram to write to the log.</param>
-        public void Append(HistogramBase histogram)
+        public async Task AppendAsync(HistogramBase histogram)
         {
             if (!_hasHeaderWritten)
             {
-                Write(histogram.StartTimeStamp.ToDateFromMillisecondsSinceEpoch(), histogram);
+                await WriteAsync(histogram.StartTimeStamp.ToDateFromMillisecondsSinceEpoch(), histogram).ConfigureAwait(false);
             }
             else
             {
-                WriteHistogram(histogram);
+                await WriteHistogramAsync(histogram).ConfigureAwait(false);
             }
         }
 
         /// <summary>
         /// Output a log format version to the log.
         /// </summary>
-        private void WriteLogFormatVersion()
+        private async Task WriteLogFormatVersionAsync()
         {
-            _log.WriteLine($"#[Histogram log format version {HistogramLogFormatVersion}]");
-            _log.Flush();
+            await _log.WriteLineAsync($"#[Histogram log format version {HistogramLogFormatVersion}]").ConfigureAwait(false);
+            await _log.FlushAsync().ConfigureAwait(false);
         }
 
         /// <summary>
         /// Log a start time in the log.
         /// </summary>
         /// <param name="startTimeWritten">Time the log was started.</param>
-        private void WriteStartTime(DateTime startTimeWritten)
+        private async Task WriteStartTimeAsync(DateTime startTimeWritten)
         {
             var secondsSinceEpoch = startTimeWritten.SecondsSinceUnixEpoch();
-            _log.WriteLine($"#[StartTime: {secondsSinceEpoch:F3} (seconds since epoch), {startTimeWritten:o}]");
-            _log.Flush();
+            await _log.WriteLineAsync($"#[StartTime: {secondsSinceEpoch:F3} (seconds since epoch), {startTimeWritten:o}]").ConfigureAwait(false);
+            await _log.FlushAsync().ConfigureAwait(false);
         }
 
-        private void WriteLegend()
+        private async Task WriteLegendAsync()
         {
-            _log.WriteLine("\"StartTimestamp\",\"Interval_Length\",\"Interval_Max\",\"Interval_Compressed_Histogram\"");
-            _log.Flush();
+            await _log.WriteLineAsync("\"StartTimestamp\",\"Interval_Length\",\"Interval_Max\",\"Interval_Compressed_Histogram\"").ConfigureAwait(false);
+            await _log.FlushAsync().ConfigureAwait(false);
         }
 
-        private void WriteHistogram(HistogramBase histogram)
+        private async Task WriteHistogramAsync(HistogramBase histogram)
         {
             var targetBuffer = ByteBuffer.Allocate(histogram.GetNeededByteBufferCapacity());
             var compressedLength = histogram.EncodeIntoCompressedByteBuffer(targetBuffer);
@@ -122,8 +123,8 @@ namespace HdrHistogram
             var payload = histogram.Tag == null
                 ? $"{startTimeStampSec:F3},{intervalLength:F3},{intervalMax:F3},{binary}"
                 : $"Tag={histogram.Tag},{startTimeStampSec:F3},{intervalLength:F3},{intervalMax:F3},{binary}";
-            _log.WriteLine(payload);
-            _log.Flush();
+            await _log.WriteLineAsync(payload).ConfigureAwait(false);
+            await _log.FlushAsync().ConfigureAwait(false);
         }
 
         /// <summary>
