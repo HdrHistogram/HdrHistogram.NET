@@ -357,7 +357,6 @@ namespace HdrHistogram.UnitTests
         [InlineData("\r")]
         [InlineData("\n")]
         [InlineData(" ")]
-        [InlineData(" ")]
         public void Setting_invalid_value_to_Tag_throws(string invalidTagValue)
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
