@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace HdrHistogram.Examples
 {
@@ -26,13 +27,16 @@ namespace HdrHistogram.Examples
 
         private static readonly TimeSpan RunPeriod = TimeSpan.FromSeconds(10);
 
-        public static void Run()
+        public static Task RunAsync()
         {
             Console.WriteLine($"Running for {RunPeriod.TotalSeconds}sec.");
 
             RecordMeasurements();
 
             OutputMeasurements();
+
+            //For compatibility with RecordExample that has a async Run
+            return Task.CompletedTask;
         }
 
         /// <summary>

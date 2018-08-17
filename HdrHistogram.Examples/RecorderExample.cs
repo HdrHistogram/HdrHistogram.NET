@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HdrHistogram.Examples
 {
@@ -26,15 +27,17 @@ namespace HdrHistogram.Examples
             _logWriter = new HistogramLogWriter(_outputStream);
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
             if (HasRunBeenCalled())
+            {
                 throw new InvalidOperationException("Can only call run once.");
+            }
 
             Console.WriteLine($"Running for {RunPeriod.TotalSeconds}sec.");
 
             //Write the headers, but no histograms (as we don't have any yet).
-            _logWriter.Write(DateTime.Now);
+            await _logWriter.WriteAsync(DateTime.Now);
 
             //ThreadSafe-writes require a Concurrent implementation of a Histogram
             //ThreadSafe-reads require a recorder
@@ -47,13 +50,12 @@ namespace HdrHistogram.Examples
                 .WithThreadSafeReads()                  //returns a Recorder that wraps the LongConcurrentHistogram
                 .Create();
 
-            var outputThread = new Thread(ts => WriteToDisk((Recorder)ts));
-            outputThread.Start(recorder);
-
+            //Probably better to Use a TaskCompletionSource instead of this ... (for less allocation)
+            var writingToDisk = Task.Run(async () => await WriteToDiskAsync(recorder));
             RecordMeasurements(recorder);
 
             //Wait for the output thread to complete writing.
-            outputThread.Join();
+            await writingToDisk;
         }
 
         private bool HasRunBeenCalled()
@@ -62,7 +64,7 @@ namespace HdrHistogram.Examples
             return currentValue != -1;
         }
 
-        private void WriteToDisk(Recorder recorder)
+        private async Task WriteToDiskAsync(Recorder recorder)
         {
             //Sample every second until flagged as completed.
             var accumulatingHistogram = new LongHistogram(TimeStamp.Hours(1), 3);
@@ -72,7 +74,7 @@ namespace HdrHistogram.Examples
 
                 var histogram = recorder.GetIntervalHistogram();
                 accumulatingHistogram.Add(histogram);
-                _logWriter.Append(histogram);
+                await _logWriter.AppendAsync(histogram);
                 Console.WriteLine($"{DateTime.Now:o} Interval.TotalCount = {histogram.TotalCount,10:G}. Accumulated.TotalCount = {accumulatingHistogram.TotalCount,10:G}.");
             }
             _logWriter.Dispose();
