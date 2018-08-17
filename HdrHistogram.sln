@@ -3,13 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram", "HdrHistogram\HdrHistogram.csproj", "{54D17764-192D-469B-8DCA-BCA216EDD6E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HdrHistogram", "HdrHistogram\HdrHistogram.csproj", "{54D17764-192D-469B-8DCA-BCA216EDD6E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.Examples", "HdrHistogram.Examples\HdrHistogram.Examples.csproj", "{4C6EE683-FB7D-4A88-93D6-0FE2763B5723}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HdrHistogram.Examples", "HdrHistogram.Examples\HdrHistogram.Examples.csproj", "{4C6EE683-FB7D-4A88-93D6-0FE2763B5723}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HdrHistogram.UnitTests", "HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj", "{42E25BE5-BE7B-4B31-BBCE-7A38DE06890A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.Benchmarking", "HdrHistogram.Benchmarking\HdrHistogram.Benchmarking.csproj", "{3469742E-EFDD-457C-9E33-26E59D34CE63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HdrHistogram.Benchmarking", "HdrHistogram.Benchmarking\HdrHistogram.Benchmarking.csproj", "{3469742E-EFDD-457C-9E33-26E59D34CE63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1D499956-AD14-4D02-84CF-3434E51AF7C5}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		build.cmd = build.cmd
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +45,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8EEA3A5E-56DC-4BF1-8200-A362A7F14F89}
 	EndGlobalSection
 EndGlobal
