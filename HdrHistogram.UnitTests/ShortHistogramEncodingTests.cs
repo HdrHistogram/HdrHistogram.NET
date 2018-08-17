@@ -16,7 +16,7 @@ namespace HdrHistogram.UnitTests
 
         protected override void LoadFullRange(IRecorder source)
         {
-            for (long i = 0L; i < DefaultHighestTrackableValue; i += 1000L)
+            for (var i = 0L; i < DefaultHighestTrackableValue; i += 1000L)
             {
                 source.RecordValue(i);
             }

@@ -99,7 +99,7 @@ namespace HdrHistogram
         public static long GetLong(ByteBuffer buffer)
         {
             long v = buffer.Get();
-            long value = v & 0x7F;
+            var value = v & 0x7F;
             if ((v & 0x80) != 0)
             {
                 v = buffer.Get();

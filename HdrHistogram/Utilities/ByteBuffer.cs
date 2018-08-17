@@ -209,7 +209,7 @@ namespace HdrHistogram.Utilities
         private static long FromBytes(byte[] buffer, int startIndex, int bytesToConvert)
         {
             long ret = 0;
-            for (int i = 0; i < bytesToConvert; i++)
+            for (var i = 0; i < bytesToConvert; i++)
             {
                 ret = unchecked((ret << 8) | buffer[startIndex + i]);
             }

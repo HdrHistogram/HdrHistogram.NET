@@ -118,7 +118,7 @@ namespace HdrHistogram.UnitTests.Persistence
         {
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
-            int histogramCount = 0;
+            var histogramCount = 0;
             long totalCount = 0;
             var accumulatedHistogramWithNoTag = Create(85899345920838, DefaultSignificantDigits);
             var accumulatedHistogramWithTagA = Create(85899345920838, DefaultSignificantDigits);
@@ -151,7 +151,7 @@ namespace HdrHistogram.UnitTests.Persistence
         {
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
-            int histogramCount = 0;
+            var histogramCount = 0;
             long totalCount = 0;
             var accumulatedHistogram = Create(85899345920838, DefaultSignificantDigits);
             foreach (var histogram in reader.ReadHistograms())
@@ -182,7 +182,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
 
-            int histogramCount = 0;
+            var histogramCount = 0;
             long totalCount = 0;
             var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
             var histograms = ((IHistogramLogV1Reader)reader).ReadHistograms()
@@ -215,10 +215,10 @@ namespace HdrHistogram.UnitTests.Persistence
         {
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
-            int histogramCount = 0;
+            var histogramCount = 0;
             long totalCount = 0;
 
-            HistogramBase accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
+            var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
             var histograms = reader.ReadHistograms()
                 .Skip(skip)
                 .Take(take);
@@ -246,10 +246,10 @@ namespace HdrHistogram.UnitTests.Persistence
         {
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
-            int histogramCount = 0;
+            var histogramCount = 0;
             long totalCount = 0;
 
-            HistogramBase accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
+            var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
             var histograms = reader.ReadHistograms()
                 .Where(h => h.StartTimeStamp >= reader.GetStartTime().MillisecondsSinceUnixEpoch())
                 .Skip(skip)

@@ -22,9 +22,9 @@ namespace HdrHistogram.Encoding
         /// <returns>The number of bytes written.</returns>
         public int Encode(IRecordedData data, ByteBuffer buffer)
         {
-            int initialPosition = buffer.Position;
+            var initialPosition = buffer.Position;
             buffer.PutInt(data.Cookie);
-            int payloadLengthPosition = buffer.Position;
+            var payloadLengthPosition = buffer.Position;
             buffer.PutInt(0); // Placeholder for payload length in bytes.
             buffer.PutInt(data.NormalizingIndexOffset);
             buffer.PutInt(data.NumberOfSignificantValueDigits);
@@ -41,14 +41,14 @@ namespace HdrHistogram.Encoding
 
         private static int FillBufferFromCountsArray(ByteBuffer buffer, IRecordedData data)
         {
-            int startPosition = buffer.Position;
-            int srcIndex = 0;
+            var startPosition = buffer.Position;
+            var srcIndex = 0;
 
             while (srcIndex < data.Counts.Length)
             {
                 // V2 encoding format uses a ZigZag LEB128-64b9B encoded long. 
                 // Positive values are counts, while negative values indicate a repeat zero counts. i.e. -4 indicates 4 sequential buckets with 0 counts.
-                long count = GetCountAtIndex(srcIndex++, data);
+                var count = GetCountAtIndex(srcIndex++, data);
                 if (count < 0)
                 {
                     throw new InvalidOperationException($"Cannot encode histogram containing negative counts ({count}) at index {srcIndex}");

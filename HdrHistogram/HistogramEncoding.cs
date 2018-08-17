@@ -70,7 +70,7 @@ namespace HdrHistogram
             var histogramType = GetBestTypeForWordSize(wordSizeInBytes);
             var histogram = Create(histogramType, header, minBarForHighestTrackableValue);
 
-            int expectedCapacity = Math.Min(histogram.GetNeededByteBufferCapacity() - header.CapacityEstimateExcess, header.PayloadLengthInBytes);
+            var expectedCapacity = Math.Min(histogram.GetNeededByteBufferCapacity() - header.CapacityEstimateExcess, header.PayloadLengthInBytes);
             var payLoadSourceBuffer = PayLoadSourceBuffer(buffer, decompressor, expectedCapacity, header);
 
             
@@ -88,18 +88,18 @@ namespace HdrHistogram
         /// <returns>The number of bytes written to the buffer</returns>
         public static int EncodeIntoCompressedByteBuffer(this HistogramBase source, ByteBuffer targetBuffer)
         {
-            int neededCapacity = source.GetNeededByteBufferCapacity();
+            var neededCapacity = source.GetNeededByteBufferCapacity();
             var intermediateUncompressedByteBuffer = ByteBuffer.Allocate(neededCapacity);
             source.Encode(intermediateUncompressedByteBuffer, HistogramEncoderV2.Instance);
 
-            int initialTargetPosition = targetBuffer.Position;
+            var initialTargetPosition = targetBuffer.Position;
             targetBuffer.PutInt(GetCompressedEncodingCookie());
-            int compressedContentsHeaderPosition = targetBuffer.Position;
+            var compressedContentsHeaderPosition = targetBuffer.Position;
             targetBuffer.PutInt(0); // Placeholder for compressed contents length
             var compressedDataLength = targetBuffer.CompressedCopy(intermediateUncompressedByteBuffer, targetBuffer.Position);
 
             targetBuffer.PutInt(compressedContentsHeaderPosition, compressedDataLength); // Record the compressed length
-            int bytesWritten = compressedDataLength + 8;
+            var bytesWritten = compressedDataLength + 8;
             targetBuffer.Position = (initialTargetPosition + bytesWritten);
             return bytesWritten;
         }

@@ -108,7 +108,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int CurrentImplementation()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += Bitwise.NumberOfLeadingZeros(_testValues[i]);
             }
@@ -119,7 +119,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int IfAndShift()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.IfAndShift.GetLeadingZeroCount(_testValues[i]);
             }
@@ -130,7 +130,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int DeBruijnMultiplication()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.DeBruijnMultiplication.GetLeadingZeroCount(_testValues[i]);
             }
@@ -141,7 +141,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int Debruijn64Bit()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.DeBruijn64Bits.GetLeadingZeroCount(_testValues[i]);
             }
@@ -152,7 +152,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int DeBruijn64BitsBitScanner()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.DeBruijn64BitsBitScanner.GetLeadingZeroCount(_testValues[i]);
             }
@@ -163,7 +163,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int Debruijn128Bit()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.DeBruijn128Bits.GetLeadingZeroCount(_testValues[i]);
             }
@@ -174,7 +174,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int StringManipulation()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.StringManipulation.GetLeadingZeroCount(_testValues[i]);
             }
@@ -184,7 +184,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int BBarry_imp1()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch.GetLeadingZeroCount(_testValues[i]);
             }
@@ -194,7 +194,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int BBarry_imp2()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.BBarryIfShiftLookup.GetLeadingZeroCount(_testValues[i]);
             }
@@ -204,7 +204,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int BBarry_imp3()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_2.GetLeadingZeroCount(_testValues[i]);
             }
@@ -214,7 +214,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public int BBarry_imp4()
         {
             var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 sum += LeadingZeroCount.BBarry32BitIfShiftLookupWith64BitShiftBranch_3.GetLeadingZeroCount(_testValues[i]);
             }

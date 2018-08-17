@@ -12,8 +12,8 @@ namespace HdrHistogram.UnitTests
         {
             var delay = TimeSpan.FromSeconds(1);
             var expected = TimeStamp.Seconds(delay.Seconds);
-            long minAccepted = (long)(expected * 0.95);
-            long maxAccepted = (long)(expected * 1.05);
+            var minAccepted = (long)(expected * 0.95);
+            var maxAccepted = (long)(expected * 1.05);
 
             var start = Stopwatch.GetTimestamp();
             Spin.Wait(delay);

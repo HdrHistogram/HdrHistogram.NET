@@ -109,7 +109,7 @@ namespace HdrHistogram
         {
             var targetBuffer = ByteBuffer.Allocate(histogram.GetNeededByteBufferCapacity());
             var compressedLength = histogram.EncodeIntoCompressedByteBuffer(targetBuffer);
-            byte[] compressedArray = new byte[compressedLength];
+            var compressedArray = new byte[compressedLength];
             targetBuffer.BlockGet(compressedArray, 0, 0, compressedLength);
 
             var startTimeStampSec = histogram.StartTimeStamp / 1000.0;

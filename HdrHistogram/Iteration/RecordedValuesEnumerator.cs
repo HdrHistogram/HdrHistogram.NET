@@ -34,7 +34,7 @@ namespace HdrHistogram.Iteration
 
         protected override bool ReachedIterationLevel()
         {
-            long currentIndexCount = SourceHistogram.GetCountAt(CurrentBucketIndex, CurrentSubBucketIndex);
+            var currentIndexCount = SourceHistogram.GetCountAt(CurrentBucketIndex, CurrentSubBucketIndex);
             return (currentIndexCount != 0) 
                 && (
                         (_visitedSubBucketIndex != CurrentSubBucketIndex) 

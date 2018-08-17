@@ -14,7 +14,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         static BBarry32BitIfShiftLookupWith64BitShiftBranch()
         {
             Lookup = new int[256];
-            for (int i = 1; i < 256; ++i)
+            for (var i = 1; i < 256; ++i)
             {
                 Lookup[i] = (int)(Math.Log(i) / Math.Log(2));
             }
@@ -49,7 +49,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         static BBarry32BitIfShiftLookupWith64BitShiftBranch_2()
         {
             Lookup = new int[256];
-            for (int i = 1; i < 256; ++i)
+            for (var i = 1; i < 256; ++i)
             {
                 Lookup[i] = (int)(Math.Log(i) / Math.Log(2));
             }
@@ -83,7 +83,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         static BBarry32BitIfShiftLookupWith64BitShiftBranch_3()
         {
             Lookup = new int[256];
-            for (int i = 1; i < 256; ++i)
+            for (var i = 1; i < 256; ++i)
             {
                 Lookup[i] = (int)(Math.Log(i) / Math.Log(2));
             }

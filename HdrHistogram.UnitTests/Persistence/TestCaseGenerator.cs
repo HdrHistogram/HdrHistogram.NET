@@ -6,7 +6,7 @@ namespace HdrHistogram.UnitTests.Persistence
     {
         public static IEnumerable<long> PowersOfTwo(int maxBits)
         {
-            for (int i = 0; i < maxBits; i++)
+            for (var i = 0; i < maxBits; i++)
             {
                 yield return (1L << i);
             }

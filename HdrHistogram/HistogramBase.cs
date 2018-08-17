@@ -512,10 +512,10 @@ namespace HdrHistogram
         {
             ResetMaxValue(0);
             ResetMinNonZeroValue(long.MaxValue);
-            int maxIndex = -1;
-            int minNonZeroIndex = -1;
+            var maxIndex = -1;
+            var minNonZeroIndex = -1;
             long observedTotalCount = 0;
-            for (int index = 0; index < lengthToCover; index++)
+            for (var index = 0; index < lengthToCover; index++)
             {
                 long countAtIndex;
                 if ((countAtIndex = GetCountAtIndex(index)) > 0)

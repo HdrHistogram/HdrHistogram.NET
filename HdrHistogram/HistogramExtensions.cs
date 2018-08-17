@@ -52,7 +52,7 @@ namespace HdrHistogram
             var geometricDeviationTotal = 0.0;
             foreach (var iterationValue in histogram.RecordedValues())
             {
-                double deviation = (histogram.MedianEquivalentValue(iterationValue.ValueIteratedTo) * 1.0) - mean;
+                var deviation = (histogram.MedianEquivalentValue(iterationValue.ValueIteratedTo) * 1.0) - mean;
                 geometricDeviationTotal += (deviation * deviation) * iterationValue.CountAddedInThisIterationStep;
             }
             var stdDeviation = Math.Sqrt(geometricDeviationTotal / histogram.TotalCount);
