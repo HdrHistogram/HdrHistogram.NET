@@ -6,13 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.8" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net47'">
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows">
-      <Version>0.10.8</Version>
-    </PackageReference>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11" />
   </ItemGroup>
 
   <ItemGroup>
