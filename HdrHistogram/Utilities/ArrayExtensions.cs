@@ -17,7 +17,7 @@
             if (source.Length != other.Length)
                 return false;
 
-            for (int i = 0; i < other.Length; i++)
+            for (var i = 0; i < other.Length; i++)
             {
                 if (!Equals(source[i], other[i]))
                 {

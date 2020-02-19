@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -50,8 +50,8 @@ namespace HdrHistogram
         {
             _startTimeInSeconds = 0;
             double baseTimeInSeconds = 0;
-            bool hasStartTime = false;
-            bool hasBaseTime = false;
+            var hasStartTime = false;
+            var hasBaseTime = false;
             foreach (var line in ReadLines())
             {
                 //Comments (and header metadata)
@@ -109,11 +109,11 @@ namespace HdrHistogram
                         hasBaseTime = true;
                     }
 
-                    double absoluteStartTimeStampSec = logTimeStampInSec + baseTimeInSeconds;
-                    double absoluteEndTimeStampSec = absoluteStartTimeStampSec + intervalLength;
+                    var absoluteStartTimeStampSec = logTimeStampInSec + baseTimeInSeconds;
+                    var absoluteEndTimeStampSec = absoluteStartTimeStampSec + intervalLength;
 
 
-                    byte[] bytes = Convert.FromBase64String(payload);
+                    var bytes = Convert.FromBase64String(payload);
                     var buffer = ByteBuffer.Allocate(bytes);
                     var histogram = DecodeHistogram(buffer, 0);
                     histogram.Tag = tag;
@@ -128,8 +128,8 @@ namespace HdrHistogram
         {
             _startTimeInSeconds = 0;
             double baseTimeInSeconds = 0;
-            bool hasStartTime = false;
-            bool hasBaseTime = false;
+            var hasStartTime = false;
+            var hasBaseTime = false;
             foreach (var line in ReadLines())
             {
                 //Comments (and header metadata)
@@ -186,11 +186,11 @@ namespace HdrHistogram
                         hasBaseTime = true;
                     }
 
-                    double absoluteStartTimeStampSec = logTimeStampInSec + baseTimeInSeconds;
-                    double absoluteEndTimeStampSec = absoluteStartTimeStampSec + intervalLength;
+                    var absoluteStartTimeStampSec = logTimeStampInSec + baseTimeInSeconds;
+                    var absoluteEndTimeStampSec = absoluteStartTimeStampSec + intervalLength;
 
 
-                    byte[] bytes = Convert.FromBase64String(payload);
+                    var bytes = Convert.FromBase64String(payload);
                     var buffer = ByteBuffer.Allocate(bytes);
                     var histogram = DecodeHistogram(buffer, 0);
                     histogram.StartTimeStamp = (long)(absoluteStartTimeStampSec * 1000.0);

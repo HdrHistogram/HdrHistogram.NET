@@ -68,8 +68,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark(Baseline = true)]
         public long LongHistogramRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _longHistogram.RecordValue(value);
@@ -81,8 +81,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long LongConcurrentHistogramRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _longConcurrentHistogram.RecordValue(value);
@@ -94,8 +94,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long IntHistogramRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _intHistogram.RecordValue(value);
@@ -107,8 +107,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long IntConcurrentHistogramRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _intConcurrentHistogram.RecordValue(value);
@@ -120,7 +120,7 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long ShortHistogramRecording()
         {
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 _shortHistogram.RecordValue(_testValues[i]);
             }
@@ -130,9 +130,9 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long LongRecorderRecording()
         {
-            long counter = 0L;
+            var counter = 0L;
 
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _longRecorder.RecordValue(value);
@@ -144,9 +144,9 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long LongConcurrentRecorderRecording()
         {
-            long counter = 0L;
+            var counter = 0L;
 
-            for (int i = 0; i < _testValues.Length; i++)
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _longConcurrentRecorder.RecordValue(value);
@@ -158,8 +158,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long IntRecorderRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _intRecorder.RecordValue(value);
@@ -171,8 +171,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long IntConcurrentRecorderRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _intConcurrentRecorder.RecordValue(value);
@@ -184,8 +184,8 @@ namespace HdrHistogram.Benchmarking.Recording
         [Benchmark]
         public long ShortRecorderRecording()
         {
-            long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            var counter = 0L;
+            for (var i = 0; i < _testValues.Length; i++)
             {
                 var value = _testValues[i];
                 _shortRecorder.RecordValue(value);

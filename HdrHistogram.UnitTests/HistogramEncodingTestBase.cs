@@ -68,7 +68,7 @@ namespace HdrHistogram.UnitTests
 
         private static void Load(IRecorder source)
         {
-            for (long i = 0L; i < 10000L; i++)
+            for (var i = 0L; i < 10000L; i++)
             {
                 source.RecordValue(1000L * i);
             }
@@ -76,7 +76,7 @@ namespace HdrHistogram.UnitTests
 
         protected virtual void LoadFullRange(IRecorder source)
         {
-            for (long i = 0L; i < DefaultHighestTrackableValue; i += 100L)
+            for (var i = 0L; i < DefaultHighestTrackableValue; i += 100L)
             {
                 source.RecordValue(i);
             }

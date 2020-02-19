@@ -164,10 +164,10 @@ namespace HdrHistogram.Utilities
 
             // Next, reset start value, indicating new phase, and retain value at flip:
             //long startValueAtFlip = startEpochUpdater.getAndSet(this, initialStartValue);
-            long startValueAtFlip = GetAndSet(ref _startEpoch, initialStartValue);
+            var startValueAtFlip = GetAndSet(ref _startEpoch, initialStartValue);
 
             // Now, spin until previous phase end value catches up with start value at flip:
-            bool caughtUp = false;
+            var caughtUp = false;
             do
             {
                 if (isNextPhaseEven)

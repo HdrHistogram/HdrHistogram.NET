@@ -41,7 +41,7 @@ namespace HdrHistogram.UnitTests
             if(expected.Length != actual.Length)
                 throw new Exception($"Expected length of {expected.Length}, but recieved {actual.Length}");
 
-            for (int i = 0; i < expected.Length; i++)
+            for (var i = 0; i < expected.Length; i++)
             {
                 var e = expected[i];
                 var a = actual[i];

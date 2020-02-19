@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using HdrHistogram.Utilities;
 
 namespace HdrHistogram.Persistence
@@ -10,7 +10,7 @@ namespace HdrHistogram.Persistence
         public int ReadCounts(ByteBuffer sourceBuffer, int lengthInBytes, int maxIndex, Action<int, long> setCount)
         {
             var idx = 0;
-            int endPosition = sourceBuffer.Position + lengthInBytes;
+            var endPosition = sourceBuffer.Position + lengthInBytes;
             while (sourceBuffer.Position < endPosition)
             {
                 var item = ReadValue(sourceBuffer);

@@ -156,7 +156,7 @@ namespace HdrHistogram
         /// <param name="index">The index to increment the count at.</param>
         protected override void IncrementCountAtIndex(int index)
         {
-            long criticalValue = _wrp.WriterCriticalSectionEnter();
+            var criticalValue = _wrp.WriterCriticalSectionEnter();
             try
             {
                 _counts.IncrementAndGet(index);
@@ -175,7 +175,7 @@ namespace HdrHistogram
         /// <param name="addend">The amount to increment by.</param>
         protected override void AddToCountAtIndex(int index, long addend)
         {
-            long criticalValue = _wrp.WriterCriticalSectionEnter();
+            var criticalValue = _wrp.WriterCriticalSectionEnter();
             try
             {
                 _counts.AddAndGet(index, addend);
@@ -196,7 +196,7 @@ namespace HdrHistogram
             {
                 _wrp.ReaderLock();
                 Debug.Assert(CountsArrayLength == _counts.Length);
-                for (int i = 0; i<_counts.Length; i++)
+                for (var i = 0; i<_counts.Length; i++)
                 {
                     _counts[i] = 0;
                 }
@@ -214,7 +214,7 @@ namespace HdrHistogram
         /// <param name="target">The array to write each count value into.</param>
         protected override void CopyCountsInto(long[] target)
         {
-            for (int i = 0; i<target.Length; i++)
+            for (var i = 0; i<target.Length; i++)
             {
                 target[i] = _counts[i];
             }

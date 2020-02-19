@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -86,7 +86,7 @@ namespace HdrHistogram.UnitTests
         public void RecordValue_increments_TotalCount()
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            for (int i = 1; i < 5; i++)
+            for (var i = 1; i < 5; i++)
             {
                 histogram.RecordValue(i);
                 Assert.Equal(i, histogram.TotalCount);
@@ -97,7 +97,7 @@ namespace HdrHistogram.UnitTests
         public void RecordValue_increments_CountAtValue()
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            for (int i = 1; i < 5; i++)
+            for (var i = 1; i < 5; i++)
             {
                 histogram.RecordValue(TestValueLevel);
                 Assert.Equal(i, histogram.GetCountAtValue(TestValueLevel));
@@ -117,7 +117,7 @@ namespace HdrHistogram.UnitTests
         public void RecordValueWithCount_increments_TotalCount(long multiplier)
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            for (int i = 1; i < 5; i++)
+            for (var i = 1; i < 5; i++)
             {
                 histogram.RecordValueWithCount(i, multiplier);
                 Assert.Equal(i * multiplier, histogram.TotalCount);
@@ -130,7 +130,7 @@ namespace HdrHistogram.UnitTests
         public void RecordValueWithCount_increments_CountAtValue(long multiplier)
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
-            for (int i = 1; i < 5; i++)
+            for (var i = 1; i < 5; i++)
             {
                 histogram.RecordValueWithCount(TestValueLevel, multiplier);
                 Assert.Equal(i * multiplier, histogram.GetCountAtValue(TestValueLevel));
@@ -378,7 +378,7 @@ namespace HdrHistogram.UnitTests
         private static int GetBucketsNeededToCoverValue(int subBucketSize, long value)
         {
             long trackableValue = (subBucketSize - 1);// << _unitMagnitude;
-            int bucketsNeeded = 1;
+            var bucketsNeeded = 1;
             while (trackableValue < value)
             {
                 trackableValue <<= 1;

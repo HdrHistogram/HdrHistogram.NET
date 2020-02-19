@@ -99,7 +99,7 @@ namespace HdrHistogram.UnitTests
 
         private static void LoadHistogram(IRecorder histogram)
         {
-            for (int i = 0; i < 10000; i += 1000)
+            for (var i = 0; i < 10000; i += 1000)
             {
                 histogram.RecordValue(i);
             }

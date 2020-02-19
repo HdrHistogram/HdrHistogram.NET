@@ -49,7 +49,7 @@ namespace HdrHistogram.Iteration
 
         protected override void IncrementIterationLevel() 
         {
-            long percentileReportingTicks =
+            var percentileReportingTicks =
                     _percentileTicksPerHalfDistance *
                             (long) Math.Pow(2,
                                     (long) (Math.Log(100.0 / (100.0 - (_percentileLevelToIterateTo))) / Math.Log(2)) + 1);
@@ -60,7 +60,7 @@ namespace HdrHistogram.Iteration
         {
             if (CountAtThisValue == 0)
                 return false;
-            double currentPercentile = (100.0 * TotalCountToCurrentIndex) / ArrayTotalCount;
+            var currentPercentile = (100.0 * TotalCountToCurrentIndex) / ArrayTotalCount;
             return (currentPercentile >= _percentileLevelToIterateTo);
         }
 

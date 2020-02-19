@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace HdrHistogram.Benchmarking.LeadingZeroCount
 {
@@ -15,7 +15,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         static BBarryIfShiftLookup()
         {
             Lookup = new int[256];
-            for (int i = 1; i < 256; ++i)
+            for (var i = 1; i < 256; ++i)
             {
                 Lookup[i] = (int)(Math.Log(i) / Math.Log(2));
             }

@@ -179,7 +179,7 @@ namespace HdrHistogram
         /// <param name="target">The array to write each count value into.</param>
         protected override void CopyCountsInto(long[] target)
         {
-            for (int i = 0; i < target.Length; i++)
+            for (var i = 0; i < target.Length; i++)
             {
                 target[i] = _counts[i];
             }

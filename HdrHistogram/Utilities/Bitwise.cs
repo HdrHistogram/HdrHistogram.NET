@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This is a .NET port of the original Java version, which was written by
  * Gil Tene as described in
  * https://github.com/HdrHistogram/HdrHistogram
@@ -29,7 +29,7 @@ namespace HdrHistogram.Utilities
         static Bitwise()
         {
             Lookup = new int[256];
-            for (int i = 1; i < 256; ++i)
+            for (var i = 1; i < 256; ++i)
             {
                 Lookup[i] = (int)(Math.Log(i) / Math.Log(2));
             }
