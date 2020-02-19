@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <WarningsAsErrors />
+  </PropertyGroup>
+</Project>
