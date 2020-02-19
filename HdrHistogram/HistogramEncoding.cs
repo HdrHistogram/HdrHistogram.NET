@@ -106,7 +106,7 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="histogram">The histogram to get the cookie for</param>
         /// <returns>The integer cookie value for the histogram.</returns>
-        public static int GetEncodingCookie(this HistogramBase histogram)
+        public static int GetEncodingCookie(this HistogramBase _)
         {
             //return EncodingCookieBase + (histogram.WordSizeInBytes << 4);
             return EncodingCookieBaseV2 | 0x10; // LSBit of wordsize byte indicates TLZE Encoding            
