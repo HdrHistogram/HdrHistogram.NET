@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using HdrHistogram.Iteration;
 
 namespace HdrHistogram.Output
@@ -18,30 +19,32 @@ namespace HdrHistogram.Output
             _lastLinePercentileFormatString = "{0:F" + significantDigits + "},{1:F12},{2},Infinity\n";
         }
 
-        public void WriteHeader()
+        public async Task WriteHeaderAsync()
         {
-            _textWriter.Write("\"Value\",\"Percentile\",\"TotalCount\",\"1/(1-Percentile)\"\n");
+            await _textWriter.WriteAsync("\"Value\",\"Percentile\",\"TotalCount\",\"1/(1-Percentile)\"\n").ConfigureAwait(false);
         }
 
-        public void WriteValue(HistogramIterationValue iterationValue)
+        public async Task WriteValueAsync(HistogramIterationValue iterationValue)
         {
             var scaledValue = iterationValue.ValueIteratedTo / _outputValueUnitScalingRatio;
             var percentile = iterationValue.PercentileLevelIteratedTo / 100.0D;
 
             if (iterationValue.IsLastValue())
             {
-                _textWriter.Write(_lastLinePercentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue);
+                await _textWriter.WriteAsync(string.Format(_lastLinePercentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue)).ConfigureAwait(false);
             }
             else
             {
-                _textWriter.Write(_percentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue, 1 / (1.0D - percentile));
+                await _textWriter.WriteAsync(string.Format(_percentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue, 1 / (1.0D - percentile))).ConfigureAwait(false);
 
             }
         }
 
-        public void WriteFooter(HistogramBase histogram)
-        {
-            //No op
-        }
+#if NETSTANDARD2_0
+        public Task WriteFooterAsync(HistogramBase histogram) => Task.CompletedTask;
+#else
+        private static readonly Task Net45CompletedTask = Task.FromResult(0);
+        public Task WriteFooterAsync(HistogramBase histogram) => Net45CompletedTask;
+#endif
     }
 }

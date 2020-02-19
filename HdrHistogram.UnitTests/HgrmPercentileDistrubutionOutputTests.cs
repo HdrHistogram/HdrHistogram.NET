@@ -25,7 +25,7 @@ namespace HdrHistogram.UnitTests
             LoadHistogram(histogram);
 
             var writer = new StringWriter();
-            histogram.OutputPercentileDistribution(writer, percentileTicksPerHalfDistance, scaling);
+            histogram.OutputPercentileDistributionAsync(writer, percentileTicksPerHalfDistance, scaling);
             var actual = writer.ToString();
 
             Assert.Equal(expected, actual);
@@ -45,7 +45,7 @@ namespace HdrHistogram.UnitTests
             LoadHistogram(histogram);
 
             var writer = new StringWriter();
-            histogram.OutputPercentileDistribution(writer, percentileTicksPerHalfDistance, scaling, true);
+            histogram.OutputPercentileDistributionAsync(writer, percentileTicksPerHalfDistance, scaling, true);
             var actual = writer.ToString();
 
             Assert.Equal(expected, actual);
@@ -74,7 +74,7 @@ namespace HdrHistogram.UnitTests
             histogram.RecordValueWithCount(282111, 1);
 
             var writer = new StringWriter();
-            histogram.OutputPercentileDistribution(writer);
+            histogram.OutputPercentileDistributionAsync(writer);
             var actual = writer.ToString();
 
             Assert.Equal(expected, actual);

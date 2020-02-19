@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using HdrHistogram.Iteration;
 
 namespace HdrHistogram.Output
@@ -25,28 +26,28 @@ namespace HdrHistogram.Output
             _footerLine3FormatString = "#[Buckets = {0,12}, SubBuckets     = {1,12}]\n";
         }
 
-        public void WriteHeader()
+        public async Task WriteHeaderAsync()
         {
-            _printStream.Write("{0,12} {1,14} {2,10} {3,14}\n\n", "Value", "Percentile", "TotalCount", "1/(1-Percentile)");
+            await _printStream.WriteAsync(string.Format("{0,12} {1,14} {2,10} {3,14}\n\n", "Value", "Percentile", "TotalCount", "1/(1-Percentile)")).ConfigureAwait(false);
         }
 
-        public void WriteValue(HistogramIterationValue iterationValue)
+        public async Task WriteValueAsync(HistogramIterationValue iterationValue)
         {
             var scaledValue = iterationValue.ValueIteratedTo / _outputValueUnitScalingRatio;
             var percentile = iterationValue.PercentileLevelIteratedTo / 100.0D;
 
             if (iterationValue.IsLastValue())
             {
-                _printStream.Write(_lastLinePercentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue);
+                await _printStream.WriteAsync(string.Format(_lastLinePercentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue)).ConfigureAwait(false);
             }
             else
             {
-                _printStream.Write(_percentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue, 1 / (1.0D - percentile));
+                await _printStream.WriteAsync(string.Format(_percentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue, 1 / (1.0D - percentile))).ConfigureAwait(false);
 
             }
         }
 
-        public void WriteFooter(HistogramBase histogram)
+        public async Task WriteFooterAsync(HistogramBase histogram)
         {
             // Calculate and output mean and std. deviation.
             // Note: mean/std. deviation numbers are very often completely irrelevant when
@@ -61,9 +62,9 @@ namespace HdrHistogram.Output
 
             var mean = histogram.GetMean() / _outputValueUnitScalingRatio;
             var stdDeviation = histogram.GetStdDeviation() / _outputValueUnitScalingRatio;
-            _printStream.Write(_footerLine1FormatString, mean, stdDeviation);
-            _printStream.Write(_footerLine2FormatString, histogram.GetMaxValue() / _outputValueUnitScalingRatio, histogram.TotalCount);
-            _printStream.Write(_footerLine3FormatString, histogram.BucketCount, histogram.SubBucketCount);
+            await _printStream.WriteAsync(string.Format(_footerLine1FormatString, mean, stdDeviation)).ConfigureAwait(false);
+            await _printStream.WriteAsync(string.Format(_footerLine2FormatString, histogram.GetMaxValue() / _outputValueUnitScalingRatio, histogram.TotalCount)).ConfigureAwait(false);
+            await _printStream.WriteAsync(string.Format(_footerLine3FormatString, histogram.BucketCount, histogram.SubBucketCount)).ConfigureAwait(false);
         }
     }
 }

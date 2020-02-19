@@ -1,11 +1,12 @@
+﻿using System.Threading.Tasks;
 using HdrHistogram.Iteration;
 
 namespace HdrHistogram.Output
 {
     internal interface IOutputFormatter
     {
-        void WriteHeader();
-        void WriteValue(HistogramIterationValue value);
-        void WriteFooter(HistogramBase histogram);
+        Task WriteHeaderAsync();
+        Task WriteValueAsync(HistogramIterationValue value);
+        Task WriteFooterAsync(HistogramBase histogram);
     }
 }

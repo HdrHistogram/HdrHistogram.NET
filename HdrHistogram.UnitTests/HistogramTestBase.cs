@@ -189,7 +189,7 @@ namespace HdrHistogram.UnitTests
             });
 
             var stringWriter = new StringWriter();
-            histogram.OutputPercentileDistribution(stringWriter,
+            histogram.OutputPercentileDistributionAsync(stringWriter,
                 percentileTicksPerHalfDistance: 5,
                 outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds,
                 useCsvFormat: true);

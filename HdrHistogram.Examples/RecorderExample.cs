@@ -100,7 +100,7 @@ namespace HdrHistogram.Examples
             Console.WriteLine(File.ReadAllText(LogPath));
             Console.WriteLine();
             Console.WriteLine("Percentile distribution (values reported in milliseconds)");
-            accumulatingHistogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds);
+            await accumulatingHistogram.OutputPercentileDistributionAsync(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds).ConfigureAwait(false);
 
             Console.WriteLine("Output thread finishing.");
         }

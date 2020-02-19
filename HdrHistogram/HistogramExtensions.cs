@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HdrHistogram.Iteration;
 using HdrHistogram.Output;
 
@@ -119,7 +120,7 @@ namespace HdrHistogram
         /// Use the <see cref="OutputScalingFactor"/> constant values to help choose an appropriate output measurement.
         /// </param>
         /// <param name="useCsvFormat">Output in CSV (Comma Separated Values) format if <c>true</c>, else use plain text form.</param>
-        public static void OutputPercentileDistribution(this HistogramBase histogram,
+        public static async Task OutputPercentileDistributionAsync(this HistogramBase histogram,
             TextWriter writer,
             int percentileTicksPerHalfDistance = 5,
             double outputValueUnitScalingRatio = OutputScalingFactor.None,
@@ -131,19 +132,19 @@ namespace HdrHistogram
 
             try
             {
-                formatter.WriteHeader();
+                await formatter.WriteHeaderAsync().ConfigureAwait(false);
                 foreach (var iterationValue in histogram.Percentiles(percentileTicksPerHalfDistance))
                 {
-                    formatter.WriteValue(iterationValue);
+                    await formatter.WriteValueAsync(iterationValue).ConfigureAwait(false);
                 }
-                formatter.WriteFooter(histogram);
+                await formatter.WriteFooterAsync(histogram).ConfigureAwait(false);
             }
             catch (ArgumentOutOfRangeException)
             {
                 // Overflow conditions on histograms can lead to ArgumentOutOfRangeException on iterations:
                 if (histogram.HasOverflowed())
                 {
-                    writer.Write("# Histogram counts indicate OVERFLOW values");
+                    await writer.WriteAsync("# Histogram counts indicate OVERFLOW values").ConfigureAwait(false);
                 }
                 else
                 {

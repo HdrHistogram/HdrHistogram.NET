@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace HdrHistogram.Examples
 {
@@ -26,13 +27,13 @@ namespace HdrHistogram.Examples
 
         private static readonly TimeSpan RunPeriod = TimeSpan.FromSeconds(10);
 
-        public static void Run()
+        public static async Task RunAsync()
         {
             Console.WriteLine($"Running for {RunPeriod.TotalSeconds}sec.");
 
             RecordMeasurements();
 
-            OutputMeasurements();
+            await OutputMeasurementsAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -52,25 +53,25 @@ namespace HdrHistogram.Examples
         /// Write to the console the memory footprint of the histogram instance and
         /// the percentile distribution of all the recorded values.
         /// </summary>
-        private static void OutputMeasurements()
+        private static async Task OutputMeasurementsAsync()
         {
             var size = Histogram.GetEstimatedFootprintInBytes();
             Console.WriteLine("Histogram size = {0} bytes ({1:F2} MB)", size, size / 1024.0 / 1024.0);
 
             Console.WriteLine("Recorded latencies [in system clock ticks] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.None);
+            await Histogram.OutputPercentileDistributionAsync(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.None).ConfigureAwait(false);
             Console.WriteLine();
 
             Console.WriteLine("Recorded latencies [in usec] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMicroseconds);
+            await Histogram.OutputPercentileDistributionAsync(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMicroseconds).ConfigureAwait(false);
             Console.WriteLine();
 
             Console.WriteLine("Recorded latencies [in msec] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds);
+            await Histogram.OutputPercentileDistributionAsync(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds).ConfigureAwait(false);
             Console.WriteLine();
 
             Console.WriteLine("Recorded latencies [in sec] for Create+Close of a DatagramSocket:");
-            Histogram.OutputPercentileDistribution(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToSeconds);
+            await Histogram.OutputPercentileDistributionAsync(Console.Out, outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToSeconds).ConfigureAwait(false);
         }
 
         private static void CreateAndCloseDatagramSocket()

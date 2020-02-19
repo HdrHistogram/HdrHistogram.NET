@@ -6,7 +6,7 @@ namespace HdrHistogram.Examples
     {
         public static async Task Main()
         {
-            //SimpleHistogramExample.Run();
+            //await SimpleHistogramExample.RunAsync();
             using var example = new RecorderExample();
             await example.RunAsync().ConfigureAwait(false);
         }
