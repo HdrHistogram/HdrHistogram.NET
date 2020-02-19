@@ -36,7 +36,7 @@ namespace HdrHistogram
     public sealed class ShortHistogram : HistogramBase
     {
         private readonly short[] _counts;
-        
+
         private long _totalCount;
 
         /// <summary>

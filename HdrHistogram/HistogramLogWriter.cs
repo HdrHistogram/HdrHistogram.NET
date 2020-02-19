@@ -30,7 +30,7 @@ namespace HdrHistogram
                 writer.Write(startTime, histograms);
             }
         }
-        
+
         /// <summary>
         /// Creates a <see cref="HistogramLogWriter"/> that writes to an underlying <see cref="Stream"/>.
         /// </summary>

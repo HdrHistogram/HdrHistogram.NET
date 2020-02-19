@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 
@@ -14,7 +14,7 @@ namespace HdrHistogram.Examples
         {
             _addressFamily = new Lazy<AddressFamily>(() => GetAddressFamily(url));
         }
-        
+
         public void CreateAndCloseDatagramSocket()
         {
             try

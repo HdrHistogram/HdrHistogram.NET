@@ -24,7 +24,7 @@ namespace HdrHistogram.Benchmarking.Recording
             const int numberOfSignificantValueDigits = 3;
 
             _testValues = TestValues(highestTrackableValue);
-            
+
             _longHistogram = new LongHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             _intHistogram = new IntHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             _shortHistogram = new ShortHistogram(highestTrackableValue, numberOfSignificantValueDigits);

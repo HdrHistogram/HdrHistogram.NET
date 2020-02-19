@@ -32,7 +32,7 @@ namespace HdrHistogram
         /// </summary>
         protected int NumberOfSignificantValueDigits { get; set; } = 3;
 
-        
+
 
         /// <summary>
         /// Specifies that the Histogram to be created should be thread safe when written to from multiple threads.
@@ -126,7 +126,7 @@ namespace HdrHistogram
             NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
             return this;
         }
-        
+
         /// <summary>
         /// Creates the histogram as configured by this factory instance.
         /// </summary>
@@ -322,9 +322,9 @@ namespace HdrHistogram
             public Recorder Create()
             {
                 return new Recorder(
-                    _histogramBuilder.LowestTrackableValue, 
-                    _histogramBuilder.HighestTrackableValue, 
-                    _histogramBuilder.NumberOfSignificantValueDigits, 
+                    _histogramBuilder.LowestTrackableValue,
+                    _histogramBuilder.HighestTrackableValue,
+                    _histogramBuilder.NumberOfSignificantValueDigits,
                     _histogramBuilder.Create);
             }
         }

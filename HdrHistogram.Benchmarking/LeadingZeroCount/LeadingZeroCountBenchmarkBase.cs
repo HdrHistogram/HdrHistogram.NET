@@ -33,7 +33,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         protected LeadingZeroCountBenchmarkBase(int maxBit)
         {
             _maxBit = maxBit;
-            
+
 
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
             var expectedData = GenerateTestData(maxBit);
@@ -61,7 +61,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             };
             ValidateImplementations(expectedData, functions);
         }
-        
+
         private static CalculationExpectation[] GenerateTestData(int maxBit)
         {
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
@@ -103,8 +103,8 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
                 }
             }
         }
-        
-        
+
+
 
         [Benchmark(Baseline = true)]
         public int CurrentImplementation()

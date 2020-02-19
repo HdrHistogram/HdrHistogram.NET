@@ -18,7 +18,7 @@ namespace HdrHistogram.Output
         {
             _printStream = printStream;
             _outputValueUnitScalingRatio = outputValueUnitScalingRatio;
-            _percentileFormatString =         "{0,12:F" + significantDigits + "} {1,2:F12} {2,10} {3,14:F2}\n";
+            _percentileFormatString = "{0,12:F" + significantDigits + "} {1,2:F12} {2,10} {3,14:F2}\n";
             _lastLinePercentileFormatString = "{0,12:F" + significantDigits + "} {1,2:F12} {2,10}\n";
             _footerLine1FormatString = "#[Mean    = {0,12:F" + significantDigits + "}, StdDeviation   = {1,12:F" + significantDigits + "}]\n";
             _footerLine2FormatString = "#[Max     = {0,12:F" + significantDigits + "}, Total count    = {1,12}]\n";
@@ -42,10 +42,10 @@ namespace HdrHistogram.Output
             else
             {
                 _printStream.Write(_percentileFormatString, scaledValue, percentile, iterationValue.TotalCountToThisValue, 1 / (1.0D - percentile));
-                
+
             }
         }
-        
+
         public void WriteFooter(HistogramBase histogram)
         {
             // Calculate and output mean and std. deviation.

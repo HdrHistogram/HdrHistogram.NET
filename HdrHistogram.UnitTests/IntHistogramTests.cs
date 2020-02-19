@@ -2,7 +2,7 @@
 
 namespace HdrHistogram.UnitTests
 {
-    
+
     public class IntHistogramTests : HistogramTestBase
     {
         protected override int WordSize => sizeof(int);

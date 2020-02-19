@@ -63,7 +63,7 @@ namespace HdrHistogram
         /// <param name="decompressor">The <see cref="DeflateStream"/> that is being used to decompress the payload. Optional.</param>
         /// <returns>The newly constructed histogram</returns>
         public static HistogramBase DecodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue,
-           DeflateStream decompressor = null) 
+           DeflateStream decompressor = null)
         {
             var header = ReadHeader(buffer);
             var wordSizeInBytes = GetWordSizeInBytesFromCookie(header.Cookie);
@@ -73,7 +73,7 @@ namespace HdrHistogram
             var expectedCapacity = Math.Min(histogram.GetNeededByteBufferCapacity() - header.CapacityEstimateExcess, header.PayloadLengthInBytes);
             var payLoadSourceBuffer = PayLoadSourceBuffer(buffer, decompressor, expectedCapacity, header);
 
-            
+
             var filledLength = histogram.FillCountsFromBuffer(payLoadSourceBuffer, expectedCapacity, wordSizeInBytes);
             histogram.EstablishInternalTackingValues(filledLength);
 

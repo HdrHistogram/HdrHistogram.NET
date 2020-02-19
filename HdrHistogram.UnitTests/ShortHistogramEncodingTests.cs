@@ -2,7 +2,7 @@
 
 namespace HdrHistogram.UnitTests
 {
-    
+
     public sealed class ShortHistogramEncodingTests : HistogramEncodingTestBase
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantDigits)
@@ -23,4 +23,4 @@ namespace HdrHistogram.UnitTests
             source.RecordValue(DefaultHighestTrackableValue);
         }
     }
-}   
+}

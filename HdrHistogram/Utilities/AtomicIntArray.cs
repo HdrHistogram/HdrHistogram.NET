@@ -64,7 +64,7 @@ namespace HdrHistogram.Utilities
 
             _counts[index] = value;
             // Is this right, is that all we need??? We definitely don't want an Interlocked here, that's too much!!
-		    //Thread.MemoryBarrier();
+            //Thread.MemoryBarrier();
             Interlocked.MemoryBarrier();
 
             //Volatile.Read (only emits half-fence (acquire fence) as opposed to Thread.VolatileRead which emits a full-fence

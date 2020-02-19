@@ -123,7 +123,7 @@ namespace HdrHistogram
                 }
             }
         }
-        
+
         IEnumerable<HistogramBase> IHistogramLogV1Reader.ReadHistograms()
         {
             _startTimeInSeconds = 0;
@@ -161,7 +161,7 @@ namespace HdrHistogram
                     var intervalLength = ParseDouble(match, "interval");
                     var maxTime = ParseDouble(match, "max");    //Ignored as it can be inferred -LC
                     var payload = match.Groups["payload"].Value;
-                    
+
 
                     if (!hasStartTime)
                     {

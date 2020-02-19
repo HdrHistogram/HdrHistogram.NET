@@ -5,7 +5,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
     {
         public static int GetLeadingZeroCount(long value)
         {
-            var x = (int) value;
+            var x = (int)value;
             x |= (x >> 1);
             x |= (x >> 2);
             x |= (x >> 4);

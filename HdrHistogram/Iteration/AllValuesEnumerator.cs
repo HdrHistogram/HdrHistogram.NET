@@ -22,7 +22,7 @@ namespace HdrHistogram.Iteration
         /// Constructor for the <see cref="AllValuesEnumerator"/>.
         /// </summary>
         /// <param name="histogram">The histogram this iterator will operate on</param>
-        public AllValuesEnumerator(HistogramBase histogram):base(histogram)
+        public AllValuesEnumerator(HistogramBase histogram) : base(histogram)
         {
             _visitedSubBucketIndex = -1;
             _visitedBucketIndex = -1;
@@ -36,7 +36,7 @@ namespace HdrHistogram.Iteration
 
         protected override bool ReachedIterationLevel()
         {
-            return (_visitedSubBucketIndex != CurrentSubBucketIndex) 
+            return (_visitedSubBucketIndex != CurrentSubBucketIndex)
                 || (_visitedBucketIndex != CurrentBucketIndex);
         }
     }

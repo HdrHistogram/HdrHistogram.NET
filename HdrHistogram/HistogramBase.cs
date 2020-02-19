@@ -92,7 +92,7 @@ namespace HdrHistogram
             get { return _tag; }
             set
             {
-                if(!string.IsNullOrEmpty(value) && TagValidation.IsMatch(value))
+                if (!string.IsNullOrEmpty(value) && TagValidation.IsMatch(value))
                 {
                     throw new ArgumentException("Tag string cannot contain commas, spaces, or line breaks.");
                 }
@@ -116,7 +116,7 @@ namespace HdrHistogram
         /// The number of sub-buckets used to store count values.
         /// </summary>
         public int SubBucketCount { get; }
-        
+
         internal int SubBucketHalfCount { get; }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace HdrHistogram
         /// microsecond, the proper value for <paramref name="lowestTrackableValue"/> would be 1000.
         /// </remarks>
         protected HistogramBase(long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            :this(Interlocked.Decrement(ref _instanceIdSequencer), lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
+            : this(Interlocked.Decrement(ref _instanceIdSequencer), lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits)
         {
         }
 
@@ -317,7 +317,7 @@ namespace HdrHistogram
                 }
             }
         }
-        
+
         /// <summary>
         /// Get the size (in value units) of the range of values that are equivalent to the given value within the histogram's resolution. 
         /// Where "equivalent" means that value samples recorded for any two equivalent values are counted in a common total count.
@@ -333,7 +333,7 @@ namespace HdrHistogram
                 //TODO: Validate the conditions under which this is hit. Missing unit test (just copy from Java) -LC
                 bucketIndex++;
             }
-                
+
             var distanceToNextValue = 1 << (_unitMagnitude + bucketIndex);
             return distanceToNextValue;
         }
@@ -425,7 +425,7 @@ namespace HdrHistogram
         {
             return new RecordedValuesEnumerable(this);
         }
-        
+
         /// <summary>
         /// Provide a means of iterating through all histogram values using the finest granularity steps supported by the underlying representation.
         /// The iteration steps through all possible unit value levels, regardless of whether or not there were recorded values for that value level, and terminates when all recorded histogram values are exhausted.

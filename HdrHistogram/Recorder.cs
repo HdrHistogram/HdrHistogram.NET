@@ -229,7 +229,7 @@ namespace HdrHistogram
 
         private void ValidateFitAsReplacementHistogram(HistogramBase replacementHistogram)
         {
-            if(replacementHistogram !=null && replacementHistogram.InstanceId != _activeHistogram.InstanceId)
+            if (replacementHistogram != null && replacementHistogram.InstanceId != _activeHistogram.InstanceId)
             {
                 throw new InvalidOperationException(
                     $"Replacement histogram must have been obtained via a previous getIntervalHistogram() call from this {GetType().Name} instance");

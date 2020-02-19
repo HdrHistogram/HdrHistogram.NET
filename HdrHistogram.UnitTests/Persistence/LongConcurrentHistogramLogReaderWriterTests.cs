@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace HdrHistogram.UnitTests.Persistence
 {
-    
+
     public sealed class LongConcurrentHistogramLogReaderWriterTests : HistogramLogReaderWriterTestBase
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits)

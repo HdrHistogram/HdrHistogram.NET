@@ -4,10 +4,10 @@
     //  i.e. not 0, not -ve and not values over 2^63 (ulong)
     public static class IfAndShift
     {
-        
+
         public static int GetLeadingZeroCount(long input)
         {
-            return (int) CountLeadingZeros((ulong) input);
+            return (int)CountLeadingZeros((ulong)input);
         }
 
         //http://stackoverflow.com/questions/31374628/fast-way-of-finding-most-and-least-significant-bit-set-in-a-64-bit-integer?lq=1

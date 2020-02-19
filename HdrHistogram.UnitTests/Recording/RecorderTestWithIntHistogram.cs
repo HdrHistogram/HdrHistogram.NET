@@ -1,8 +1,8 @@
-using Xunit;
+﻿using Xunit;
 
 namespace HdrHistogram.UnitTests.Recording
 {
-    
+
     public sealed class RecorderTestWithIntHistogram : RecorderTestsBase
     {
         protected override HistogramBase CreateHistogram(long id, long min, long max, int sf)

@@ -22,7 +22,7 @@ namespace HdrHistogram
         private readonly WriterReaderPhaser _wrp = new WriterReaderPhaser();
         private readonly AtomicIntArray _counts;
         private long _totalCount = 0L;
-        
+
         /// <summary>
         /// Construct a <see cref="IntConcurrentHistogram"/> given the lowest and highest values to be tracked and a number of significant decimal digits.
         /// Providing a <paramref name="lowestTrackableValue"/> is useful is situations where the units used for the histogram's values are much smaller that the minimal accuracy required. 
@@ -74,7 +74,7 @@ namespace HdrHistogram
         /// </summary>
         public override long TotalCount
         {
-            get {return Interlocked.Read(ref _totalCount);}
+            get { return Interlocked.Read(ref _totalCount); }
             protected set { Interlocked.Exchange(ref _totalCount, value); }
         }
 
@@ -195,7 +195,7 @@ namespace HdrHistogram
             {
                 _wrp.ReaderLock();
                 Debug.Assert(CountsArrayLength == _counts.Length);
-                for (var i = 0; i<_counts.Length; i++)
+                for (var i = 0; i < _counts.Length; i++)
                 {
                     _counts[i] = 0;
                 }
@@ -213,7 +213,7 @@ namespace HdrHistogram
         /// <param name="target">The array to write each count value into.</param>
         protected override void CopyCountsInto(long[] target)
         {
-            for (var i = 0; i<target.Length; i++)
+            for (var i = 0; i < target.Length; i++)
             {
                 target[i] = _counts[i];
             }

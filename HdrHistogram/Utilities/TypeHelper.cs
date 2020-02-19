@@ -16,7 +16,7 @@ namespace HdrHistogram.Utilities
         /// <remarks>
         /// In most versions of .NET this method is provided directly on <see cref="Type"/>, however for full support, we provide this ourselves.
         /// </remarks>
-        public static ConstructorInfo GetConstructor( Type type, Type[] ctorArgTypes)
+        public static ConstructorInfo GetConstructor(Type type, Type[] ctorArgTypes)
         {
             var info = type.GetTypeInfo();
             return info.DeclaredConstructors

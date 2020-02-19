@@ -36,49 +36,57 @@ namespace HdrHistogram
             {
                 buffer.Put((byte)value);
             }
-            else {
+            else
+            {
                 buffer.Put((byte)((value & 0x7F) | 0x80));
                 if (value >> 14 == 0)
                 {
                     buffer.Put((byte)(value >> 7));
                 }
-                else {
+                else
+                {
                     buffer.Put((byte)(value >> 7 | 0x80));
                     if (value >> 21 == 0)
                     {
                         buffer.Put((byte)(value >> 14));
                     }
-                    else {
+                    else
+                    {
                         buffer.Put((byte)(value >> 14 | 0x80));
                         if (value >> 28 == 0)
                         {
                             buffer.Put((byte)(value >> 21));
                         }
-                        else {
+                        else
+                        {
                             buffer.Put((byte)(value >> 21 | 0x80));
                             if (value >> 35 == 0)
                             {
                                 buffer.Put((byte)(value >> 28));
                             }
-                            else {
+                            else
+                            {
                                 buffer.Put((byte)(value >> 28 | 0x80));
                                 if (value >> 42 == 0)
                                 {
                                     buffer.Put((byte)(value >> 35));
                                 }
-                                else {
+                                else
+                                {
                                     buffer.Put((byte)(value >> 35 | 0x80));
                                     if (value >> 49 == 0)
                                     {
                                         buffer.Put((byte)(value >> 42));
                                     }
-                                    else {
+                                    else
+                                    {
                                         buffer.Put((byte)(value >> 42 | 0x80));
                                         if (value >> 56 == 0)
                                         {
                                             buffer.Put((byte)(value >> 49));
                                         }
-                                        else {
+                                        else
+                                        {
                                             buffer.Put((byte)(value >> 49 | 0x80));
                                             buffer.Put((byte)(value >> 56));
                                         }
