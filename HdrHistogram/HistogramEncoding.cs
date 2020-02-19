@@ -194,17 +194,13 @@ namespace HdrHistogram
         {
             var cookieBase = GetCookieBase(cookie);
 
-            switch (cookieBase)
+            return cookieBase switch
             {
-                case CompressedEncodingCookieBaseV2:
-                    return EncodingHeaderSizeV2;
-                case CompressedEncodingCookieBaseV1:
-                    return EncodingHeaderSizeV1;
-                case CompressedEncodingCookieBaseV0:
-                    return EncodingHeaderSizeV0;
-                default:
-                    throw new ArgumentException("The buffer does not contain a compressed Histogram");
-            }
+                CompressedEncodingCookieBaseV2 => EncodingHeaderSizeV2,
+                CompressedEncodingCookieBaseV1 => EncodingHeaderSizeV1,
+                CompressedEncodingCookieBaseV0 => EncodingHeaderSizeV0,
+                _ => throw new ArgumentException("The buffer does not contain a compressed Histogram"),
+            };
         }
 
         private static int GetCookieBase(int cookie)
@@ -232,15 +228,14 @@ namespace HdrHistogram
 
         private static Type GetBestTypeForWordSize(int wordSizeInBytes)
         {
-            switch (wordSizeInBytes)
+            return wordSizeInBytes switch
             {
-                case 2: return typeof(ShortHistogram);
-                case 4: return typeof(IntHistogram);
-                case 8: return typeof(LongHistogram);
-                case 9: return typeof(LongHistogram);
-                default:
-                    throw new IndexOutOfRangeException();
-            }
+                2 => typeof(ShortHistogram),
+                4 => typeof(IntHistogram),
+                8 => typeof(LongHistogram),
+                9 => typeof(LongHistogram),
+                _ => throw new IndexOutOfRangeException(),
+            };
         }
     }
 }

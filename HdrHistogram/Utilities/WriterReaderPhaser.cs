@@ -167,7 +167,7 @@ namespace HdrHistogram.Utilities
             var startValueAtFlip = GetAndSet(ref _startEpoch, initialStartValue);
 
             // Now, spin until previous phase end value catches up with start value at flip:
-            var caughtUp = false;
+            bool caughtUp;
             do
             {
                 if (isNextPhaseEven)
