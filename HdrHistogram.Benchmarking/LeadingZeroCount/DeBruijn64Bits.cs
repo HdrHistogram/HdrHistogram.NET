@@ -67,7 +67,7 @@
             b |= b >> 8;
             b |= b >> 16;
             b |= b >> 32;
-            b = b & ~(b >> 1);
+            b &= ~(b >> 1);
             return MagicTable[b * Magic >> 58];
         }
 

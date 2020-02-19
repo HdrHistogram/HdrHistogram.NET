@@ -15,7 +15,7 @@ namespace HdrHistogram.UnitTests
                 digits = Math.Abs(digits);
                 var temp = value / Math.Pow(10, digits);
                 temp = Math.Round(temp, 0);
-                temp = temp * Math.Pow(10, digits);
+                temp *= Math.Pow(10, digits);
                 return temp;
             }
         }

@@ -20,12 +20,12 @@
 
             ulong n = 1;
 
-            if ((input >> 32) == 0) { n = n + 32; input = input << 32; }
-            if ((input >> 48) == 0) { n = n + 16; input = input << 16; }
-            if ((input >> 56) == 0) { n = n + 8; input = input << 8; }
-            if ((input >> 60) == 0) { n = n + 4; input = input << 4; }
-            if ((input >> 62) == 0) { n = n + 2; input = input << 2; }
-            n = n - (input >> 63);
+            if ((input >> 32) == 0) { n += 32; input <<= 32; }
+            if ((input >> 48) == 0) { n += 16; input <<= 16; }
+            if ((input >> 56) == 0) { n += 8; input <<= 8; }
+            if ((input >> 60) == 0) { n += 4; input <<= 4; }
+            if ((input >> 62) == 0) { n += 2; input <<= 2; }
+            n -= (input >> 63);
 
             return n;
         }
