@@ -729,9 +729,9 @@ namespace HdrHistogram
             return new RecordedData(
                 this.GetEncodingCookie(),
                 0,
-                this.NumberOfSignificantValueDigits,
-                this.LowestTrackableValue,
-                this.HighestTrackableValue,
+                NumberOfSignificantValueDigits,
+                LowestTrackableValue,
+                HighestTrackableValue,
                 1.0,
                 relevantCounts
                 );
@@ -740,9 +740,9 @@ namespace HdrHistogram
         private long[] GetRelevantCounts()
         {
             var max = this.GetMaxValue();
-            var bucketIdx = this.GetBucketIndex(max);
-            var subBucketIdx = this.GetSubBucketIndex(max, bucketIdx);
-            var maxIdx = this.CountsArrayIndex(bucketIdx, subBucketIdx);
+            var bucketIdx = GetBucketIndex(max);
+            var subBucketIdx = GetSubBucketIndex(max, bucketIdx);
+            var maxIdx = CountsArrayIndex(bucketIdx, subBucketIdx);
             var length = maxIdx + 1;
             var relevantCounts = new long[length];
             CopyCountsInto(relevantCounts);
