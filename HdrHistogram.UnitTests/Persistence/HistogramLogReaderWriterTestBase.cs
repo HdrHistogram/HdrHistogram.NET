@@ -47,7 +47,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var data = histogram.WriteLog();
             var actualHistograms = data.ReadHistograms();
 
-            Assert.Equal(1, actualHistograms.Length);
+            Assert.Single(actualHistograms);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
@@ -61,7 +61,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var data = histogram.WriteLog();
             var actualHistograms = data.ReadHistograms();
 
-            Assert.Equal(1, actualHistograms.Length);
+            Assert.Single(actualHistograms);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
@@ -79,7 +79,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var data = histogram.WriteLog();
             var actualHistograms = data.ReadHistograms();
 
-            Assert.Equal(1, actualHistograms.Length);
+            Assert.Single(actualHistograms);
             Assert.Equal(tag, actualHistograms[0].Tag);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }

@@ -172,6 +172,7 @@ namespace HdrHistogram.UnitTests
 
         [InlineData(1, 5000, 3)]
         [InlineData(1000, 100000, 5)]
+        [Theory]
         public void CanCreateLongHistogramWithSpecifiedRangeValues(long min, long max, int sf)
         {
             var actual = HistogramFactory.With64BitBucketSize()
@@ -186,6 +187,7 @@ namespace HdrHistogram.UnitTests
         }
         [InlineData(1, 5000, 3)]
         [InlineData(1000, 100000, 5)]
+        [Theory]
         public void LongConcurrentHistogramWithSpecifiedRangeValues(long min, long max, int sf)
         {
             var actual = HistogramFactory.With64BitBucketSize()
@@ -202,6 +204,7 @@ namespace HdrHistogram.UnitTests
 
         [InlineData(1, 5000, 3)]
         [InlineData(1000, 100000, 5)]
+        [Theory]
         public void CanCreateLongHistogramRecorder(long min, long max, int sf)
         {
             var actual = HistogramFactory.With64BitBucketSize()
@@ -219,6 +222,7 @@ namespace HdrHistogram.UnitTests
 
         [InlineData(1, 5000, 3)]
         [InlineData(1000, 100000, 5)]
+        [Theory]
         public void CanCreateLongConcurrentHistogramRecorder(long min, long max, int sf)
         {
             var actual = HistogramFactory.With64BitBucketSize()
