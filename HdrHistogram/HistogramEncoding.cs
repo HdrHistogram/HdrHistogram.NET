@@ -12,9 +12,6 @@ namespace HdrHistogram
     /// </summary>
     public static class HistogramEncoding
     {
-        private const int UncompressedDoubleHistogramEncodingCookie = 0x0c72124e;
-        private const int CompressedDoubleHistogramEncodingCookie = 0x0c72124f;
-
         private const int EncodingCookieBaseV2 = 0x1c849303;
         private const int EncodingCookieBaseV1 = 0x1c849301;
         private const int EncodingCookieBaseV0 = 0x1c849308;
