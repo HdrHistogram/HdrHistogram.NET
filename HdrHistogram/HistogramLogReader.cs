@@ -27,10 +27,8 @@ namespace HdrHistogram
         /// <returns>Return a lazily evaluated sequence of histograms.</returns>
         public static IEnumerable<HistogramBase> Read(Stream inputStream)
         {
-            using (var reader = new HistogramLogReader(inputStream))
-            {
-                return reader.ReadHistograms();
-            }
+            using var reader = new HistogramLogReader(inputStream);
+            return reader.ReadHistograms();
         }
 
         /// <summary>

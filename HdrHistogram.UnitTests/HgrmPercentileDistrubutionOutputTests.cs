@@ -90,11 +90,9 @@ namespace HdrHistogram.UnitTests
 
         private string GetEmbeddedFileText(string filename)
         {
-            using (var stream = GetEmbeddedFileStream(filename))
-            {
-                var reader = new StreamReader(stream);
-                return reader.ReadToEnd().Replace("\r\n", "\n");
-            }
+            using var stream = GetEmbeddedFileStream(filename);
+            var reader = new StreamReader(stream);
+            return reader.ReadToEnd().Replace("\r\n", "\n");
         }
 
         private static void LoadHistogram(IRecorder histogram)

@@ -19,9 +19,7 @@ namespace HdrHistogram.Examples
         {
             try
             {
-                using (var socket = new Socket(_addressFamily.Value, SocketType.Stream, ProtocolType.Tcp))
-                {
-                }
+                using var socket = new Socket(_addressFamily.Value, SocketType.Stream, ProtocolType.Tcp);
             }
             catch (SocketException)
             {

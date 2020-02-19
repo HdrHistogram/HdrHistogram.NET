@@ -25,10 +25,8 @@ namespace HdrHistogram
         /// <param name="histograms">The histograms to include in the output.</param>
         public static void Write(Stream outputStream, DateTime startTime, params HistogramBase[] histograms)
         {
-            using (var writer = new HistogramLogWriter(outputStream))
-            {
-                writer.Write(startTime, histograms);
-            }
+            using var writer = new HistogramLogWriter(outputStream);
+            writer.Write(startTime, histograms);
         }
 
         /// <summary>

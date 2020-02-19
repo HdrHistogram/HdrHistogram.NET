@@ -29,13 +29,11 @@ namespace HdrHistogram.UnitTests.Persistence
                 data = writerStream.ToArray();
             }
 
-            using (var readerStream = new MemoryStream(data))
-            {
-                var reader = new HistogramLogReader(readerStream);
-                Assert.Empty(reader.ReadHistograms().ToList());
-                var actualStartTime = reader.GetStartTime().SecondsSinceUnixEpoch().Round(3);
-                Assert.Equal(expectedStartTime, actualStartTime);
-            }
+            using var readerStream = new MemoryStream(data);
+            var reader = new HistogramLogReader(readerStream);
+            Assert.Empty(reader.ReadHistograms().ToList());
+            var actualStartTime = reader.GetStartTime().SecondsSinceUnixEpoch().Round(3);
+            Assert.Equal(expectedStartTime, actualStartTime);
         }
 
         [Theory]

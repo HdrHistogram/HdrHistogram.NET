@@ -5,10 +5,8 @@
         static void Main()
         {
             //SimpleHistogramExample.Run();
-            using (var example = new RecorderExample())
-            {
-                example.Run();
-            }
+            using var example = new RecorderExample();
+            example.Run();
         }
     }
 }
