@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,7 +17,9 @@ namespace HdrHistogram.UnitTests
             Action foo = () =>
                          {
                              for (var i = 0; i < loopcount; i++)
+                             {
                                  target.RecordValue(i);
+                             }
                          };
 
             var actions = Enumerable.Range(1, concurrency)

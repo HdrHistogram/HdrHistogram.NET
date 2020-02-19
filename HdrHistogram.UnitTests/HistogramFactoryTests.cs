@@ -42,7 +42,8 @@ namespace HdrHistogram.UnitTests
                 .WithPrecisionOf(sf)
                 .WithThreadSafeReads()
                 .Create();
-            var histogram = actual.GetIntervalHistogram();
+            var histogram = actual.GetIntervalHistogram();
+
             Assert.IsAssignableFrom<ShortHistogram>(histogram);
             Assert.Equal(min, histogram.LowestTrackableValue);
             Assert.Equal(max, histogram.HighestTrackableValue);
@@ -88,7 +89,8 @@ namespace HdrHistogram.UnitTests
             [Theory]
         [InlineData(1, 5000, 3)]
         [InlineData(1000, 100000, 5)]
-        public void IntConcurrentHistogramWithSpecifiedRangeValues(long min, long max, int sf)
+        public void IntConcurrentHistogramWithSpecifiedRangeValues(long min, long max, int sf)
+
         {
             var actual = HistogramFactory.With32BitBucketSize()
                 .WithValuesFrom(min)
@@ -100,20 +102,26 @@ namespace HdrHistogram.UnitTests
             Assert.IsAssignableFrom<IntConcurrentHistogram>(actual);
             Assert.Equal(min, actual.LowestTrackableValue);
 
-            Assert.Equal(max, actual.HighestTrackableValue);
+            Assert.Equal(max, actual.HighestTrackableValue);
+
             Assert.Equal(sf, actual.NumberOfSignificantValueDigits);
         }
 
 [Theory]
-        [InlineData(1, 5000, 3)]
+        [InlineData(1, 5000, 3)]
+
         [InlineData(1000, 100000, 5)]
         public void CanCreateIntHistogramRecorder(long min, long max, int sf)
 
-        {
+        {
+
             var actual = HistogramFactory.With32BitBucketSize()
-                .WithValuesFrom(min)
-                .WithValuesUpTo(max)
-                .WithPrecisionOf(sf)
+                .WithValuesFrom(min)
+
+                .WithValuesUpTo(max)
+
+                .WithPrecisionOf(sf)
+
                 .WithThreadSafeReads()
                 .Create();
             var histogram = actual.GetIntervalHistogram();

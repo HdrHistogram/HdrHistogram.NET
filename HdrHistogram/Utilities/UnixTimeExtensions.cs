@@ -17,7 +17,11 @@ namespace HdrHistogram.Utilities
         /// <exception cref="ArgumentException">Thrown if the <paramref name="source"/> Kind is <see cref="DateTimeKind.Unspecified"/>.</exception>
         public static double SecondsSinceUnixEpoch(this DateTime source)
         {
-            if (source.Kind == DateTimeKind.Unspecified) throw new ArgumentException("DateTime must have kind specified.");
+            if (source.Kind == DateTimeKind.Unspecified)
+            {
+                throw new ArgumentException("DateTime must have kind specified.");
+            }
+
             return (source.ToUniversalTime().Ticks - EpochInTicks) / (double)TimeSpan.TicksPerSecond;
         }
 
@@ -29,7 +33,11 @@ namespace HdrHistogram.Utilities
         /// <exception cref="ArgumentException">Thrown if the <paramref name="source"/> Kind is <see cref="DateTimeKind.Unspecified"/>.</exception>
         public static long MillisecondsSinceUnixEpoch(this DateTime source)
         {
-            if (source.Kind == DateTimeKind.Unspecified) throw new ArgumentException("DateTime must have kind specified.");
+            if (source.Kind == DateTimeKind.Unspecified)
+            {
+                throw new ArgumentException("DateTime must have kind specified.");
+            }
+
             return (source.ToUniversalTime().Ticks - EpochInTicks) / TimeSpan.TicksPerMillisecond;
         }
 

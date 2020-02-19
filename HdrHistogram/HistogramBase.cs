@@ -93,7 +93,10 @@ namespace HdrHistogram
             set
             {
                 if(!string.IsNullOrEmpty(value) && TagValidation.IsMatch(value))
+                {
                     throw new ArgumentException("Tag string cannot contain commas, spaces, or line breaks.");
+                }
+
                 _tag = value;
             }
         }
@@ -180,9 +183,20 @@ namespace HdrHistogram
         /// </remarks>
         protected HistogramBase(long instanceId, long lowestTrackableValue, long highestTrackableValue, int numberOfSignificantValueDigits)
         {
-            if (lowestTrackableValue < 1) throw new ArgumentException("lowestTrackableValue must be >= 1", nameof(lowestTrackableValue));
-            if (highestTrackableValue < 2 * lowestTrackableValue) throw new ArgumentException("highestTrackableValue must be >= 2 * lowestTrackableValue", nameof(highestTrackableValue));
-            if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5)) throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5", nameof(numberOfSignificantValueDigits));
+            if (lowestTrackableValue < 1)
+            {
+                throw new ArgumentException("lowestTrackableValue must be >= 1", nameof(lowestTrackableValue));
+            }
+
+            if (highestTrackableValue < 2 * lowestTrackableValue)
+            {
+                throw new ArgumentException("highestTrackableValue must be >= 2 * lowestTrackableValue", nameof(highestTrackableValue));
+            }
+
+            if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5))
+            {
+                throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5", nameof(numberOfSignificantValueDigits));
+            }
 
             InstanceId = instanceId;
             LowestTrackableValue = lowestTrackableValue;
@@ -460,7 +474,9 @@ namespace HdrHistogram
                 totalCounted += GetCountAtIndex(i);
                 //If adding has wrapped back around (for Long implementations)
                 if (totalCounted < 0)
+                {
                     return true;
+                }
             }
             return (totalCounted != TotalCount);
         }
@@ -631,7 +647,10 @@ namespace HdrHistogram
         {
             RecordValueWithCount(value, count);
             if (expectedIntervalBetweenValueSamples <= 0)
+            {
                 return;
+            }
+
             for (var missingValue = value - expectedIntervalBetweenValueSamples;
                  missingValue >= expectedIntervalBetweenValueSamples;
                  missingValue -= expectedIntervalBetweenValueSamples)

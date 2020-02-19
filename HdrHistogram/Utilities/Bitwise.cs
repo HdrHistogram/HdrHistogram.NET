@@ -45,7 +45,10 @@ namespace HdrHistogram.Utilities
             //Optimisation for 32 bit values. So values under 00:16:41.0 when measuring with Stopwatch.GetTimestamp()*, we will hit a fast path.
             //  * as at writing on Win10 .NET 4.6
             if (value < int.MaxValue)
+            {
                 return 63 - Log2((int)value);
+            }
+
             return NumberOfLeadingZerosLong(value);
         }
 

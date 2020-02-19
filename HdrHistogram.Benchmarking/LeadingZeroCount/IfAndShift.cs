@@ -1,4 +1,4 @@
-namespace HdrHistogram.Benchmarking.LeadingZeroCount
+﻿namespace HdrHistogram.Benchmarking.LeadingZeroCount
 {
     //Can we optimise this impl for value between 1->long.max
     //  i.e. not 0, not -ve and not values over 2^63 (ulong)
@@ -13,7 +13,10 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         //http://stackoverflow.com/questions/31374628/fast-way-of-finding-most-and-least-significant-bit-set-in-a-64-bit-integer?lq=1
         public static ulong CountLeadingZeros(ulong input)
         {
-            if (input == 0) return 64;
+            if (input == 0)
+            {
+                return 64;
+            }
 
             ulong n = 1;
 

@@ -97,7 +97,9 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
                 {
                     var actual = kvp.Value(data.Value);
                     if (actual != expected)
+                    {
                         throw new InvalidOperationException($"{kvp.Key} implementation invalid for {data.Value}. Expected {expected}, but was {actual}.");
+                    }
                 }
             }
         }

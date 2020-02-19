@@ -32,14 +32,24 @@ namespace HdrHistogram.UnitTests
         private static void CollectionEquals(HistogramIterationValue[] expected, HistogramIterationValue[] actual)
         {
             if (expected == null && actual == null)
+            {
                 return;
-            if(expected == null)
-                throw new Exception("Expected null array");
-            if (actual == null)
-                throw new Exception("Unexpected null array");
+            }
 
-            if(expected.Length != actual.Length)
+            if (expected == null)
+            {
+                throw new Exception("Expected null array");
+            }
+
+            if (actual == null)
+            {
+                throw new Exception("Unexpected null array");
+            }
+
+            if (expected.Length != actual.Length)
+            {
                 throw new Exception($"Expected length of {expected.Length}, but recieved {actual.Length}");
+            }
 
             for (var i = 0; i < expected.Length; i++)
             {

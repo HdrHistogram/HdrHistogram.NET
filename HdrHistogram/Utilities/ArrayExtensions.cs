@@ -15,7 +15,9 @@
         public static bool IsSequenceEqual<T>(this T[] source, T[] other)
         {
             if (source.Length != other.Length)
+            {
                 return false;
+            }
 
             for (var i = 0; i < other.Length; i++)
             {

@@ -37,7 +37,9 @@ namespace HdrHistogram.Iteration
         protected override bool HasNext() 
         {
             if (base.HasNext())
+            {
                 return true;
+            }
             // We want one additional last step to 100%
             if (!_reachedLastRecordedValue && (ArrayTotalCount > 0)) {
                 _percentileLevelToIterateTo = 100.0;
@@ -59,7 +61,10 @@ namespace HdrHistogram.Iteration
         protected override bool ReachedIterationLevel() 
         {
             if (CountAtThisValue == 0)
+            {
                 return false;
+            }
+
             var currentPercentile = (100.0 * TotalCountToCurrentIndex) / ArrayTotalCount;
             return (currentPercentile >= _percentileLevelToIterateTo);
         }

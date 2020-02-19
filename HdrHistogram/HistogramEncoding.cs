@@ -142,7 +142,9 @@ namespace HdrHistogram
         {
             var constructor = TypeHelper.GetConstructor(histogramType, HistogramClassConstructorArgsTypes);
             if (constructor == null)
+            {
                 throw new ArgumentException("The target type does not have a supported constructor", nameof(histogramType));
+            }
 
             var highestTrackableValue = Math.Max(header.HighestTrackableValue, minBarForHighestTrackableValue);
             try

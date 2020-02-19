@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -29,7 +29,9 @@ namespace HdrHistogram.Examples
         public void Run()
         {
             if (HasRunBeenCalled())
+            {
                 throw new InvalidOperationException("Can only call run once.");
+            }
 
             Console.WriteLine($"Running for {RunPeriod.TotalSeconds}sec.");
 

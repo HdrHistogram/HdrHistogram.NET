@@ -230,7 +230,10 @@ namespace HdrHistogram
             {
                 var line = _log.ReadLine();
                 if (line == null)
+                {
                     yield break;
+                }
+
                 yield return line;
             }
         }
@@ -264,10 +267,16 @@ namespace HdrHistogram
         private static string ParseTag(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
+            {
                 return null;
+            }
+
             value = value.Substring(4);
             if (string.IsNullOrWhiteSpace(value))
+            {
                 return null;
+            }
+
             return value;
         }
 

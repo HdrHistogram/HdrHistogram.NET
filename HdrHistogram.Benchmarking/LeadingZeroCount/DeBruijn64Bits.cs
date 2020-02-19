@@ -1,4 +1,4 @@
-namespace HdrHistogram.Benchmarking.LeadingZeroCount
+﻿namespace HdrHistogram.Benchmarking.LeadingZeroCount
 {
     public static class DeBruijn64Bits
     {
@@ -23,7 +23,11 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             // at this point you could also use popcount to find the number of set bits.
             // That might well be faster than a lookup table because you prevent a 
             // potential cache miss
-            if (v == unchecked((ulong)-1)) return 64;
+            if (v == unchecked((ulong)-1))
+            {
+                return 64;
+            }
+
             v++;
             return BitPatternToLog2[(ulong)(v * Multiplicator) >> 58];
         }

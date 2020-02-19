@@ -23,9 +23,15 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         {
             //TODO: Test this with just < instead of <=? i.e. const of int.Max+1;
             if (value <= int.MaxValue)
+            {
                 return 63 - Log2((int)value);
+            }
+
             if (value <= uint.MaxValue)
+            {
                 return 62 - Log2((int)(value >> 1));
+            }
+
             return 31 - Log2((int)(value >> 32));
         }
 
@@ -57,7 +63,10 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public static int GetLeadingZeroCount(long value)
         {
             if (value <= int.MaxValue)
+            {
                 return 63 - Log2((uint)value);
+            }
+
             return 32 - Log2((uint)(value >> 31));
         }
 
@@ -91,7 +100,10 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
         public static int GetLeadingZeroCount(long value)
         {
             if (value < IntOverflow)
+            {
                 return 63 - Log2((uint)value);
+            }
+
             return 32 - Log2((uint)(value >> 31));
         }
 
