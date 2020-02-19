@@ -1,12 +1,14 @@
-﻿namespace HdrHistogram.Examples
+﻿using System.Threading.Tasks;
+
+namespace HdrHistogram.Examples
 {
     class Program
     {
-        static void Main()
+        public static async Task Main()
         {
             //SimpleHistogramExample.Run();
             using var example = new RecorderExample();
-            example.Run();
+            await example.RunAsync().ConfigureAwait(false);
         }
     }
 }

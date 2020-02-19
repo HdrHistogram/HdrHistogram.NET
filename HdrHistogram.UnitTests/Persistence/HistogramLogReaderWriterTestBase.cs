@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using HdrHistogram.Utilities;
 using Xunit;
 
@@ -16,7 +17,7 @@ namespace HdrHistogram.UnitTests.Persistence
         private const long OneHourOfNanoseconds = 3600L * 1000 * 1000 * 1000;
 
         [Fact]
-        public void CanReadEmptyLog()
+        public async Task CanReadEmptyLogAsync()
         {
             byte[] data;
             var startTimeWritten = DateTime.Now;
@@ -25,7 +26,7 @@ namespace HdrHistogram.UnitTests.Persistence
 
             using (var writerStream = new MemoryStream())
             {
-                HistogramLogWriter.Write(writerStream, startTimeWritten);
+                await HistogramLogWriter.WriteAsync(writerStream, startTimeWritten).ConfigureAwait(false);
                 data = writerStream.ToArray();
             }
 
@@ -39,26 +40,26 @@ namespace HdrHistogram.UnitTests.Persistence
         [Theory]
         [InlineData(3600L * 1000 * 1000, DefaultSignificantDigits, 1000)]
         [InlineData(long.MaxValue / 2, DefaultSignificantDigits, 1000)]
-        public void CanRoundTripSingleHistogram(long highestTrackableValue, int significantDigits, int multiplier)
+        public async Task CanRoundTripSingleHistogramAsync(long highestTrackableValue, int significantDigits, int multiplier)
         {
             var histogram = CreatePopulatedHistogram(highestTrackableValue, significantDigits, multiplier);
 
             histogram.SetTimes();
-            var data = histogram.WriteLog();
+            var data = await histogram.WriteLogAsync().ConfigureAwait(false);
             var actualHistograms = data.ReadHistograms();
 
             Assert.Single(actualHistograms);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
-        protected void RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
+        protected async Task RoundTripSingleHistogramsWithFullRangesOfCountsAndValuesAsync(long count)
         {
             var value = 1;
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram.RecordValueWithCount(value, count);
 
             histogram.SetTimes();
-            var data = histogram.WriteLog();
+            var data = await histogram.WriteLogAsync().ConfigureAwait(false);
             var actualHistograms = data.ReadHistograms();
 
             Assert.Single(actualHistograms);
@@ -68,7 +69,7 @@ namespace HdrHistogram.UnitTests.Persistence
         [Theory]
         [InlineData("ATag")]
         [InlineData("AnotherTag")]
-        public void CanRoundTripSingleHistogramsWithSparseValues(string tag)
+        public async Task CanRoundTripSingleHistogramsWithSparseValuesAsync(string tag)
         {
             var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram.Tag = tag;
@@ -76,7 +77,7 @@ namespace HdrHistogram.UnitTests.Persistence
             histogram.RecordValue((long.MaxValue / 2) + 1);
 
             histogram.SetTimes();
-            var data = histogram.WriteLog();
+            var data = await histogram.WriteLogAsync().ConfigureAwait(false);
             var actualHistograms = data.ReadHistograms();
 
             Assert.Single(actualHistograms);
@@ -85,7 +86,7 @@ namespace HdrHistogram.UnitTests.Persistence
         }
 
         [Fact]
-        public void CanAppendHistogram()
+        public async Task CanAppendHistogramAsync()
         {
             var histogram1 = Create(DefaultHighestTrackableValue, DefaultSignificantDigits);
             histogram1.RecordValue(1);
@@ -99,8 +100,8 @@ namespace HdrHistogram.UnitTests.Persistence
             using (var writerStream = new MemoryStream())
             using (var log = new HistogramLogWriter(writerStream))
             {
-                log.Append(histogram1);
-                log.Append(histogram2);
+                await log.AppendAsync(histogram1).ConfigureAwait(false);
+                await log.AppendAsync(histogram2).ConfigureAwait(false);
                 data = writerStream.ToArray();
             }
             var actualHistograms = data.ReadHistograms();
