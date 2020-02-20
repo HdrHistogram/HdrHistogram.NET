@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Description>HdrHistogram supports low latency recording and analyzing of sampled data value counts across a configurable integer value range with configurable value precision within the range.</Description>
     <Authors>Gil Tene, Lee Campbell</Authors>
     <PackageReleaseNotes>NetStandard release</PackageReleaseNotes>
@@ -15,8 +15,8 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
-<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-  <DocumentationFile>bin\Release\$(TargetFramework)\HdrHistogram.xml</DocumentationFile>
-</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DocumentationFile>bin\Release\$(TargetFramework)\HdrHistogram.xml</DocumentationFile>
+  </PropertyGroup>
 
 </Project>

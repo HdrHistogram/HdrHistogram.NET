@@ -32,7 +32,11 @@ namespace HdrHistogram.UnitTests.Persistence
 
             using var readerStream = new MemoryStream(data);
             var reader = new HistogramLogReader(readerStream);
+#if NETCOREAPP3_1
+            Assert.Empty(await reader.ReadHistogramsAsync().ToListAsync().ConfigureAwait(false));
+#else
             Assert.Empty(reader.ReadHistograms().ToList());
+#endif
             var actualStartTime = reader.GetStartTime().SecondsSinceUnixEpoch().Round(3);
             Assert.Equal(expectedStartTime, actualStartTime);
         }
@@ -46,7 +50,11 @@ namespace HdrHistogram.UnitTests.Persistence
 
             histogram.SetTimes();
             var data = await histogram.WriteLogAsync().ConfigureAwait(false);
+#if NETCOREAPP3_1
+            var actualHistograms = await data.ReadHistogramsAsync().ConfigureAwait(false);
+#else
             var actualHistograms = data.ReadHistograms();
+#endif
 
             Assert.Single(actualHistograms);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
@@ -60,7 +68,11 @@ namespace HdrHistogram.UnitTests.Persistence
 
             histogram.SetTimes();
             var data = await histogram.WriteLogAsync().ConfigureAwait(false);
+#if NETCOREAPP3_1
+            var actualHistograms = await data.ReadHistogramsAsync().ConfigureAwait(false);
+#else
             var actualHistograms = data.ReadHistograms();
+#endif
 
             Assert.Single(actualHistograms);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
@@ -78,8 +90,11 @@ namespace HdrHistogram.UnitTests.Persistence
 
             histogram.SetTimes();
             var data = await histogram.WriteLogAsync().ConfigureAwait(false);
+#if NETCOREAPP3_1
+            var actualHistograms = await data.ReadHistogramsAsync().ConfigureAwait(false);
+#else
             var actualHistograms = data.ReadHistograms();
-
+#endif
             Assert.Single(actualHistograms);
             Assert.Equal(tag, actualHistograms[0].Tag);
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
@@ -104,7 +119,12 @@ namespace HdrHistogram.UnitTests.Persistence
                 await log.AppendAsync(histogram2).ConfigureAwait(false);
                 data = writerStream.ToArray();
             }
+
+#if NETCOREAPP3_1
+            var actualHistograms = await data.ReadHistogramsAsync().ConfigureAwait(false);
+#else
             var actualHistograms = data.ReadHistograms();
+#endif
 
             Assert.Equal(2, actualHistograms.Length);
             HistogramAssert.AreValueEqual(histogram1, actualHistograms.First());
@@ -113,7 +133,11 @@ namespace HdrHistogram.UnitTests.Persistence
 
         [Theory]
         [InlineData("tagged-Log.logV2.hlog")]
+#if NETCOREAPP3_1
+        public async Task CanReadV2TaggedLogs(string logPath)
+#else
         public void CanReadV2TaggedLogs(string logPath)
+#endif
         {
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
@@ -121,7 +145,11 @@ namespace HdrHistogram.UnitTests.Persistence
             long totalCount = 0;
             var accumulatedHistogramWithNoTag = Create(85899345920838, DefaultSignificantDigits);
             var accumulatedHistogramWithTagA = Create(85899345920838, DefaultSignificantDigits);
+#if NETCOREAPP3_1
+            await foreach (var histogram in reader.ReadHistogramsAsync().ConfigureAwait(false))
+#else
             foreach (var histogram in reader.ReadHistograms())
+#endif
             {
                 histogramCount++;
                 Assert.IsAssignableFrom<HistogramBase>(histogram);// "Expected integer value histograms in log file");
@@ -146,14 +174,22 @@ namespace HdrHistogram.UnitTests.Persistence
 
         [Theory]
         [InlineData("jHiccup-2.0.7S.logV2.hlog")]
+#if NETCOREAPP3_1
+        public async Task CanReadv2Logs(string logPath)
+#else
         public void CanReadv2Logs(string logPath)
+#endif
         {
             var readerStream = GetEmbeddedFileStream(logPath);
             var reader = new HistogramLogReader(readerStream);
             var histogramCount = 0;
             long totalCount = 0;
             var accumulatedHistogram = Create(85899345920838, DefaultSignificantDigits);
+#if NETCOREAPP3_1
+            await foreach (var histogram in reader.ReadHistogramsAsync().ConfigureAwait(false))
+#else
             foreach (var histogram in reader.ReadHistograms())
+#endif
             {
                 histogramCount++;
                 Assert.IsAssignableFrom<HistogramBase>(histogram);//, "Expected integer value histograms in log file");
@@ -173,7 +209,11 @@ namespace HdrHistogram.UnitTests.Persistence
         [InlineData("jHiccup-2.0.1.logV0.hlog", 0, int.MaxValue, 81, 61256, 1510998015, 1569718271, 1438869961.225)]
         [InlineData("jHiccup-2.0.1.logV0.hlog", 19, 25, 25, 18492, 459007, 623103, 1438869961.225)]
         [InlineData("jHiccup-2.0.1.logV0.hlog", 45, 34, 34, 25439, 1209008127, 1234173951, 1438869961.225)]
+#if NETCOREAPP3_1
+        public async Task CanReadv0Logs(string logPath, int skip, int take,
+#else
         public void CanReadv0Logs(string logPath, int skip, int take,
+#endif
             int expectedHistogramCount, int expectedCombinedValueCount,
             int expectedCombined999, long expectedCombinedMaxLength,
             double expectedStartTime)
@@ -184,10 +224,17 @@ namespace HdrHistogram.UnitTests.Persistence
             var histogramCount = 0;
             long totalCount = 0;
             var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
+#if NETCOREAPP3_1
+            var histograms = ((IHistogramLogV1Reader)reader).ReadHistogramsAsync()
+                .Skip(skip)
+                .Take(take);
+            await foreach (var histogram in histograms.ConfigureAwait(false))
+#else
             var histograms = ((IHistogramLogV1Reader)reader).ReadHistograms()
                 .Skip(skip)
                 .Take(take);
             foreach (var histogram in histograms)
+#endif
             {
                 histogramCount++;
                 totalCount += histogram.TotalCount;
@@ -207,7 +254,11 @@ namespace HdrHistogram.UnitTests.Persistence
         [InlineData("ycsb.logV1.hlog", 0, int.MaxValue, 602, 300056, 1214463, 1546239, 1438613579.295)]
         [InlineData("ycsb.logV1.hlog", 0, 180, 180, 89893, 1375231, 1546239, 1438613579.295)]
         [InlineData("ycsb.logV1.hlog", 180, 520, 422, 210163, 530, 17775, 1438613579.295)]
+#if NETCOREAPP3_1
+        public async Task CanReadv1Logs(string logPath, int skip, int take,
+#else
         public void CanReadv1Logs(string logPath, int skip, int take,
+#endif
             int expectedHistogramCount, int expectedCombinedValueCount,
             int expectedCombined999, long expectedCombinedMaxLength,
             double expectedStartTime)
@@ -218,10 +269,17 @@ namespace HdrHistogram.UnitTests.Persistence
             long totalCount = 0;
 
             var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
+#if NETCOREAPP3_1
+            var histograms = reader.ReadHistogramsAsync()
+                .Skip(skip)
+                .Take(take);
+            await foreach (var histogram in histograms.ConfigureAwait(false))
+#else
             var histograms = reader.ReadHistograms()
                 .Skip(skip)
                 .Take(take);
             foreach (var histogram in histograms)
+#endif
             {
                 histogramCount++;
                 totalCount += histogram.TotalCount;
@@ -238,7 +296,11 @@ namespace HdrHistogram.UnitTests.Persistence
         [Theory]
         [InlineData("ycsb.logV1.hlog", 0, 180, 180, 90033, 1375231, 1546239, 1438613579.295)]
         [InlineData("ycsb.logV1.hlog", 180, 520, 421, 209686, 530, 17775, 1438613579.295)]
+#if NETCOREAPP3_1
+        public async Task CanReadv1Logs_Skip_PreStart(string logPath, int skip, int take,
+#else
         public void CanReadv1Logs_Skip_PreStart(string logPath, int skip, int take,
+#endif
             int expectedHistogramCount, int expectedCombinedValueCount,
             int expectedCombined999, long expectedCombinedMaxLength,
             double expectedStartTime)
@@ -249,11 +311,19 @@ namespace HdrHistogram.UnitTests.Persistence
             long totalCount = 0;
 
             var accumulatedHistogram = Create(OneHourOfNanoseconds, DefaultSignificantDigits);
+#if NETCOREAPP3_1
+            var histograms = reader.ReadHistogramsAsync()
+                .Where(h => h.StartTimeStamp >= reader.GetStartTime().MillisecondsSinceUnixEpoch())
+                .Skip(skip)
+                .Take(take);
+            await foreach (var histogram in histograms.ConfigureAwait(false))
+#else
             var histograms = reader.ReadHistograms()
                 .Where(h => h.StartTimeStamp >= reader.GetStartTime().MillisecondsSinceUnixEpoch())
                 .Skip(skip)
                 .Take(take);
             foreach (var histogram in histograms)
+#endif
             {
                 histogramCount++;
                 totalCount += histogram.TotalCount;

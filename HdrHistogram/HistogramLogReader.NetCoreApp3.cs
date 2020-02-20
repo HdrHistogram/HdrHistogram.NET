@@ -1,9 +1,10 @@
-﻿#if !NETSTANDARD2_1
+﻿#if NETSTANDARD2_1
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using HdrHistogram.Utilities;
 
 namespace HdrHistogram
@@ -19,7 +20,7 @@ namespace HdrHistogram
         //Content lines - format =  startTimestamp, intervalLength, maxTime, histogramPayload
         private static readonly Regex UntaggedLogLineMatcher = new Regex(@"(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
         private static readonly Regex TaggedLogLineMatcher = new Regex(@"((?<tag>Tag=.+),)?(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
-        private readonly TextReader _log;
+        private readonly StreamReader _log;
         private double _startTimeInSeconds;
 
         /// <summary>
@@ -27,10 +28,13 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="inputStream">The <see cref="Stream"/> to read from.</param>
         /// <returns>Return a lazily evaluated sequence of histograms.</returns>
-        public static IEnumerable<HistogramBase> Read(Stream inputStream)
+        public static async IAsyncEnumerable<HistogramBase> ReadAsync(Stream inputStream)
         {
             using var reader = new HistogramLogReader(inputStream);
-            return reader.ReadHistograms();
+            await foreach (var histogramBase in reader.ReadHistogramsAsync().ConfigureAwait(false))
+            {
+                yield return histogramBase;
+            }
         }
 
         /// <summary>
@@ -46,13 +50,13 @@ namespace HdrHistogram
         /// Reads each histogram out from the underlying stream.
         /// </summary>
         /// <returns>Return a lazily evaluated sequence of histograms.</returns>
-        public IEnumerable<HistogramBase> ReadHistograms()
+        public async IAsyncEnumerable<HistogramBase> ReadHistogramsAsync()
         {
             _startTimeInSeconds = 0;
             double baseTimeInSeconds = 0;
             var hasStartTime = false;
             var hasBaseTime = false;
-            foreach (var line in ReadLines())
+            await foreach (var line in ReadLinesAsync().ConfigureAwait(false))
             {
                 //Comments (and header metadata)
                 if (IsComment(line))
@@ -124,13 +128,13 @@ namespace HdrHistogram
             }
         }
 
-        IEnumerable<HistogramBase> IHistogramLogV1Reader.ReadHistograms()
+        async IAsyncEnumerable<HistogramBase> IHistogramLogV1Reader.ReadHistogramsAsync()
         {
             _startTimeInSeconds = 0;
             double baseTimeInSeconds = 0;
             var hasStartTime = false;
             var hasBaseTime = false;
-            foreach (var line in ReadLines())
+            await foreach (var line in ReadLinesAsync().ConfigureAwait(false))
             {
                 //Comments (and header metadata)
                 if (IsComment(line))
@@ -224,11 +228,11 @@ namespace HdrHistogram
             return HistogramEncoding.DecodeFromCompressedByteBuffer(buffer, minBarForHighestTrackableValue);
         }
 
-        private IEnumerable<string> ReadLines()
+        private async IAsyncEnumerable<string> ReadLinesAsync()
         {
             while (true)
             {
-                var line = _log.ReadLine();
+                var line = await _log.ReadLineAsync().ConfigureAwait(false);
                 if (line == null)
                 {
                     yield break;
@@ -308,4 +312,4 @@ namespace HdrHistogram
     }
 }
 
-#endif  
+#endif

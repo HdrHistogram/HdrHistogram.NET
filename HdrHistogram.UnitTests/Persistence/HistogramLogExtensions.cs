@@ -8,6 +8,18 @@ namespace HdrHistogram.UnitTests.Persistence
 {
     public static class HistogramLogExtensions
     {
+#if NETCOREAPP3_1
+        public static async Task<HistogramBase[]> ReadHistogramsAsync(this byte[] data)
+        {
+            HistogramBase[] actualHistograms;
+            using (var readerStream = new MemoryStream(data))
+            {
+                actualHistograms = await HistogramLogReader.ReadAsync(readerStream).ToArrayAsync().ConfigureAwait(false);
+            }
+
+            return actualHistograms;
+        }
+#else
         public static HistogramBase[] ReadHistograms(this byte[] data)
         {
             HistogramBase[] actualHistograms;
@@ -15,8 +27,10 @@ namespace HdrHistogram.UnitTests.Persistence
             {
                 actualHistograms = HistogramLogReader.Read(readerStream).ToArray();
             }
+
             return actualHistograms;
         }
+#endif
 
         public static async Task<byte[]> WriteLogAsync(this HistogramBase histogram)
         {

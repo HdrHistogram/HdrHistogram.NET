@@ -3,4 +3,8 @@
     <LangVersion>latest</LangVersion>
     <WarningsAsErrors />
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="4.0.0" />
+  </ItemGroup>
 </Project>

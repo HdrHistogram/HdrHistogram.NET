@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace HdrHistogram.UnitTests
@@ -12,7 +13,7 @@ namespace HdrHistogram.UnitTests
     public sealed class HgrmPercentileDistrubutionOutputTests
     {
         [Theory, CombinatorialData]
-        public void PercentileDistrubution_hgrm_output_is_in_correct_format(
+        public async Task PercentileDistrubution_hgrm_output_is_in_correct_formatAsync(
             [CombinatorialValues(36000000000)]long highestTrackableValue,
             [CombinatorialValues(1, 2, 3, 4, 5)]int signigicantDigits,
             [CombinatorialValues(10000.0)]double scaling,
@@ -25,14 +26,14 @@ namespace HdrHistogram.UnitTests
             LoadHistogram(histogram);
 
             var writer = new StringWriter();
-            histogram.OutputPercentileDistributionAsync(writer, percentileTicksPerHalfDistance, scaling);
+            await histogram.OutputPercentileDistributionAsync(writer, percentileTicksPerHalfDistance, scaling).ConfigureAwait(false);
             var actual = writer.ToString();
 
             Assert.Equal(expected, actual);
         }
 
         [Theory, CombinatorialData]
-        public void PercentileDistrubution_csv_output_is_in_correct_format(
+        public async Task PercentileDistrubution_csv_output_is_in_correct_formatAsync(
             [CombinatorialValues(36000000000)]long highestTrackableValue,
             [CombinatorialValues(1, 2, 3, 4, 5)]int signigicantDigits,
             [CombinatorialValues(10000.0)]double scaling,
@@ -45,17 +46,41 @@ namespace HdrHistogram.UnitTests
             LoadHistogram(histogram);
 
             var writer = new StringWriter();
-            histogram.OutputPercentileDistributionAsync(writer, percentileTicksPerHalfDistance, scaling, true);
+            await histogram.OutputPercentileDistributionAsync(writer, percentileTicksPerHalfDistance, scaling, true).ConfigureAwait(false);
             var actual = writer.ToString();
 
             Assert.Equal(expected, actual);
         }
 
         [Fact] //BUG https://github.com/HdrHistogram/HdrHistogram.NET/issues/39
-        public void OnlySingleValueFlaggedAsLastValue()
+        public async Task OnlySingleValueFlaggedAsLastValueAsync()
         {
-            var expected = GetEmbeddedFileText("IsLastValueBug.hgrm");
 
+            //https://devblogs.microsoft.com/dotnet/floating-point-parsing-and-formatting-improvements-in-net-core-3-0/
+            /*
+             * Real value :
+             *      percentile = 0.9997802734375
+             * HgrmOutputFormatter USES :
+             *      string.Format("{x,2:F12}, percentile)
+             *      
+             * netfx => netcoreapp2.2 returns
+             *      0.999780273438 (rounded)
+             *
+             * netcoreapp3.x now returns
+             *      0.999780273437 (truncated)
+             *
+             * Explanation from the blog :
+             * For the remaining format-specifiers that take a precision ("C", "E", "F", "N", and "P"),
+             * there is no mechanism to fallback to the old behavior.
+             * The previous behavior would clamp precisions greater than 14 (exclusive) to be 17 for "E" and 15 for the others.
+             * However, this only impacted the significant digits that would be displayed,
+             * the remaining digits (even if available) would be filled in as zero.
+             */
+#if NETCOREAPP3_1
+            var expected = GetEmbeddedFileText("IsLastValueBug_netcoreapp3.hgrm");
+#else
+            var expected = GetEmbeddedFileText("IsLastValueBug.hgrm");
+#endif
             var histogram = new LongHistogram(highestTrackableValue: 36000000000, numberOfSignificantValueDigits: 3);
             histogram.RecordValueWithCount(1L, 7604459);
             histogram.RecordValueWithCount(383, 2395524);
@@ -74,7 +99,7 @@ namespace HdrHistogram.UnitTests
             histogram.RecordValueWithCount(282111, 1);
 
             var writer = new StringWriter();
-            histogram.OutputPercentileDistributionAsync(writer);
+            await histogram.OutputPercentileDistributionAsync(writer).ConfigureAwait(false);
             var actual = writer.ToString();
 
             Assert.Equal(expected, actual);
