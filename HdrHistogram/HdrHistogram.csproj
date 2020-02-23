@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Description>HdrHistogram supports low latency recording and analyzing of sampled data value counts across a configurable integer value range with configurable value precision within the range.</Description>
     <Authors>Gil Tene, Lee Campbell</Authors>
-    <PackageReleaseNotes>NetStandard release</PackageReleaseNotes>
-    <Copyright>Copyright 2017</Copyright>
+    <PackageReleaseNotes>NetStandard 2.0 release</PackageReleaseNotes>
+    <Copyright>Copyright 2020</Copyright>
     <PackageTags>HdrHistogram HdrHistogram.NET Histogram Instrumentation</PackageTags>
     <PackageProjectUrl>https://github.com/HdrHistogram/HdrHistogram.NET</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/LICENSE.txt</PackageLicenseUrl>
@@ -21,6 +21,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.3|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard1.3\HdrHistogram.xml</DocumentationFile>
     <DefineConstants>RELEASE;NETSTANDARD1_3</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\HdrHistogram.xml</DocumentationFile>
+    <DefineConstants>RELEASE;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
 </Project>
