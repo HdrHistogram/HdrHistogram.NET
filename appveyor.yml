@@ -1,7 +1,7 @@
 version: 2.{build}.0
 pull_requests:
   do_not_increment_build_number: true
-image: Visual Studio 2017
+image: Visual Studio 2019
 build_script:
 - ps: >-
     Write-Host $env:APPVEYOR_BUILD_VERSION
