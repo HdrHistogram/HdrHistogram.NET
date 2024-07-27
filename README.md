@@ -1,15 +1,18 @@
-<img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/HdrHistogram-icon-64x64.png">
+<img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/HdrHistogram-icon-64x64.png" alt="HdrHistorgram.NET logo">
 
 # HdrHistogram
-**A High Dynamic Range (HDR) Histogram**
+
+A High Dynamic Range (HDR) Histogram
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HdrHistogram/HdrHistogram?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/q0o5faahigq6u4qe/branch/master?svg=true)](https://ci.appveyor.com/project/LeeCampbell/hdrhistogram-net/branch/master) [![Build status](https://ci.appveyor.com/api/projects/status/q0o5faahigq6u4qe?svg=true)](https://ci.appveyor.com/project/LeeCampbell/hdrhistogram-net)
 
 ## What is it
+
 HdrHistogram.NET is the official port of the Java HdrHistogram library.
-All official implementations of HdrHistogram can be found at https://github.com/HdrHistogram
+All official implementations of HdrHistogram can be found at <https://github.com/HdrHistogram>
 
 ## Why would I use it?
+
 You would use it to efficiently capture large number of response times measurements.
 
 Often when measuring response times, one could make the common mistake of reporting on the mean value or the 90th percentile.
@@ -17,9 +20,10 @@ Gil Tene (the original author of the Java HdrHistogram) illustrates in numerous 
 Instead you want to collect all of the data and then be able to report your measurements across the range of measurements.
 
 ## How would I use it?
+
 The library is available as a package from Nuget as [HdrHistogram](https://www.nuget.org/packages/HdrHistogram/)
 
-Generally you want to be able to record at the finest accuracy the response-time of a given function of your software. 
+Generally you want to be able to record at the finest accuracy the response-time of a given function of your software.
 To do this code might look something like this
 
 ### Declare the Histogram
@@ -31,6 +35,7 @@ var histogram = new LongHistogram(TimeStamp.Hours(1), 3);
 ```
 
 ### Record your measurements
+
 Next you would record your measurements.
 The `System.Diagnostics.Stopwatch.GetTimestamp()` method provides the most accurate way to record the elapsed time an action took to run.
 By measuring the difference of the timestamp values before and after the action to measure, we can get the most accurate recording of elapsed
@@ -44,7 +49,8 @@ histogram.RecordValue(elapsed);
 
 ```
 
-### Output the results.
+### Output the results
+
 Once you have recorded all of your data, you are able to present that data based on a highly dynamic range of buckets.
 We are not interested in all the values, but just enough of the values to get a picture of our system's performance.
 To do this we want to generate a percentile distribution, with exponentially increasing fidelity.
@@ -66,7 +72,7 @@ Console.WriteLine(writer.ToString());
 
 Would produce output similar to:
 
-```
+``` text
        Value     Percentile TotalCount 1/(1-Percentile)
 
        0.285 0.000000000000          1           1.00
@@ -151,13 +157,14 @@ Would produce output similar to:
 #[Max     =     2541.568, Total count    =        35004]
 #[Buckets =           21, SubBuckets     =         2048]
 ```
+
 Note that in the example above a value for the optional parameter `outputValueUnitScalingRatio` is provided.
 If you record elapsed time using the suggested method with `Stopwatch.GetTimestamp()`, then you will have recorded values in a non-standard unit of time.
 Instead of paying to cost of converting recorded values at the time of recording, record raw values.
 Use the helper methods to convert recorded values to standard units at output time, when performance is less critical.
 
-
 ### Example of reporting results as a chart
+
 You can also have HdrHistogram output the results in a file format that can be charted.
 This is especially useful when comparing measurements.
 
@@ -166,7 +173,7 @@ First you will need to create the file to be used as an input for the chart.
 ```  csharp
 using (var writer = new StreamWriter("HistogramResults.hgrm"))
 {
-	histogram.OutputPercentileDistribution(writer);
+  histogram.OutputPercentileDistribution(writer);
 }
 ```
 
@@ -174,20 +181,21 @@ The data can then be plotter to visualize the percentile distribution of your re
 Multiple files can be plotted in the same chart allowing effective visual comparison of your results.
 You can use either
 
- * the online tool - http://hdrhistogram.github.io/HdrHistogram/plotFiles.html
- * the local tool - _.\GoogleChartsExample\plotFiles.html_
-  ![](http://i.imgur.com/Z1wIqw1.png)
+- the online tool - <http://hdrhistogram.github.io/HdrHistogram/plotFiles.html>
+- the local tool - _.\GoogleChartsExample\plotFiles.html_
+  ![Example visualised plot comparing 3 percentile distributions](http://i.imgur.com/Z1wIqw1.png)
 
 If you use the local tool, there are example result files in the _.\GoogleChartsExample_ directory.
 The tool also allows you to export to png.
 
 ## So what is so special about this way of recording response times?
 
-* itself is low latency
-* tiny foot print due to just storing a dynamic range of buckets and counts
-* produces the reports you actually want
+- itself is low latency
+- tiny foot print due to just storing a dynamic range of buckets and counts
+- produces the reports you actually want
 
 ## Full code example
+
 This code sample show a recording of the time taken to execute a ping request.
 We execute and record this in a loop.
 
@@ -196,26 +204,26 @@ We execute and record this in a loop.
 var histogram = new LongHistogram(TimeStamp.Hours(1), 3);
 using (var ping = new System.Net.NetworkInformation.Ping())
 {
-	for (int i = 0; i < 100; i++)
-	{
-		long startTimestamp = Stopwatch.GetTimestamp();
-		//Execute our action we want to record.
-		ping.Send("www.github.com");
-		long elapsed = Stopwatch.GetTimestamp() - startTimestamp;
-		histogram.RecordValue(elapsed);
-	}
+  for (int i = 0; i < 100; i++)
+  {
+    long startTimestamp = Stopwatch.GetTimestamp();
+    //Execute our action we want to record.
+    ping.Send("www.github.com");
+    long elapsed = Stopwatch.GetTimestamp() - startTimestamp;
+    histogram.RecordValue(elapsed);
+  }
 }
 //Output the percentile distribution of our results to the Console with values presented in Milliseconds
 histogram.OutputPercentileDistribution(
-	printStream: Console.Out,
-	percentileTicksPerHalfDistance: 3,
-	outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds);
+  printStream: Console.Out,
+  percentileTicksPerHalfDistance: 3,
+  outputValueUnitScalingRatio: OutputScalingFactor.TimeStampToMilliseconds);
 
 ```
 
 **output:**
 
-```
+``` text
        Value     Percentile TotalCount 1/(1-Percentile)
 
       79.360 0.000000000000          1           1.00
@@ -246,17 +254,16 @@ histogram.OutputPercentileDistribution(
 #[Buckets =           26, SubBuckets     =         2048]
 ```
 
-
-
 ### How would I contribute to this project?
+
 We welcome pull requests!
 If you do choose to contribute, please first raise an issue so we are not caught off guard by the pull request.
 Next can you please ensure that your PR (Pull Request) has a comment in it describing what it achieves and the issues that it closes.
 Ideally if it is fixing an issue or a bug, there would be a Unit Test proving the fix and a reference to the Issues in the PR comments.
 
+---
 
-HdrHistogram Details
-----------------------------------------------
+## HdrHistogram Details
 
 An HdrHistogram supports the recording and analyzing of sampled data value counts across a configurable integer value range with configurable value precision within the range.
 Value precision is expressed as the number of significant digits in the value recording, and provides control over value quantization behavior across the value range and the subsequent value resolution at any given level.
@@ -287,12 +294,11 @@ In order to facilitate the accuracy needed for various post-recording analysis t
 This sort of example resolution can be thought of as "always accurate to 3 decimal points."
 Such an example Histogram would simply be created with a highestTrackableValue of 3,600,000,000, and a numberOfSignificantValueDigits of 3, and would occupy a fixed, unchanging memory footprint of around 185KB (see "Footprint estimation" below).
 
-
-Histogram variants and internal representation
-----------------------------------------------
+### Histogram variants and internal representation
 
 The HdrHistogram package includes multiple implementations of the
 `HistogramBase` class:
+
 - `LongHistogram`, which is the commonly used Histogram form and tracks value counts in `long` fields.
 - `IntHistogram` and `ShortHistogram`, which track value counts in `int` and `short` fields respectively, are provided for use cases where smaller count ranges are practical and smaller overall storage is beneficial (e.g. systems where tens of thousands of in-memory histogram are being tracked).
 - `SynchronizedHistogram` (see 'Synchronization and concurrent access' below)
@@ -302,15 +308,13 @@ Using an exponent a (non-normalized) mantissa to support a wide dynamic range at
 Histograms use exponentially increasing bucket value ranges (the parallel of the exponent portion of a floating point number) with each bucket containing a fixed number (per bucket) set of linear sub-buckets (the parallel of a non-normalized mantissa portion of a floating point number).
 Both dynamic range and resolution are configurable, with `highestTrackableValue` controlling dynamic range, and `numberOfSignificantValueDigits` controlling resolution.
 
-Synchronization and concurrent access
-----------------------------------------------
+### Synchronization and concurrent access
 
 In the interest of keeping value recording cost to a minimum, the commonly used `LongHistogram` class and its `IntHistogram` and `ShortHistogram` variants are NOT internally synchronized, and do NOT use atomic variables.
 Callers wishing to make potentially concurrent, multi-threaded updates or queries against Histogram objects should either take care to externally synchronize and/or order their access, or use the `SynchronizedHistogram` variant.
 It is worth mentioning that since Histogram objects are additive, it is common practice to use per-thread, non-synchronized histograms for the recording fast path, and "flipping" the actively recorded-to histogram (usually with some non-locking variants on the fast path) and having a summary/reporting thread perform histogram aggregation math across time and/or threads.
 
-Iteration
-----------------------------------------------
+### Iteration
 
 Histograms supports multiple convenient forms of iterating through the histogram data set, including linear, logarithmic, and percentile iteration mechanisms, as well as means for iterating through each recorded value or each possible value level.
 The iteration mechanisms are accessible through the HistogramData available through `getHistogramData()`.
@@ -318,51 +322,47 @@ Iteration mechanisms all provide `HistogramIterationValue` data points along the
 
 Recorded values are available as instance methods:
 
- - `RecordedValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `RecordedValuesEnumerable`\`RecordedValuesEnumerator`
- - `AllValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `AllValueEnumerable`\`AllValuesEnumerator`
+- `RecordedValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `RecordedValuesEnumerable`\`RecordedValuesEnumerator`
+- `AllValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `AllValueEnumerable`\`AllValuesEnumerator`
 
 All others are available for the default (corrected) histogram data set via the following extension methods:
 
- - `Percentiles`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `PercentileEnumerable`/`PercentileEnumerator`
- - `LinearBucketValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `LinearBucketEnumerable`/`LinearEnumerator`
- - `LogarithmicBucketValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `LogarithmicBucketEnumerable`/`LogarithmicEnumerator`
-
-
+- `Percentiles`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `PercentileEnumerable`/`PercentileEnumerator`
+- `LinearBucketValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `LinearBucketEnumerable`/`LinearEnumerator`
+- `LogarithmicBucketValues`: An `IEnumerable<HistogramIterationValue>` through the histogram using a `LogarithmicBucketEnumerable`/`LogarithmicEnumerator`
 
 Iteration is typically done with a for-each loop statement. E.g.:
 
 ``` csharp
- foreach (var v in histogram.Percentiles(ticksPerHalfDistance))
- {
-     ...
- }
+foreach (var v in histogram.Percentiles(ticksPerHalfDistance))
+{
+  ...
+}
 ```
 
  or
 
 ``` csharp
- for (var v in histogram.LinearBucketValues(unitsPerBucket))
- {
-     ...
- }
+for (var v in histogram.LinearBucketValues(unitsPerBucket))
+{
+  ...
+}
 ```
 
 These enumerators are optimised for fast forward readonly "_hosepipe_" usage.
 They are low allocation and may reuse objects internally to keep allocations low and thus reduce garbage collection/memory pressure.
 
-Equivalent Values and value ranges
-----------------------------------------------
+### Equivalent Values and value ranges
 
 Due to the finite (and configurable) resolution of the histogram, multiple adjacent integer data values can be "equivalent".
 Two values are considered "equivalent" if samples recorded for both are always counted in a common total count due to the histogram's resolution level.
 HdrHistogram provides methods for
 
- * determining the lowest and highest equivalent values for any given value,
- * determining whether two values are equivalent,
- * finding the next non-equivalent value for a given value (useful when looping through values, in order to avoid a double-counting count).
+- determining the lowest and highest equivalent values for any given value,
+- determining whether two values are equivalent,
+- finding the next non-equivalent value for a given value (useful when looping through values, in order to avoid a double-counting count).
 
-Corrected vs. Raw value recording calls
-----------------------------------------------
+### Corrected vs. Raw value recording calls
 
 In order to support a common use case needed when histogram values are used to track response time distribution, Histogram provides for the recording of corrected histogram value by supporting a `RecordValueWithExpectedInterval(long, long)` variant is provided.
 This value recording form is useful in [common latency measurement] scenarios where response times may exceed the expected interval between issuing requests, leading to "dropped" response time measurements that would typically correlate with "bad" results.
@@ -370,7 +370,7 @@ This value recording form is useful in [common latency measurement] scenarios wh
 When a value recorded in the histogram exceeds the `expectedIntervalBetweenValueSamples` parameter, recorded histogram data will reflect an appropriate number of additional values, linearly decreasing in steps of `expectedIntervalBetweenValueSamples`, down to the last value that would still be higher than `expectedIntervalBetweenValueSamples`.
 
 To illustrate why this corrective behavior is critically needed in order to accurately represent value distribution when large value measurements may lead to missed samples, imagine a system for which response times samples are taken once every 10 msec to characterize response time distribution.
-The hypothetical system behaves "perfectly" for 100 seconds (10,000 recorded samples), with each sample showing a 1msec response time value.
+The hypothetical system behaves "perfectly" for 100 seconds (10,000 recorded samples), with each sample showing a 1 msec response time value.
 At each sample for 100 seconds (10,000 logged samples at 1 msec each).
 The hypothetical system then encounters a 100 sec pause during which only a single sample is recorded (with a 100 second value).
 The raw data histogram collected for such a hypothetical system (over the 200 second scenario above) would show ~99.99% of results at 1 msec or below, which is obviously "not right".
@@ -382,8 +382,7 @@ Data sets recorded with an `expectedIntervalBetweenValueSamples` parameter will 
 
 When used for response time characterization, the recording with the optional `expectedIntervalBetweenValueSamples` parameter will tend to produce data sets that would much more accurately reflect the response time distribution that a random, uncoordinated request would have experienced.
 
-Footprint estimation
-----------------------------------------------
+### Footprint estimation
 
 Due to it's dynamic range representation, Histogram is relatively efficient in memory space requirements given the accuracy and dynamic range it covers.
 Still, it is useful to be able to estimate the memory footprint involved for a given `highestTrackableValue` and `numberOfSignificantValueDigits` combination.
@@ -404,13 +403,14 @@ A conservative (high) estimate of a Histogram's footprint in bytes is available 
 
 ## Terminology
 
-  * **Latency** : The time that something is latent i.e. not being processed.
+- **Latency** : The time that something is latent i.e. not being processed.
  This maybe due to being in a queue.
-  * **Service Time** : The time taken to actually service a request.
-  * **Response time** : The sum of the latency and the service time. e.g. the time your request was queued, plus the time it took to process.
+- **Service Time** : The time taken to actually service a request.
+- **Response time** : The sum of the latency and the service time. e.g. the time your request was queued, plus the time it took to process.
 
-References (see also)
- - [How NOT to Measure Latency](http://www.infoq.com/presentations/latency-pitfalls) Gil Tene - qCon 2013
- - [Understanding Latency](https://www.youtube.com/watch?v=9MKY4KypBzg)  Gil Tene - React San Francisco 2014
- - [Designing for Performance](https://youtu.be/fDGWWpHlzvw?t=4m56s) Martin Thompson - GOTO Chicago 2015
- - https://en.wikipedia.org/wiki/Response_time_(technology)
+References (see also):
+
+- [How NOT to Measure Latency](http://www.infoq.com/presentations/latency-pitfalls) Gil Tene - qCon 2013
+- [Understanding Latency](https://www.youtube.com/watch?v=9MKY4KypBzg)  Gil Tene - React San Francisco 2014
+- [Designing for Performance](https://youtu.be/fDGWWpHlzvw?t=4m56s) Martin Thompson - GOTO Chicago 2015
+- https://en.wikipedia.org/wiki/Response_time_(technology)
