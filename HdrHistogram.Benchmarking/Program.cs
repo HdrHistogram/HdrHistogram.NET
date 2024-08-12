@@ -21,6 +21,7 @@ namespace HdrHistogram.Benchmarking
                 .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
                 .AddJob(Job.Default.WithRuntime(CoreRuntime.Core31))
                 .AddJob(Job.Default.WithRuntime(CoreRuntime.Core50))
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60))
                 ;
 
             var switcher = new BenchmarkSwitcher(new[] {
