@@ -5,7 +5,9 @@ namespace HdrHistogram.Benchmarking.Recording
 {
     public class Recording32BitBenchmark
     {
-        private readonly long[] _testValues;
+        private const int TEST_VALUE_LENGTH = 92;
+        private static readonly long HighestTrackableValue = TimeStamp.Minutes(10);
+        private static readonly long[] TestValues = GenerateTestValues(HighestTrackableValue);
         private readonly LongHistogram _longHistogram;
         private readonly LongConcurrentHistogram _longConcurrentHistogram;
         private readonly IntHistogram _intHistogram;
@@ -20,26 +22,24 @@ namespace HdrHistogram.Benchmarking.Recording
         public Recording32BitBenchmark()
         {
             const int lowestTrackableValue = 1;
-            var highestTrackableValue = TimeStamp.Minutes(10);
             const int numberOfSignificantValueDigits = 3;
+            if (TestValues.Length != TEST_VALUE_LENGTH) throw new System.InvalidOperationException($"Constant TEST_VALUE_LENGTH has incorrect value of {TEST_VALUE_LENGTH}. Expected {TestValues.Length}.");
 
-            _testValues = TestValues(highestTrackableValue);
-            
-            _longHistogram = new LongHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            _intHistogram = new IntHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            _shortHistogram = new ShortHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            _longHistogram = new LongHistogram(HighestTrackableValue, numberOfSignificantValueDigits);
+            _intHistogram = new IntHistogram(HighestTrackableValue, numberOfSignificantValueDigits);
+            _shortHistogram = new ShortHistogram(HighestTrackableValue, numberOfSignificantValueDigits);
 
-            _longConcurrentHistogram = new LongConcurrentHistogram(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits);
-            _intConcurrentHistogram = new IntConcurrentHistogram(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits);
+            _longConcurrentHistogram = new LongConcurrentHistogram(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits);
+            _intConcurrentHistogram = new IntConcurrentHistogram(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits);
 
-            _longRecorder = new Recorder(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new LongHistogram(id, low, hi, sf));
-            _longConcurrentRecorder = new Recorder(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new LongConcurrentHistogram(id, low, hi, sf));
-            _intRecorder = new Recorder(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new IntHistogram(id, low, hi, sf));
-            _intConcurrentRecorder = new Recorder(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new IntConcurrentHistogram(id, low, hi, sf));
-            _shortRecorder = new Recorder(lowestTrackableValue, highestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new ShortHistogram(id, low, hi, sf));
+            _longRecorder = new Recorder(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new LongHistogram(id, low, hi, sf));
+            _longConcurrentRecorder = new Recorder(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new LongConcurrentHistogram(id, low, hi, sf));
+            _intRecorder = new Recorder(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new IntHistogram(id, low, hi, sf));
+            _intConcurrentRecorder = new Recorder(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new IntConcurrentHistogram(id, low, hi, sf));
+            _shortRecorder = new Recorder(lowestTrackableValue, HighestTrackableValue, numberOfSignificantValueDigits, (id, low, hi, sf) => new ShortHistogram(id, low, hi, sf));
         }
 
-        private static long[] TestValues(long highestTrackableValue)
+        private static long[] GenerateTestValues(long highestTrackableValue)
         {
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
             //  32 bit values are the 89 values
@@ -65,129 +65,129 @@ namespace HdrHistogram.Benchmarking.Recording
                 .ToArray();
         }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark(Baseline = true, OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long LongHistogramRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _longHistogram.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long LongConcurrentHistogramRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _longConcurrentHistogram.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long IntHistogramRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _intHistogram.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long IntConcurrentHistogramRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _intConcurrentHistogram.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long ShortHistogramRecording()
         {
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                _shortHistogram.RecordValue(_testValues[i]);
+                _shortHistogram.RecordValue(TestValues[i]);
             }
             return _shortHistogram.TotalCount;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long LongRecorderRecording()
         {
             long counter = 0L;
 
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _longRecorder.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long LongConcurrentRecorderRecording()
         {
             long counter = 0L;
 
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _longConcurrentRecorder.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long IntRecorderRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _intRecorder.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long IntConcurrentRecorderRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _intConcurrentRecorder.RecordValue(value);
                 counter += value;
             }
             return counter;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public long ShortRecorderRecording()
         {
             long counter = 0L;
-            for (int i = 0; i < _testValues.Length; i++)
+            for (int i = 0; i < TestValues.Length; i++)
             {
-                var value = _testValues[i];
+                var value = TestValues[i];
                 _shortRecorder.RecordValue(value);
                 counter += value;
             }
