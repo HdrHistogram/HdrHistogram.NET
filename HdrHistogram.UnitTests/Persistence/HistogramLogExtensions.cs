@@ -9,12 +9,10 @@ namespace HdrHistogram.UnitTests.Persistence
     {
         public static HistogramBase[] ReadHistograms(this byte[] data)
         {
-            HistogramBase[] actualHistograms;
             using (var readerStream = new MemoryStream(data))
             {
-                actualHistograms = HistogramLogReader.Read(readerStream).ToArray();
+                return HistogramLogReader.Read(readerStream).ToArray();
             }
-            return actualHistograms;
         }
 
         public static byte[] WriteLog(this HistogramBase histogram)
