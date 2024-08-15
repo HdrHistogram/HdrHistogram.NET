@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using HdrHistogram.Utilities;
 
@@ -29,7 +30,8 @@ namespace HdrHistogram
         {
             using (var reader = new HistogramLogReader(inputStream))
             {
-                return reader.ReadHistograms();
+                return reader.ReadHistograms()
+                    .ToArray();
             }
         }
 
