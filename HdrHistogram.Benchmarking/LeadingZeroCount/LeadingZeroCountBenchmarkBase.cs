@@ -27,17 +27,19 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
     /// </remarks>
     public abstract class LeadingZeroCountBenchmarkBase
     {
+        private const int TEST_VALUE_LENGTH = 92;
         private readonly int _maxBit;
         private readonly long[] _testValues;
 
         protected LeadingZeroCountBenchmarkBase(int maxBit)
         {
             _maxBit = maxBit;
-            
 
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
             var expectedData = GenerateTestData(maxBit);
             _testValues = expectedData.Select(d => d.Value).ToArray();
+
+            if (_testValues.Length != TEST_VALUE_LENGTH) throw new System.InvalidOperationException($"Constant TEST_VALUE_LENGTH has incorrect value of {TEST_VALUE_LENGTH}. Expected {_testValues.Length}.");
         }
 
         [BenchmarkDotNet.Attributes.GlobalSetup]
@@ -47,6 +49,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             var functions = new Dictionary<string, Func<long, int>>
             {
                 {"CurrentImpl", Bitwise.NumberOfLeadingZeros},
+                {"Imperative", Bitwise.Imperative.NumberOfLeadingZeros},
                 {"IfAndShift", LeadingZeroCount.IfAndShift.GetLeadingZeroCount},
                 //{"MathLog", LeadingZeroCount.MathLog.GetLeadingZeroCount},
                 {"StringManipulation", LeadingZeroCount.StringManipulation.GetLeadingZeroCount},
@@ -61,7 +64,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             };
             ValidateImplementations(expectedData, functions);
         }
-        
+
         private static CalculationExpectation[] GenerateTestData(int maxBit)
         {
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
@@ -101,10 +104,9 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
                 }
             }
         }
-        
-        
 
-        [Benchmark(Baseline = true)]
+
+        [Benchmark(Baseline = true, OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int CurrentImplementation()
         {
             var sum = 0;
@@ -115,7 +117,18 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
+        public int ImperativeImplementation()
+        {
+            var sum = 0;
+            for (int i = 0; i < _testValues.Length; i++)
+            {
+                sum += Bitwise.Imperative.NumberOfLeadingZeros(_testValues[i]);
+            }
+            return sum;
+        }
+
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int IfAndShift()
         {
             var sum = 0;
@@ -126,7 +139,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int DeBruijnMultiplication()
         {
             var sum = 0;
@@ -137,7 +150,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int Debruijn64Bit()
         {
             var sum = 0;
@@ -148,7 +161,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int DeBruijn64BitsBitScanner()
         {
             var sum = 0;
@@ -159,7 +172,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int Debruijn128Bit()
         {
             var sum = 0;
@@ -170,7 +183,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             return sum;
         }
 
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int StringManipulation()
         {
             var sum = 0;
@@ -180,7 +193,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             }
             return sum;
         }
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int BBarry_imp1()
         {
             var sum = 0;
@@ -190,7 +203,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             }
             return sum;
         }
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int BBarry_imp2()
         {
             var sum = 0;
@@ -200,7 +213,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             }
             return sum;
         }
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int BBarry_imp3()
         {
             var sum = 0;
@@ -210,7 +223,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             }
             return sum;
         }
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
         public int BBarry_imp4()
         {
             var sum = 0;
