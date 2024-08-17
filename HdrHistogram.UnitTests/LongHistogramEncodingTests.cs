@@ -1,8 +1,6 @@
-﻿using Xunit;
-
-namespace HdrHistogram.UnitTests
+﻿namespace HdrHistogram.UnitTests
 {
-    
+
     public sealed class LongHistogramEncodingTests : HistogramEncodingTestBase
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantDigits)

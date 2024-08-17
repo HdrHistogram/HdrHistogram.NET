@@ -1,8 +1,8 @@
-﻿using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
 
 namespace HdrHistogram.Benchmarking
 {

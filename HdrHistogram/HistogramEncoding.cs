@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HdrHistogram.Encoding;
+using HdrHistogram.Utilities;
+using System;
 using System.IO;
 using System.IO.Compression;
-using HdrHistogram.Encoding;
-using HdrHistogram.Utilities;
 
 namespace HdrHistogram
 {

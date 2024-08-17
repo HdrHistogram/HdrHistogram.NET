@@ -7,7 +7,6 @@
  */
 
 using System;
-using HdrHistogram.Utilities;
 
 namespace HdrHistogram
 {

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-using HdrHistogram.Utilities;
+﻿using HdrHistogram.Utilities;
+using System;
 using Xunit;
 
 namespace HdrHistogram.UnitTests.Recording

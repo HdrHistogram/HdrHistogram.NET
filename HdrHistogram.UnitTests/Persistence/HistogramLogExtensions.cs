@@ -1,7 +1,7 @@
+using HdrHistogram.Utilities;
 using System;
 using System.IO;
 using System.Linq;
-using HdrHistogram.Utilities;
 
 namespace HdrHistogram.UnitTests.Persistence
 {

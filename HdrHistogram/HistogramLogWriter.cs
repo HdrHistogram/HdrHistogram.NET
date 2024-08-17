@@ -1,7 +1,7 @@
+using HdrHistogram.Utilities;
 using System;
 using System.IO;
 using System.Threading;
-using HdrHistogram.Utilities;
 
 namespace HdrHistogram
 {

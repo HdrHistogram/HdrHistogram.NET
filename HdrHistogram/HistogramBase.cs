@@ -6,14 +6,14 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
+using HdrHistogram.Encoding;
+using HdrHistogram.Iteration;
+using HdrHistogram.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using HdrHistogram.Encoding;
-using HdrHistogram.Iteration;
-using HdrHistogram.Utilities;
 
 namespace HdrHistogram
 {

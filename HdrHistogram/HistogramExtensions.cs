@@ -6,13 +6,13 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
+using HdrHistogram.Iteration;
+using HdrHistogram.Output;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using HdrHistogram.Iteration;
-using HdrHistogram.Output;
 
 namespace HdrHistogram
 {
