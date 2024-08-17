@@ -5,21 +5,21 @@ image: Visual Studio 2022
 build_script:
 - ps: >-
     Write-Host $env:APPVEYOR_BUILD_VERSION
-    
+
     Write-Host $env:APPVEYOR_PULL_REQUEST_NUMBER
-    
+
     Write-Host $env:APPVEYOR_PULL_REQUEST_TITLE
-    
+
     Write-Host $env:APPVEYOR_REPO_NAME
-    
+
     Write-Host $env:APPVEYOR_REPO_BRANCH
-    
+
     Write-Host $env:APPVEYOR_REPO_COMMIT
-    
+
     Write-Host $env:APPVEYOR_JOB_ID
 
     $semver = $env:APPVEYOR_BUILD_VERSION;
-    
+
     if($env:APPVEYOR_PULL_REQUEST_NUMBER -ge 0) {
       $semver = "$semver-PR$env:APPVEYOR_PULL_REQUEST_NUMBER";
     }
@@ -27,7 +27,7 @@ build_script:
     dotnet restore
 
     dotnet build -c=Release /p:Version=$semver
-    
+
     dotnet test .\HdrHistogram.UnitTests\HdrHistogram.UnitTests.csproj --no-build /p:Configuration=Release
 
     dotnet pack .\HdrHistogram\HdrHistogram.csproj -c=Release --no-build --include-symbols /p:Version=$semver
