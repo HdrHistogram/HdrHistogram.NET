@@ -36,8 +36,12 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             _maxBit = maxBit;
 
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
-            var expectedData = GenerateTestData(maxBit);
-            _testValues = expectedData.Select(d => d.Value).ToArray();
+            var source = GenerateTestData(maxBit);
+            
+            _testValues = source
+                .Skip(Math.Max(0, source.Count() - TEST_VALUE_LENGTH))
+                .Select(d => d.Value)
+                .ToArray();
 
             if (_testValues.Length != TEST_VALUE_LENGTH) throw new System.InvalidOperationException($"Constant TEST_VALUE_LENGTH has incorrect value of {TEST_VALUE_LENGTH}. Expected {_testValues.Length}.");
         }
