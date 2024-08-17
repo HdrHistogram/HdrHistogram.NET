@@ -1,5 +1,5 @@
-using System;
 using HdrHistogram.Utilities;
+using System;
 
 namespace HdrHistogram.Persistence
 {

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace HdrHistogram.UnitTests.Persistence
 {
-    
+
     public sealed class ShortHistogramLogReaderWriterTests : HistogramLogReaderWriterTestBase
     {
         protected override HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits)

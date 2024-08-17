@@ -1,6 +1,6 @@
+using HdrHistogram.Iteration;
 using System.Collections;
 using System.Collections.Generic;
-using HdrHistogram.Iteration;
 
 namespace HdrHistogram.UnitTests
 {

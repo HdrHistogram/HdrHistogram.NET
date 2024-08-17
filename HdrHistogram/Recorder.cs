@@ -6,9 +6,9 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
+using HdrHistogram.Utilities;
 using System;
 using System.Threading;
-using HdrHistogram.Utilities;
 
 namespace HdrHistogram
 {

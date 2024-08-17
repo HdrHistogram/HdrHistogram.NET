@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using HdrHistogram.Iteration;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace HdrHistogram.UnitTests

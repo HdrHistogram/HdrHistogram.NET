@@ -2,7 +2,7 @@
 
 namespace HdrHistogram.UnitTests
 {
-    
+
     public class HistogramFactoryTests
     {
         #region 16bit recording factory tests
