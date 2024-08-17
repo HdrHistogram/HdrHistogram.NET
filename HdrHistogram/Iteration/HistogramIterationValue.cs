@@ -24,7 +24,7 @@ namespace HdrHistogram.Iteration
         /// The actual value level that was iterated from by the iterator
         /// </summary>
         public long ValueIteratedFrom { get; private set; }
-        
+
         /// <summary>
         /// The count of recorded values in the histogram that exactly match this [lowestEquivalentValue(valueIteratedTo)...highestEquivalentValue(valueIteratedTo)] value range.
         /// </summary>
@@ -67,14 +67,14 @@ namespace HdrHistogram.Iteration
         }
 
         // Set is all-or-nothing to avoid the potential for accidental omission of some values...
-        internal void Set(long valueIteratedTo, 
-                          long valueIteratedFrom, 
+        internal void Set(long valueIteratedTo,
+                          long valueIteratedFrom,
                           long countAtValueIteratedTo,
-                          long countInThisIterationStep, 
-                          long totalCountToThisValue, 
+                          long countInThisIterationStep,
+                          long totalCountToThisValue,
                           long totalValueToThisValue,
-                          double percentile, 
-                          double percentileLevelIteratedTo) 
+                          double percentile,
+                          double percentileLevelIteratedTo)
         {
             ValueIteratedTo = valueIteratedTo;
             ValueIteratedFrom = valueIteratedFrom;
@@ -85,14 +85,14 @@ namespace HdrHistogram.Iteration
             Percentile = percentile;
             PercentileLevelIteratedTo = percentileLevelIteratedTo;
         }
-        
+
         /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>
         /// <returns>
         /// A string that represents the current object.
         /// </returns>
-        public override string  ToString()
+        public override string ToString()
         {
             return "ValueIteratedTo:" + ValueIteratedTo +
                     ", ValueIteratedFrom:" + ValueIteratedFrom +

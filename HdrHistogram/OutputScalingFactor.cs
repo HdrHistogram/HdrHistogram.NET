@@ -19,7 +19,7 @@ namespace HdrHistogram
         /// For use when values are recorded and reported in the same unit of measurement.
         /// </summary>
         public const double None = 1.0;
-        
+
         /// <summary>
         /// For use when values are recorded with <seealso cref="Stopwatch.GetTimestamp()"/> and output should be reported in microseconds.
         /// </summary>

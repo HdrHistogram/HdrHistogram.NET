@@ -196,7 +196,7 @@ namespace HdrHistogram.UnitTests
             var recordedMilliseconds = GetCellValue(stringWriter.ToString(), 0, 1);
             var actual = double.Parse(recordedMilliseconds);
             var expected = pause.TotalMilliseconds;
-            
+
             //10% Variance to allow for slack in transitioning from Thread.Sleep
             actual.Should().BeInRange(expected * 0.9, expected * 1.1);
         }

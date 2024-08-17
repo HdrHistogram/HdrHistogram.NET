@@ -20,7 +20,7 @@ namespace HdrHistogram.Iteration
         /// The constructor for <see cref="RecordedValuesEnumerator"/>
         /// </summary>
         /// <param name="histogram">The histogram this iterator will operate on</param>
-        public RecordedValuesEnumerator(HistogramBase histogram) :base(histogram)
+        public RecordedValuesEnumerator(HistogramBase histogram) : base(histogram)
         {
             _visitedSubBucketIndex = -1;
             _visitedBucketIndex = -1;
@@ -35,9 +35,9 @@ namespace HdrHistogram.Iteration
         protected override bool ReachedIterationLevel()
         {
             long currentIndexCount = SourceHistogram.GetCountAt(CurrentBucketIndex, CurrentSubBucketIndex);
-            return (currentIndexCount != 0) 
+            return (currentIndexCount != 0)
                 && (
-                        (_visitedSubBucketIndex != CurrentSubBucketIndex) 
+                        (_visitedSubBucketIndex != CurrentSubBucketIndex)
                         || (_visitedBucketIndex != CurrentBucketIndex
                 ));
         }

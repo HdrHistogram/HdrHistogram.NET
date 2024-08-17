@@ -13,10 +13,10 @@ namespace HdrHistogram.UnitTests
     {
         [Theory, CombinatorialData]
         public void PercentileDistrubution_hgrm_output_is_in_correct_format(
-            [CombinatorialValues(36000000000)]long highestTrackableValue,
-            [CombinatorialValues(1, 2, 3, 4, 5)]int signigicantDigits,
-            [CombinatorialValues(10000.0)]double scaling,
-            [CombinatorialValues(5, 10, 20)]int percentileTicksPerHalfDistance)
+            [CombinatorialValues(36000000000)] long highestTrackableValue,
+            [CombinatorialValues(1, 2, 3, 4, 5)] int signigicantDigits,
+            [CombinatorialValues(10000.0)] double scaling,
+            [CombinatorialValues(5, 10, 20)] int percentileTicksPerHalfDistance)
         {
             var fileName = $"Sample_10kBy1k_{signigicantDigits}sf_TicksPerHour_asMs_{percentileTicksPerHalfDistance}percPerHalfDistance.hgrm";
             var expected = GetEmbeddedFileText(fileName);
@@ -33,10 +33,10 @@ namespace HdrHistogram.UnitTests
 
         [Theory, CombinatorialData]
         public void PercentileDistrubution_csv_output_is_in_correct_format(
-            [CombinatorialValues(36000000000)]long highestTrackableValue,
-            [CombinatorialValues(1, 2, 3, 4, 5)]int signigicantDigits,
-            [CombinatorialValues(10000.0)]double scaling,
-            [CombinatorialValues(5, 10, 20)]int percentileTicksPerHalfDistance)
+            [CombinatorialValues(36000000000)] long highestTrackableValue,
+            [CombinatorialValues(1, 2, 3, 4, 5)] int signigicantDigits,
+            [CombinatorialValues(10000.0)] double scaling,
+            [CombinatorialValues(5, 10, 20)] int percentileTicksPerHalfDistance)
         {
             var fileName = $"Sample_10kBy1k_{signigicantDigits}sf_TicksPerHour_asMs_{percentileTicksPerHalfDistance}percPerHalfDistance.csv";
             var expected = GetEmbeddedFileText(fileName);
@@ -56,7 +56,7 @@ namespace HdrHistogram.UnitTests
         {
             var expected = GetEmbeddedFileText("IsLastValueBug.hgrm");
 
-            var histogram = new LongHistogram(highestTrackableValue: 36000000000, numberOfSignificantValueDigits:3);
+            var histogram = new LongHistogram(highestTrackableValue: 36000000000, numberOfSignificantValueDigits: 3);
             histogram.RecordValueWithCount(1L, 7604459);
             histogram.RecordValueWithCount(383, 2395524);
             histogram.RecordValueWithCount(453, 2);
@@ -79,7 +79,7 @@ namespace HdrHistogram.UnitTests
 
             Assert.Equal(expected, actual);
         }
-        
+
         private Stream GetEmbeddedFileStream(string filename)
         {
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);

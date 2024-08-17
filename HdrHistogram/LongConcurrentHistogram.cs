@@ -75,7 +75,7 @@ namespace HdrHistogram
         /// </summary>
         public override long TotalCount
         {
-            get {return Interlocked.Read(ref _totalCount);}
+            get { return Interlocked.Read(ref _totalCount); }
             protected set { Interlocked.Exchange(ref _totalCount, value); }
         }
 
@@ -196,7 +196,7 @@ namespace HdrHistogram
             {
                 _wrp.ReaderLock();
                 Debug.Assert(CountsArrayLength == _counts.Length);
-                for (int i = 0; i<_counts.Length; i++)
+                for (int i = 0; i < _counts.Length; i++)
                 {
                     _counts[i] = 0;
                 }
@@ -214,7 +214,7 @@ namespace HdrHistogram
         /// <param name="target">The array to write each count value into.</param>
         protected override void CopyCountsInto(long[] target)
         {
-            for (int i = 0; i<target.Length; i++)
+            for (int i = 0; i < target.Length; i++)
             {
                 target[i] = _counts[i];
             }

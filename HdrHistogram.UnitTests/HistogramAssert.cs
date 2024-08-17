@@ -33,12 +33,12 @@ namespace HdrHistogram.UnitTests
         {
             if (expected == null && actual == null)
                 return;
-            if(expected == null)
+            if (expected == null)
                 throw new Exception("Expected null array");
             if (actual == null)
                 throw new Exception("Unexpected null array");
 
-            if(expected.Length != actual.Length)
+            if (expected.Length != actual.Length)
                 throw new Exception($"Expected length of {expected.Length}, but recieved {actual.Length}");
 
             for (int i = 0; i < expected.Length; i++)

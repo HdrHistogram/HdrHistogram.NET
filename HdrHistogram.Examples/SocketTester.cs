@@ -14,7 +14,7 @@ namespace HdrHistogram.Examples
         {
             _addressFamily = new Lazy<AddressFamily>(() => GetAddressFamily(url));
         }
-        
+
         public void CreateAndCloseDatagramSocket()
         {
             try
