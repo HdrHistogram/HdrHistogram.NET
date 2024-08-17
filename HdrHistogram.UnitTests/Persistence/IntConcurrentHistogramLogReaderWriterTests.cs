@@ -21,7 +21,7 @@ namespace HdrHistogram.UnitTests.Persistence
         public static IEnumerable<object[]> PowersOfTwo()
         {
             return TestCaseGenerator.PowersOfTwo(31)
-                .Select(v=>new object[1]{v});
+                .Select(v => new object[1] { v });
         }
     }
 }

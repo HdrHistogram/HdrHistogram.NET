@@ -11,7 +11,7 @@ namespace HdrHistogram.UnitTests.Persistence
         {
             return new ShortHistogram(highestTrackableValue, numberOfSignificantValueDigits);
         }
-        
+
         [Theory]
         [MemberData(nameof(PowersOfTwo))]
         public void CanRoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)

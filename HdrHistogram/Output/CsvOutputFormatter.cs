@@ -38,7 +38,7 @@ namespace HdrHistogram.Output
 
             }
         }
-        
+
         public void WriteFooter(HistogramBase histogram)
         {
             //No op

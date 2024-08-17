@@ -27,7 +27,7 @@ namespace HdrHistogram.Iteration
         private bool _freshSubBucket;
         private long _currentValueAtIndex;
         private long _nextValueAtIndex;
-        
+
         protected HistogramBase SourceHistogram { get; }
         protected long ArrayTotalCount { get; }
         protected int CurrentBucketIndex { get; private set; }

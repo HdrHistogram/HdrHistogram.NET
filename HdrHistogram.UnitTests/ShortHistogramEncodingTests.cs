@@ -21,4 +21,4 @@ namespace HdrHistogram.UnitTests
             source.RecordValue(DefaultHighestTrackableValue);
         }
     }
-}   
+}

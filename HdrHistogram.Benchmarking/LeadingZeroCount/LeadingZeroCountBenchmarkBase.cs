@@ -37,7 +37,7 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
 
             //Create array of +ve numbers in the 'maxBit' bit range (i.e. 32 bit or 64bit)
             var source = GenerateTestData(maxBit);
-            
+
             _testValues = source
                 .Skip(Math.Max(0, source.Count() - TEST_VALUE_LENGTH))
                 .Select(d => d.Value)
