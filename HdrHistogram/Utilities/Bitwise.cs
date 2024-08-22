@@ -23,22 +23,24 @@ namespace HdrHistogram.Utilities
         public static int NumberOfLeadingZeros(long value)
         {
 #if NET5_0_OR_GREATER
-            return Intrinsic.NumberOfLeadingZeros(value);
+            return IntrinsicNumberOfLeadingZeros(value);
 #else
             return Imperative.NumberOfLeadingZeros(value);
 #endif
         }
 
 #if NET5_0_OR_GREATER
-        public static class Intrinsic
+        /// <summary>
+        /// Returns the Leading Zero Count (lzc) of the <paramref name="value"/> for its binary representation.
+        /// </summary>
+        /// <param name="value">The value to find the number of leading zeros</param>
+        /// <returns>The number of leading zeros.</returns>
+        private static int IntrinsicNumberOfLeadingZeros(long value)
         {
-            public static int NumberOfLeadingZeros(long value)
-            {
-                ulong testValue = (ulong)value;
-                return System.Numerics.BitOperations.LeadingZeroCount(testValue);
+            ulong testValue = (ulong)value;
+            return System.Numerics.BitOperations.LeadingZeroCount(testValue);
 
-            }
-        }
+        }        
 #endif
 
         //Code has been tested and taken from :
@@ -48,7 +50,7 @@ namespace HdrHistogram.Utilities
         //http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
 
         /// <summary>
-        /// Imperative implementation of the LeadingZeroCount, when access to the BitOperations.LeadingZeroCount is not available.
+        /// Imperative implementation of the LeadingZeroCount, when access to the <see cref="System.Numerics.BitOperations.LeadingZeroCount(ulong)"/> is not available.
         /// </summary>
         public static class Imperative
         {
