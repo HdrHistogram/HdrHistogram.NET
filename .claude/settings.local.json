@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:hdrhistogram.net)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd technical documentation for AI coding assistants\n\nCreate comprehensive tech-standards documentation covering:\n- Coding standards \\(naming conventions, XML docs, design patterns\\)\n- Testing standards \\(xUnit patterns, test hierarchy, coverage guidelines\\)\n- Architecture \\(class hierarchy, Recorder pattern, thread safety\\)\n- API reference \\(public API surface, usage patterns\\)\n- Build system \\(CI/CD, NuGet packaging, versioning\\)\n- Histogram encoding \\(V2 binary format, log format specs\\)\n- GitHub CLI reference for project management\n\nThese specifications enable AI assistants to autonomously understand\nand contribute to the codebase following established patterns.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)"
+    ]
+  }
+}
