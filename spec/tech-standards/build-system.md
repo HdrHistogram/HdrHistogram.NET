@@ -147,13 +147,13 @@ environment:
 for:
   - branches:
       only:
-        - master
+        - main
     environment:
       semver: 2.5.{build}
 
   - branches:
       except:
-        - master
+        - main
     environment:
       semver: 2.5.{build}-pr{appveyor_pull_request_number}
 
@@ -192,7 +192,7 @@ notifications:
 
 Format: `{major}.{minor}.{build}`
 
-- **master branch**: `2.5.{build}` (release versions)
+- **main branch**: `2.5.{build}` (release versions)
 - **PR builds**: `2.5.{build}-pr{pr_number}` (pre-release versions)
 
 ### Setting Version

@@ -1,4 +1,4 @@
-<img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/master/HdrHistogram-icon-64x64.png" alt="HdrHistorgram.NET logo">
+<img style="float: right;" align="right" height=64 src="https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/main/HdrHistogram-icon-64x64.png" alt="HdrHistorgram.NET logo">
 
 # HdrHistogram
 
