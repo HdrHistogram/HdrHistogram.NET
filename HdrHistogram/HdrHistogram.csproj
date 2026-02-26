@@ -5,7 +5,7 @@
     <Description>HdrHistogram supports low latency recording and analyzing of sampled data value counts across a configurable integer value range with configurable value precision within the range.</Description>
     <Authors>Gil Tene, Lee Campbell</Authors>
     <PackageReleaseNotes>Net 8.0 release</PackageReleaseNotes>
-    <Copyright>Copyright 2024</Copyright>
+    <Copyright>Copyright 2025</Copyright>
     <PackageTags>HdrHistogram HdrHistogram.NET Histogram Instrumentation</PackageTags>
     <PackageProjectUrl>https://github.com/HdrHistogram/HdrHistogram.NET</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/HdrHistogram/HdrHistogram.NET/main/LICENSE.txt</PackageLicenseUrl>
