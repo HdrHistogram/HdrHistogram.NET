@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  SEMVER: 2.${{ github.run_number }}.0${{ github.event_name == 'pull_request' && format('-PR{0}', github.event.pull_request.number) || '' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - run: dotnet restore
+      - run: dotnet build -c Release /p:Version=${{ env.SEMVER }}
+      - run: dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj --no-build -c Release
+      - run: dotnet pack ./HdrHistogram/HdrHistogram.csproj -c Release --no-build --include-symbols /p:Version=${{ env.SEMVER }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: HdrHistogram/bin/Release/*.nupkg
