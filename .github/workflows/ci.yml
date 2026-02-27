@@ -15,11 +15,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+          cache: true
+          cache-dependency-path: '**/*.csproj'
 
       - run: dotnet restore
-      - run: dotnet build -c Release /p:Version=${{ env.SEMVER }}
+      - run: dotnet build -c Release --no-restore /p:Version=${{ env.SEMVER }}
       - run: dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj --no-build -c Release
-      - run: dotnet pack ./HdrHistogram/HdrHistogram.csproj -c Release --no-build --include-symbols /p:Version=${{ env.SEMVER }}
+      - run: dotnet pack ./HdrHistogram/HdrHistogram.csproj -c Release --no-build --include-symbols --no-restore /p:Version=${{ env.SEMVER }}
 
       - uses: actions/upload-artifact@v4
         with:
