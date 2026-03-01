@@ -23,14 +23,14 @@ From codebase inspection:
 
 ### 1. Confirm brace style from source files
 
-- [ ] Read 3–5 representative C# files (e.g. `HdrHistogram/HistogramBase.cs`, `HdrHistogram/Recorder.cs`, `HdrHistogram/HistogramLogWriter.cs`) to confirm K&R brace style throughout.
+- [x] Read 3–5 representative C# files (e.g. `HdrHistogram/HistogramBase.cs`, `HdrHistogram/Recorder.cs`, `HdrHistogram/HistogramLogWriter.cs`) to confirm K&R brace style throughout.
   - **File**: existing source files (read-only)
   - **Why**: The brief lists this as an open question; exploration says K&R — confirm before writing the rule.
   - **Verify**: The `csharp_new_line_before_open_brace` setting in the final `.editorconfig` matches what is seen.
 
 ### 2. Create `.editorconfig` at repository root
 
-- [ ] Create `/workspace/repo/.editorconfig` with the following sections, each annotated with inline comments:
+- [x] Create `/workspace/repo/.editorconfig` with the following sections, each annotated with inline comments:
 
   **`[*]` — all files**
   - `root = true`
@@ -74,27 +74,27 @@ From codebase inspection:
 
 ### 3. Verify all C# severity levels are `suggestion` or `warning`
 
-- [ ] Grep the new `.editorconfig` for any occurrence of `:error` to confirm none are present.
+- [x] Grep the new `.editorconfig` for any occurrence of `:error` to confirm none are present.
   - **File**: `/workspace/repo/.editorconfig`
   - **Why**: Acceptance criterion — severity must never be `error`.
   - **Verify**: Zero matches for `:error`.
 
 ### 4. Verify `root = true` is present
 
-- [ ] Confirm the first non-comment line in `.editorconfig` is `root = true`.
+- [x] Confirm the first non-comment line in `.editorconfig` is `root = true`.
   - **File**: `/workspace/repo/.editorconfig`
   - **Why**: Acceptance criterion — ensures the file is treated as the root configuration.
   - **Verify**: `root = true` appears before any section header.
 
 ### 5. Run `dotnet build` and confirm success
 
-- [ ] Run `dotnet build` from `/workspace/repo` and check exit code is 0 with no new errors.
+- [x] Run `dotnet build` from `/workspace/repo` and check exit code is 0 with no new errors.
   - **Why**: Acceptance criterion — the new file must not break the build.
   - **Verify**: Build output shows 0 errors; any new diagnostics are at `suggestion` / `warning` level only.
 
 ### 6. Inspect inline comments for non-obvious rules
 
-- [ ] Read the finished `.editorconfig` and confirm every non-obvious rule (e.g. `_camelCase` naming, `csharp_new_line_before_open_brace`, `csharp_using_directive_placement`) has an explanatory comment.
+- [x] Read the finished `.editorconfig` and confirm every non-obvious rule (e.g. `_camelCase` naming, `csharp_new_line_before_open_brace`, `csharp_using_directive_placement`) has an explanatory comment.
   - **File**: `/workspace/repo/.editorconfig`
   - **Why**: Acceptance criterion — "Settings are documented with inline comments where the convention might not be obvious."
   - **Verify**: Each Roslyn/C# style rule has at least a brief `#` comment.
@@ -113,6 +113,16 @@ From codebase inspection:
 | `root = true` is present | Tasks 2 + 4 |
 
 ---
+
+### 7. Fix brace style setting and var property names
+
+- [x] Fix two bugs found during code review:
+  1. `csharp_new_line_before_open_brace = none` → `= all` with comment corrected to "Allman style" (brace style is Allman — confirmed by reading source files directly, overriding the incorrect initial exploration finding)
+  2. `csharp_prefer_var_when_type_is_apparent` → `csharp_style_var_when_type_is_apparent` (correct Roslyn property name)
+  3. `csharp_prefer_var_elsewhere` → `csharp_style_var_elsewhere` (correct Roslyn property name)
+  - **File**: `/workspace/repo/.editorconfig`
+  - **Why**: Code review identified incorrect brace style value and invalid Roslyn property names that would be silently ignored.
+  - **Verify**: `grep csharp_new_line_before_open_brace` shows `= all`; property names use `csharp_style_var_*` prefix; `dotnet build` still passes.
 
 ## Out of scope (per brief)
 

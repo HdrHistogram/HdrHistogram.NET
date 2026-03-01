@@ -1,0 +1,125 @@
+# EditorConfig: https://editorconfig.org
+# Root config — stops editors searching parent directories for further .editorconfig files.
+root = true
+
+# ──────────────────────────────────────────────
+# All files
+# ──────────────────────────────────────────────
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# ──────────────────────────────────────────────
+# C# source files
+# ──────────────────────────────────────────────
+[*.cs]
+indent_style = space
+indent_size = 4
+
+# --- Using directives ---
+# Keep using directives outside the namespace block (Java/traditional C# style).
+csharp_using_directive_placement = outside_namespace:suggestion
+
+# --- Namespace declarations ---
+# Use traditional block-scoped namespaces: namespace Foo { } rather than file-scoped.
+csharp_style_namespace_declarations = block_scoped:suggestion
+
+# --- Brace placement ---
+# Allman style: opening brace on its own line after the declaration.
+# Applies to all constructs (types, methods, control flow, etc.).
+csharp_new_line_before_open_brace = all
+
+# --- var usage ---
+# Use var when the type is already obvious from the right-hand side (e.g. new, cast).
+csharp_style_var_when_type_is_apparent = true:suggestion
+# Use explicit types everywhere else so the reader does not need to infer them.
+csharp_style_var_elsewhere = false:suggestion
+
+# ──────────────────────────────────────────────
+# Roslyn naming rules — private fields
+# Naming symbols: any private field
+# Style: _camelCase prefix
+# ──────────────────────────────────────────────
+
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case_underscore_prefix
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers =
+
+dotnet_naming_style.camel_case_underscore_prefix.capitalization = camel_case
+dotnet_naming_style.camel_case_underscore_prefix.required_prefix = _
+
+# ──────────────────────────────────────────────
+# Roslyn naming rules — public members
+# Naming symbols: public/internal/protected members (types, methods, properties, events)
+# Style: PascalCase
+# ──────────────────────────────────────────────
+
+dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_members
+dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = suggestion
+
+dotnet_naming_symbols.public_members.applicable_kinds = class, struct, enum, property, method, event, delegate
+dotnet_naming_symbols.public_members.applicable_accessibilities = public, internal, protected, protected_internal
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# ──────────────────────────────────────────────
+# Roslyn naming rules — interfaces
+# Naming symbols: interfaces at any accessibility
+# Style: PascalCase with I prefix
+# ──────────────────────────────────────────────
+
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.style = i_prefix_pascal_case
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.severity = suggestion
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+
+dotnet_naming_style.i_prefix_pascal_case.capitalization = pascal_case
+dotnet_naming_style.i_prefix_pascal_case.required_prefix = I
+
+# ──────────────────────────────────────────────
+# XML / MSBuild project files
+# ──────────────────────────────────────────────
+[*.{csproj,props,targets,xml}]
+indent_style = space
+indent_size = 2
+
+# ──────────────────────────────────────────────
+# JSON and YAML
+# ──────────────────────────────────────────────
+[*.{json,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# ──────────────────────────────────────────────
+# Markdown
+# Trailing whitespace is meaningful in some Markdown renderers (two trailing
+# spaces produce a hard line break), but this project follows the convention
+# of trimming it and using blank lines for paragraph breaks instead.
+# ──────────────────────────────────────────────
+[*.md]
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# ──────────────────────────────────────────────
+# Visual Studio solution files
+# Visual Studio generates solution files with tab indentation; preserve that
+# convention to avoid spurious diffs when the IDE regenerates the file.
+# ──────────────────────────────────────────────
+[*.sln]
+indent_style = tab
+
+# ──────────────────────────────────────────────
+# Windows batch / command scripts
+# Windows tools require CRLF line endings in .cmd/.bat files.
+# ──────────────────────────────────────────────
+[*.{cmd,bat}]
+end_of_line = crlf
