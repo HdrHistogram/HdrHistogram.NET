@@ -8,12 +8,12 @@
 
 ## 1. Inspect `.csproj` — deprecated properties removed
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<PackageLicenseUrl>` is absent from the file.
   **Why:** Acceptance criterion 5 — deprecated element must not appear.
   **Verify:** `grep -n "PackageLicenseUrl" HdrHistogram/HdrHistogram.csproj` returns no output.
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<PackageIconUrl>` is absent from the file.
   **Why:** Acceptance criterion 6 — deprecated element must not appear.
   **Verify:** `grep -n "PackageIconUrl" HdrHistogram/HdrHistogram.csproj` returns no output.
@@ -22,22 +22,22 @@
 
 ## 2. Inspect `.csproj` — modern properties present
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<PackageLicenseExpression>CC0-1.0 OR BSD-2-Clause</PackageLicenseExpression>` is present.
   **Why:** Acceptance criterion 5 — modern SPDX expression replaces deprecated URL.
   **Verify:** `grep -n "PackageLicenseExpression" HdrHistogram/HdrHistogram.csproj` shows the correct value.
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<PackageIcon>HdrHistogram-icon-64x64.png</PackageIcon>` is present.
   **Why:** Acceptance criterion 6 — modern icon declaration replaces deprecated URL.
   **Verify:** `grep -n "PackageIcon>" HdrHistogram/HdrHistogram.csproj` shows the correct value (no `Url` suffix).
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<PackageReadmeFile>README.md</PackageReadmeFile>` is present.
   **Why:** Acceptance criterion 2 — readme declaration eliminates the "missing readme" informational message.
   **Verify:** `grep -n "PackageReadmeFile" HdrHistogram/HdrHistogram.csproj` shows `README.md`.
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<WarningsAsErrors>NU5125;NU5048</WarningsAsErrors>` is present.
   **Why:** Acceptance criterion 7 — treats both deprecated-metadata warnings as build errors to prevent future regression.
   **Verify:** `grep -n "WarningsAsErrors" HdrHistogram/HdrHistogram.csproj` shows `NU5125;NU5048`.
@@ -46,12 +46,12 @@
 
 ## 3. Inspect `.csproj` — embedding `<None>` items present
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<None Include="../HdrHistogram-icon-64x64.png" Pack="true" PackagePath="" />` is present in an `<ItemGroup>`.
   **Why:** Acceptance criterion 3 — without this declaration the icon is not copied into the `.nupkg`.
   **Verify:** `grep -n "HdrHistogram-icon-64x64.png" HdrHistogram/HdrHistogram.csproj` shows `Pack="true"`.
 
-- [ ] **File:** `HdrHistogram/HdrHistogram.csproj`
+- [x] **File:** `HdrHistogram/HdrHistogram.csproj`
   **Change:** Confirm `<None Include="../README.md" Pack="true" PackagePath="" />` is present in an `<ItemGroup>`.
   **Why:** Acceptance criterion 4 — without this declaration README.md is not copied into the `.nupkg`.
   **Verify:** `grep -n "README.md" HdrHistogram/HdrHistogram.csproj` shows `Pack="true"`.
@@ -60,12 +60,12 @@
 
 ## 4. Confirm source files exist at expected relative paths
 
-- [ ] **File:** `HdrHistogram-icon-64x64.png` (repo root)
+- [x] **File:** `HdrHistogram-icon-64x64.png` (repo root)
   **Change:** Confirm the icon file exists so the relative path `../HdrHistogram-icon-64x64.png` resolves correctly during pack.
   **Why:** Acceptance criterion 3 — file must be present for the embed to succeed.
   **Verify:** `ls -lh HdrHistogram-icon-64x64.png` succeeds.
 
-- [ ] **File:** `README.md` (repo root)
+- [x] **File:** `README.md` (repo root)
   **Change:** Confirm README.md exists so the relative path `../README.md` resolves correctly during pack.
   **Why:** Acceptance criterion 4 — file must be present for the embed to succeed.
   **Verify:** `ls -lh README.md` succeeds.
@@ -74,7 +74,7 @@
 
 ## 5. Build check — no NU5125/NU5048 warnings
 
-- [ ] **Command:** `dotnet build -c Release`
+- [x] **Command:** `dotnet build -c Release`
   **Change:** n/a — verification step only.
   **Why:** Acceptance criterion 1 — `<WarningsAsErrors>` causes the build to fail if either warning appears, so a green build proves they are absent.
   **Verify:** Exit code 0; no `NU5125` or `NU5048` in output.
@@ -83,7 +83,7 @@
 
 ## 6. Pack check — no warnings, no "missing readme" message
 
-- [ ] **Command:** `dotnet pack ./HdrHistogram/HdrHistogram.csproj -c Release --no-build`
+- [x] **Command:** `dotnet pack ./HdrHistogram/HdrHistogram.csproj -c Release --no-build`
   **Change:** n/a — verification step only.
   **Why:** Acceptance criteria 1 & 2 — `dotnet pack` must complete without NU5125, NU5048, or a "missing readme" informational message.
   **Verify:** Exit code 0; no warnings or informational messages about license URL, icon URL, or readme in stdout/stderr.
@@ -92,7 +92,7 @@
 
 ## 7. Package content inspection — icon and readme embedded at root
 
-- [ ] **Command:** Inspect the generated `.nupkg` archive for `HdrHistogram-icon-64x64.png` and `README.md`.
+- [x] **Command:** Inspect the generated `.nupkg` archive for `HdrHistogram-icon-64x64.png` and `README.md`.
   **Change:** n/a — verification step only.
   **Why:** Acceptance criteria 3 & 4 — both files must appear at the package root (not in a subdirectory).
   **Verify:**
@@ -105,7 +105,7 @@
 
 ## 8. Unit test check — no regressions
 
-- [ ] **Command:** `dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj -c Release --no-build`
+- [x] **Command:** `dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj -c Release --no-build`
   **Change:** n/a — verification step only.
   **Why:** Acceptance criterion 8 — metadata-only changes must not break existing library tests.
   **Verify:** All tests pass; exit code 0; no failures or errors reported.
