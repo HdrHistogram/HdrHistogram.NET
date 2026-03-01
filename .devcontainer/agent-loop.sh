@@ -145,23 +145,31 @@ Closes #${ISSUE_NUM}"
         ;;
 
     pick-issue)
-        ISSUE_JSON=$(gh issue list --assignee @me --state open \
-            --repo "$UPSTREAM_REPO" \
-            --json number,title --limit 1 2>/dev/null || echo "[]")
-
-        if [ "$ISSUE_JSON" = "[]" ] || [ "$ISSUE_JSON" = "" ]; then
-            ISSUE_JSON=$(gh issue list --label agent --state open \
+        if [ -n "${ISSUE_NUMBER:-}" ]; then
+            # Issue pre-assigned by fleet.sh
+            ISSUE_NUM="$ISSUE_NUMBER"
+            ISSUE_TITLE=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue view "$ISSUE_NUM" \
+                --repo "$UPSTREAM_REPO" --json title --jq .title)
+        else
+            # Self-select: assigned first, then labelled 'agent'
+            ISSUE_JSON=$(gh issue list --assignee @me --state open \
                 --repo "$UPSTREAM_REPO" \
                 --json number,title --limit 1 2>/dev/null || echo "[]")
-        fi
 
-        ISSUE_NUM=$(echo "$ISSUE_JSON" | jq -r '.[0].number // empty')
-        if [ -z "$ISSUE_NUM" ]; then
-            echo "No work available."
-            exit 0
-        fi
+            if [ "$ISSUE_JSON" = "[]" ] || [ "$ISSUE_JSON" = "" ]; then
+                ISSUE_JSON=$(gh issue list --label agent --state open \
+                    --repo "$UPSTREAM_REPO" \
+                    --json number,title --limit 1 2>/dev/null || echo "[]")
+            fi
 
-        ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.[0].title')
+            ISSUE_NUM=$(echo "$ISSUE_JSON" | jq -r '.[0].number // empty')
+            if [ -z "$ISSUE_NUM" ]; then
+                echo "No work available."
+                exit 0
+            fi
+
+            ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.[0].title')
+        fi
         BRANCH_SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | \
             sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | head -c 40)
 
