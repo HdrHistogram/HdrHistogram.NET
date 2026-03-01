@@ -107,7 +107,7 @@ If the number of analyser warnings is large, severity for specific rule categori
 |---|---|---|
 | Enabling `Nullable` causes widespread nullable warnings/errors on existing code that was written without nullability annotations | High | Nullable warnings default to `warning`, not `error`; the build will not break. Warnings can be addressed incrementally. If the volume is very high, add `<Nullable>annotations</Nullable>` initially (emits fewer warnings) and upgrade in a follow-up. |
 | `EnforceCodeStyleInBuild` promotes `.editorconfig` `suggestion`-level rules to build diagnostics | Medium | The `.editorconfig` already sets all rules to `suggestion`; `EnforceCodeStyleInBuild` reports them but at `suggestion` (info) level, which does not fail the build. Verify output after first build. |
-| `AnalysisLevel=latest-recommended` introduces new warning rules that fail CI | Medium | Run `dotnet build` locally first; inspect warnings. Use `<NoWarn>` or downgrade individual rules via `.editorconfig` if needed. Note that AppVeyor CI does not appear to be configured currently (`appveyor.yml` absent). |
+| `AnalysisLevel=latest-recommended` introduces new warning rules that fail CI | Medium | Run `dotnet build` locally first; inspect warnings. Use `<NoWarn>` or downgrade individual rules via `.editorconfig` if needed. CI is active via GitHub Actions (`.github/workflows/ci.yml`). The pipeline runs `dotnet build -c Release` and `dotnet test` on every PR. New analyser warnings will surface in CI output. Because `TreatWarningsAsErrors` is not set, they will not fail the build. |
 | `ImplicitUsings=disable` conflicts with any project that implicitly relies on them | Low | Existing code has explicit `using` statements; disabling implicit usings is consistent with current practice. |
 | `netstandard2.0` target in the main library may not support all analyser rules | Low | Analyser rules apply at the MSBuild/Roslyn layer regardless of target framework; no special handling needed. |
 
@@ -116,5 +116,6 @@ If the number of analyser warnings is large, severity for specific rule categori
 1. Should `TreatWarningsAsErrors` be scoped to analyser-only categories (e.g., `<WarningsAsErrors>$(WarningsAsErrors);CA*</WarningsAsErrors>`) now, or deferred to a follow-up issue after the warning volume is known?
    Recommendation: defer — start conservative per the issue notes.
 2. Is there a CI pipeline that needs updating once `EnforceCodeStyleInBuild` is active?
-   Observation: no `appveyor.yml` found at repo root; CI status is unknown.
-   Action: verify with the team before tightening rules further.
+   CI runs via GitHub Actions (`.github/workflows/ci.yml`) with `dotnet build -c Release` and `dotnet test`.
+   No pipeline changes are needed for this PR; the new settings are exercised automatically.
+   If warning volume is high after merging, downgrade specific rule categories via `.editorconfig` in a follow-up.
