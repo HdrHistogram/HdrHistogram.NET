@@ -9,30 +9,44 @@ source "$SCRIPT_DIR/.env"
 # Build the image
 docker build -t hdrhistogram-agent -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR/"
 
-# Fetch available issues (assigned to agent first, then labelled 'agent')
-ISSUES=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue list --assignee "$GIT_USER_NAME" --state open \
+# Fetch assigned issues as tab-separated "number\ttitle" lines
+ASSIGNED=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue list --assignee "$GIT_USER_NAME" --state open \
     --repo "$UPSTREAM_REPO" --json number,title --limit "$FLEET_SIZE" \
-    --search "sort:created-asc" 2>/dev/null || echo "[]")
+    --search "sort:created-asc" \
+    --jq '.[] | [.number, .title] | @tsv' 2>/dev/null || true)
 
-ISSUE_COUNT=$(echo "$ISSUES" | jq 'length')
+declare -a ISSUE_NUMS=()
+declare -a ISSUE_TITLES=()
+ASSIGNED_NUMS=""
+
+while IFS=$'\t' read -r num title; do
+    [ -z "$num" ] && continue
+    ISSUE_NUMS+=("$num")
+    ISSUE_TITLES+=("$title")
+    ASSIGNED_NUMS+=" $num "
+done <<< "$ASSIGNED"
+
+ISSUE_COUNT=${#ISSUE_NUMS[@]}
 
 if [ "$ISSUE_COUNT" -lt "$FLEET_SIZE" ]; then
     REMAINING=$((FLEET_SIZE - ISSUE_COUNT))
-    ASSIGNED_NUMS=$(echo "$ISSUES" | jq -r '.[].number')
-
     EXTRA=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue list --label agent --state open \
         --repo "$UPSTREAM_REPO" --json number,title --limit "$REMAINING" \
-        --search "sort:created-asc" 2>/dev/null || echo "[]")
+        --search "sort:created-asc" \
+        --jq '.[] | [.number, .title] | @tsv' 2>/dev/null || true)
 
-    # Filter out any already-assigned issues
-    for num in $ASSIGNED_NUMS; do
-        EXTRA=$(echo "$EXTRA" | jq --argjson n "$num" '[.[] | select(.number != $n)]')
-    done
-
-    ISSUES=$(echo "$ISSUES $EXTRA" | jq -s 'add // []')
+    while IFS=$'\t' read -r num title; do
+        [ -z "$num" ] && continue
+        # Skip already-assigned issues
+        if [[ "$ASSIGNED_NUMS" == *" $num "* ]]; then
+            continue
+        fi
+        ISSUE_NUMS+=("$num")
+        ISSUE_TITLES+=("$title")
+    done <<< "$EXTRA"
 fi
 
-ISSUE_COUNT=$(echo "$ISSUES" | jq 'length')
+ISSUE_COUNT=${#ISSUE_NUMS[@]}
 if [ "$ISSUE_COUNT" -eq 0 ]; then
     echo "No issues available."
     exit 0
@@ -41,8 +55,8 @@ fi
 echo "Found $ISSUE_COUNT issue(s). Launching agents..."
 
 for i in $(seq 0 $((ISSUE_COUNT - 1))); do
-    ISSUE_NUM=$(echo "$ISSUES" | jq -r ".[$i].number")
-    ISSUE_TITLE=$(echo "$ISSUES" | jq -r ".[$i].title")
+    ISSUE_NUM="${ISSUE_NUMS[$i]}"
+    ISSUE_TITLE="${ISSUE_TITLES[$i]}"
     AGENT_NAME="hdrhistogram-agent-${ISSUE_NUM}"
 
     echo "Starting $AGENT_NAME for issue #${ISSUE_NUM}: ${ISSUE_TITLE}"
