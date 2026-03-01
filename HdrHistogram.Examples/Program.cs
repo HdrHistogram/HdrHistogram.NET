@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.Examples
+namespace HdrHistogram.Examples
 {
     class Program
     {

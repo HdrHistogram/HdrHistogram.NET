@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This is a .NET port of the original Java version, which was written by
  * Gil Tene as described in
  * https://github.com/HdrHistogram/HdrHistogram

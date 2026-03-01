@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.UnitTests
+namespace HdrHistogram.UnitTests
 {
 
     public sealed class LongHistogramEncodingTests : HistogramEncodingTestBase
