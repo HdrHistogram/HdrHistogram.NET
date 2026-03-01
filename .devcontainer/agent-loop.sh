@@ -18,7 +18,8 @@ sync_state() {
 
 run_claude() {
     local prompt="$1"
-    timeout "$CLAUDE_TIMEOUT" claude --dangerously-skip-permissions --print "$prompt"
+    timeout "$CLAUDE_TIMEOUT" claude --dangerously-skip-permissions --print \
+        --output-format stream-json --verbose "$prompt"
 }
 
 load_prompt() {
@@ -154,12 +155,14 @@ Closes #${ISSUE_NUM}"
             # Self-select: assigned first, then labelled 'agent'
             ISSUE_JSON=$(gh issue list --assignee @me --state open \
                 --repo "$UPSTREAM_REPO" \
-                --json number,title --limit 1 2>/dev/null || echo "[]")
+                --json number,title --limit 1 \
+                --search "sort:created-asc" 2>/dev/null || echo "[]")
 
             if [ "$ISSUE_JSON" = "[]" ] || [ "$ISSUE_JSON" = "" ]; then
                 ISSUE_JSON=$(gh issue list --label agent --state open \
                     --repo "$UPSTREAM_REPO" \
-                    --json number,title --limit 1 2>/dev/null || echo "[]")
+                    --json number,title --limit 1 \
+                    --search "sort:created-asc" 2>/dev/null || echo "[]")
             fi
 
             ISSUE_NUM=$(echo "$ISSUE_JSON" | jq -r '.[0].number // empty')
