@@ -12,7 +12,7 @@ The fix is a one-line doc-comment change; no logic or tests need to change.
 
 ### Implementation
 
-- [ ] **Fix XML cref in `HdrHistogram/Utilities/Bitwise.cs:53`**
+- [x] **Fix XML cref in `HdrHistogram/Utilities/Bitwise.cs:53`**
   - **File:** `HdrHistogram/Utilities/Bitwise.cs`
   - **Line:** 53 (the `<summary>` of the `Imperative` nested class)
   - **Change:** Replace `<see cref="System.Numerics.BitOperations.LeadingZeroCount(ulong)"/>` with `<c>System.Numerics.BitOperations.LeadingZeroCount(ulong)</c>`
@@ -23,12 +23,12 @@ The fix is a one-line doc-comment change; no logic or tests need to change.
 
 ### Build Verification
 
-- [ ] **Build for `netstandard2.0` with CS1574 treated as error**
+- [x] **Build for `netstandard2.0` with CS1574 treated as error**
   - **Command:** `dotnet build HdrHistogram/HdrHistogram.csproj -f netstandard2.0 /warnaserror:CS1574`
   - **Why:** Directly validates acceptance criterion 1 — no `CS1574` warning on the `netstandard2.0` target.
   - **Verify:** Command exits with code 0 and no `CS1574` diagnostic appears in output.
 
-- [ ] **Build for `net8.0`**
+- [x] **Build for `net8.0`**
   - **Command:** `dotnet build HdrHistogram/HdrHistogram.csproj -f net8.0`
   - **Why:** Validates acceptance criterion 2 — the fix must not introduce new warnings or errors on the modern target framework.
   - **Verify:** Command exits with code 0; output contains no new warnings or errors compared to pre-fix baseline.
@@ -37,7 +37,7 @@ The fix is a one-line doc-comment change; no logic or tests need to change.
 
 ### Regression Testing
 
-- [ ] **Run the full test suite**
+- [x] **Run the full test suite**
   - **Command:** `dotnet test`
   - **Why:** Confirms no regressions from the doc-comment change (the fix is IL-invisible, but CI must stay green).
   - **Verify:** All tests pass; no test failures or errors reported.
