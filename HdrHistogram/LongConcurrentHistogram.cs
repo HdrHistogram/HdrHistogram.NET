@@ -1,4 +1,4 @@
-﻿using HdrHistogram.Utilities;
+using HdrHistogram.Utilities;
 using System;
 using System.Diagnostics;
 using System.Threading;

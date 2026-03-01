@@ -1,4 +1,4 @@
-﻿using HdrHistogram.Encoding;
+using HdrHistogram.Encoding;
 using HdrHistogram.Utilities;
 using System;
 using System.IO;

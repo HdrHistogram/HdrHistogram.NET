@@ -1,4 +1,4 @@
-﻿using HdrHistogram.Iteration;
+using HdrHistogram.Iteration;
 using System.IO;
 
 namespace HdrHistogram.Output

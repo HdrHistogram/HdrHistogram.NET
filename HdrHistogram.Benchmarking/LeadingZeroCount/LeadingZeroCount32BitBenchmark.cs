@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.Benchmarking.LeadingZeroCount
+namespace HdrHistogram.Benchmarking.LeadingZeroCount
 {
     public class LeadingZeroCount32BitBenchmark : LeadingZeroCountBenchmarkBase
     {

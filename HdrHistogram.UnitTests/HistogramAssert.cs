@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HdrHistogram.Iteration;
 using System;
 using System.Linq;

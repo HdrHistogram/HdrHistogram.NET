@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.Encoding
+namespace HdrHistogram.Encoding
 {
     /// <summary>
     /// Defines the histogram data to be recorded

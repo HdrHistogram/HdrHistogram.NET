@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.UnitTests
+namespace HdrHistogram.UnitTests
 {
 
     public class LongHistogramTests : HistogramTestBase
