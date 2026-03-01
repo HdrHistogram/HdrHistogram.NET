@@ -40,7 +40,6 @@
       "Bash(git commit:*)",
       "Bash(git commit -m *)",
       "Bash(git push:*)",
-      "Bash(gh pr create:*)",
       "Bash(git config:*)",
       "Bash(git diff:*)",
       "Bash(git fetch:*)",
@@ -104,7 +103,9 @@
     ],
     "deny": [
       "Bash(git branch -D:*)",
-      "Bash(gh pr merge:*)"
+      "Bash(gh pr merge:*)",
+      "Bash(git -C *)",
+      "Bash(cd *)"
     ],
     "ask": []
   }
