@@ -148,8 +148,8 @@ Closes #${ISSUE_NUM}"
         if [ -n "${ISSUE_NUMBER:-}" ]; then
             # Issue pre-assigned by fleet.sh
             ISSUE_NUM="$ISSUE_NUMBER"
-            ISSUE_TITLE=$(gh issue view "$ISSUE_NUM" --repo "$UPSTREAM_REPO" \
-                --json title --jq .title)
+            ISSUE_TITLE=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue view "$ISSUE_NUM" \
+                --repo "$UPSTREAM_REPO" --json title --jq .title)
         else
             # Self-select: assigned first, then labelled 'agent'
             ISSUE_JSON=$(gh issue list --assignee @me --state open \

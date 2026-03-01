@@ -27,7 +27,7 @@ if [ "$ISSUE_COUNT" -lt "$FLEET_SIZE" ]; then
         EXTRA=$(echo "$EXTRA" | jq --argjson n "$num" '[.[] | select(.number != $n)]')
     done
 
-    ISSUES=$(echo "$ISSUES $EXTRA" | jq -s 'add')
+    ISSUES=$(echo "$ISSUES $EXTRA" | jq -s 'add // []')
 fi
 
 ISSUE_COUNT=$(echo "$ISSUES" | jq 'length')
