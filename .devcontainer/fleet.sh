@@ -11,7 +11,8 @@ docker build -t hdrhistogram-agent -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR/"
 
 # Fetch available issues (assigned to agent first, then labelled 'agent')
 ISSUES=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue list --assignee "$GIT_USER_NAME" --state open \
-    --repo "$UPSTREAM_REPO" --json number,title --limit "$FLEET_SIZE" 2>/dev/null || echo "[]")
+    --repo "$UPSTREAM_REPO" --json number,title --limit "$FLEET_SIZE" \
+    --search "sort:created-asc" 2>/dev/null || echo "[]")
 
 ISSUE_COUNT=$(echo "$ISSUES" | jq 'length')
 
@@ -20,7 +21,8 @@ if [ "$ISSUE_COUNT" -lt "$FLEET_SIZE" ]; then
     ASSIGNED_NUMS=$(echo "$ISSUES" | jq -r '.[].number')
 
     EXTRA=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue list --label agent --state open \
-        --repo "$UPSTREAM_REPO" --json number,title --limit "$REMAINING" 2>/dev/null || echo "[]")
+        --repo "$UPSTREAM_REPO" --json number,title --limit "$REMAINING" \
+        --search "sort:created-asc" 2>/dev/null || echo "[]")
 
     # Filter out any already-assigned issues
     for num in $ASSIGNED_NUMS; do
