@@ -13,7 +13,7 @@ No logic, API surface, or behaviour is altered.
 
 ### 1. Apply formatting
 
-- [ ] **Run `dotnet format whitespace HdrHistogram.sln`** to automatically fix all whitespace,
+- [x] **Run `dotnet format whitespace HdrHistogram.sln`** to automatically fix all whitespace,
   line-ending, charset, and final-newline violations across all four projects.
   _Why:_ The brief mandates using the `whitespace` sub-command explicitly to avoid invoking
   `style` or `analyzers` fixers that could make non-cosmetic changes.
@@ -21,7 +21,7 @@ No logic, API surface, or behaviour is altered.
 
 ### 2. Spot-check Bitwise.cs
 
-- [ ] **Inspect the diff for `HdrHistogram/Utilities/Bitwise.cs`** (lines 40–60) using `git diff`
+- [x] **Inspect the diff for `HdrHistogram/Utilities/Bitwise.cs`** (lines 40–60) using `git diff`
   to confirm the 8 WHITESPACE fixes are indentation-only and contain no logic change.
   _Why:_ This is the only file with substantive (non-trivial) formatting changes; the brief
   calls it out explicitly as requiring manual verification.
@@ -29,27 +29,27 @@ No logic, API surface, or behaviour is altered.
 
 ### 3. Verify formatting is fully resolved
 
-- [ ] **Run `dotnet format --verify-no-changes HdrHistogram.sln`** and confirm it exits with
+- [x] **Run `dotnet format --verify-no-changes HdrHistogram.sln`** and confirm it exits with
   code 0 and reports zero violations.
   _Why:_ Acceptance criterion 1 — the formatter must report a clean state after the fix.
   _Verify:_ Exit code is 0; output contains no violation lines.
 
 ### 4. Confirm build is clean
 
-- [ ] **Run `dotnet build HdrHistogram.sln`** and confirm it succeeds with no errors and no
+- [x] **Run `dotnet build HdrHistogram.sln`** and confirm it succeeds with no errors and no
   warnings introduced by this change.
   _Why:_ Acceptance criterion 2 — reformatting must not break the build.
   _Verify:_ Build output ends with `Build succeeded` and warning count is unchanged.
 
 ### 5. Confirm all unit tests pass
 
-- [ ] **Run `dotnet test HdrHistogram.sln`** and confirm every test passes.
+- [x] **Run `dotnet test HdrHistogram.sln`** and confirm every test passes.
   _Why:_ Acceptance criterion 3 — existing tests must continue to pass without modification.
   _Verify:_ Test output shows 0 failed, 0 skipped (or same counts as pre-change baseline).
 
 ### 6. Commit the formatting change
 
-- [ ] **Stage all modified files** (`git add -u`) and **create a commit** with the exact message:
+- [x] **Stage all modified files** (`git add -u`) and **create a commit** with the exact message:
   `chore: apply dotnet format to match .editorconfig`
   _Why:_ Acceptance criterion 6 — the commit message must match this string exactly so that
   tooling (e.g. `git log --grep`) and the blame-ignore-revs entry can reference it reliably.
@@ -57,7 +57,7 @@ No logic, API surface, or behaviour is altered.
 
 ### 7. Create `.git-blame-ignore-revs`
 
-- [ ] **Record the SHA** of the formatting commit (`git rev-parse HEAD`) and **create
+- [x] **Record the SHA** of the formatting commit (`git rev-parse HEAD`) and **create
   `.git-blame-ignore-revs`** at the repository root containing that SHA, prefixed with a
   comment line: `# chore: apply dotnet format to match .editorconfig`
   _Why:_ Acceptance criterion 5 — the bulk formatting commit must be skippable via
@@ -69,7 +69,7 @@ No logic, API surface, or behaviour is altered.
 
 ### 8. Commit `.git-blame-ignore-revs`
 
-- [ ] **Stage and commit `.git-blame-ignore-revs`** with message:
+- [x] **Stage and commit `.git-blame-ignore-revs`** with message:
   `chore: add .git-blame-ignore-revs for formatting commit`
   _Why:_ The brief says to include this file in the same PR; it must be its own commit so it
   is not mixed with the formatting diff.
@@ -77,7 +77,7 @@ No logic, API surface, or behaviour is altered.
 
 ### 9. Open a pull request
 
-- [ ] **Push the branch** and **open a PR against `main`** using `gh pr create`.
+- [x] **Push the branch** and **open a PR against `main`** using `gh pr create`.
   PR title: `chore: apply dotnet format to match .editorconfig (#115)`
   PR body must reference issue #115 and summarise: what was run, violation counts fixed,
   and note that `.git-blame-ignore-revs` is included.
