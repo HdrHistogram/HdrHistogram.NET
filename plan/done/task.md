@@ -22,7 +22,7 @@
 
 **Verification:** Open the file and confirm the `<TargetFrameworks>` element contains exactly `net8.0` and no semicolons.
 
-- [ ] Replace the `<TargetFrameworks>` value in `HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj` with `net8.0`
+- [x] Replace the `<TargetFrameworks>` value in `HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj` with `net8.0`
 
 ---
 
@@ -58,7 +58,7 @@ Targets the current LTS runtime only (developer tool, not a shipped library):
 
 **Verification:** Lines 39–45 of `build-system.md` show `net8.0` only, with no EOL framework identifiers and no "Multi-targeted for performance comparison" text.
 
-- [ ] Update the Benchmarking Project TFM block (lines 39–45) in `spec/tech-standards/build-system.md`
+- [x] Update the Benchmarking Project TFM block (lines 39–45) in `spec/tech-standards/build-system.md`
 
 ---
 
@@ -88,7 +88,7 @@ BenchmarkDotNet is used with these targets:
 
 **Verification:** Line 227 (or equivalent) contains `` `net8.0` (current LTS runtime) `` and no reference to "Multiple .NET versions".
 
-- [ ] Update the Benchmark Configuration bullet (line 227) in `spec/tech-standards/build-system.md`
+- [x] Update the Benchmark Configuration bullet (line 227) in `spec/tech-standards/build-system.md`
 
 ---
 
@@ -109,7 +109,7 @@ Verification is build-only (see Build Verification tasks below).
 
 **Verification:** Command exits with code 0 and the output contains zero occurrences of `NETSDK1138`.
 
-- [ ] Run `dotnet build HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj -c Release` and confirm zero `NETSDK1138` warnings and exit code 0
+- [x] Run `dotnet build HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj -c Release` and confirm zero `NETSDK1138` warnings and exit code 0
 
 ---
 
@@ -121,7 +121,7 @@ Verification is build-only (see Build Verification tasks below).
 
 **Verification:** Command exits with code 0 and output shows all projects (main library, unit tests, examples, benchmarking) built successfully.
 
-- [ ] Run `dotnet build -c Release` from the repo root and confirm the full solution builds with exit code 0 and no regressions
+- [x] Run `dotnet build -c Release` from the repo root and confirm the full solution builds with exit code 0 and no regressions
 
 ---
 

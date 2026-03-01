@@ -38,10 +38,10 @@ HdrHistogram.sln
 
 ### Benchmarking Project
 
-Multi-targeted for performance comparison:
+Targets the current LTS runtime only (developer tool, not a shipped library):
 
 ```xml
-<TargetFrameworks>net8.0;net7.0;net6.0;net5.0;net47;netcoreapp3.1;netcoreapp2.1.29</TargetFrameworks>
+<TargetFrameworks>net8.0</TargetFrameworks>
 ```
 
 ## Dependencies
@@ -224,7 +224,7 @@ dotnet run -c Release -- -f *Recording*
 ### Benchmark Configuration
 
 BenchmarkDotNet is used with these targets:
-- Multiple .NET versions for comparison
+- `net8.0` (current LTS runtime)
 - Windows diagnostics support
 - Memory allocation tracking
 
