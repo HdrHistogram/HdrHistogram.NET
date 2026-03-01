@@ -5,16 +5,17 @@
 The `HdrHistogram.Benchmarking` project currently targets seven frameworks, five of which are end-of-life.
 This causes repeated `NETSDK1138` warnings during CI builds.
 Since the benchmarking project is a developer tool for measuring current performance — not a shipped library — it has no reason to target EOL runtimes.
-The fix is to reduce `TargetFrameworks` to only currently supported frameworks and update the build-system spec to match.
+The fix is to reduce `TargetFrameworks` to `net8.0` only and update the build-system spec to match.
 
 ## Affected Files
 
 | File | Change |
 |------|--------|
-| `HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj` | Replace `TargetFrameworks` with supported frameworks only |
-| `spec/tech-standards/build-system.md` | Update Benchmarking Project section to reflect new targets |
+| `HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj` | Replace `TargetFrameworks` with `net8.0` only |
+| `spec/tech-standards/build-system.md` | Update the Benchmarking Project TFM block (lines 39–45) and the Benchmark Configuration narrative bullet (lines 226–229) to reflect the new target |
 
 No other projects are affected: `HdrHistogram.csproj` already targets `net8.0;netstandard2.0`, and both `HdrHistogram.UnitTests` and `HdrHistogram.Examples` already target `net8.0` only.
+No CI workflow changes are required because the existing `dotnet-version: '8.0.x'` pin already covers `net8.0`.
 
 ## Current State
 
@@ -35,21 +36,22 @@ EOL frameworks in the list (all EOL as of 2026-03-01):
 ## Target State
 
 ```xml
-<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+<TargetFrameworks>net8.0</TargetFrameworks>
 ```
 
 Rationale:
 
 - `net8.0` is LTS, supported until November 2026; it is already the SDK version used by CI.
-- `net9.0` is the current STS release (supported until May 2026), giving a two-version comparison which is the primary value of multi-targeting in a benchmarking project.
-- If `net9.0` is judged too close to its own EOL date at the time of merge, `net8.0` alone is an acceptable minimum.
+- `net9.0` reaches end-of-life in May 2026 — approximately two months from the date of this brief — so it does not meet the bar for inclusion.
+- A single supported LTS framework is the correct minimum for a developer-only benchmarking tool.
 
 ## Acceptance Criteria
 
 - [ ] `HdrHistogram.Benchmarking.csproj` contains no EOL target frameworks.
 - [ ] `dotnet build -c Release` completes with zero `NETSDK1138` warnings.
 - [ ] `dotnet build -c Release` completes successfully for the whole solution.
-- [ ] `spec/tech-standards/build-system.md` Benchmarking Project section reflects the new `TargetFrameworks` value.
+- [ ] The `spec/tech-standards/build-system.md` Benchmarking Project TFM block reflects `net8.0` only.
+- [ ] The `spec/tech-standards/build-system.md` Benchmark Configuration section accurately describes the final `TargetFrameworks` value (the "Multiple .NET versions for comparison" bullet is updated or removed to reflect a single target).
 
 ## Test Strategy
 
@@ -66,7 +68,5 @@ No new tests need to be added or modified.
 
 | Item | Detail |
 |------|--------|
-| `net9.0` SDK availability in CI | The CI workflow (`ci.yml`) pins `dotnet-version: 8.0.x`. If `net9.0` is added as a target, CI must be able to build it. The .NET 8 SDK cannot build `net9.0` targets; CI would need to be updated to use .NET 9 SDK (or a multi-SDK setup). If this is out of scope, use `net8.0` only. |
 | `BenchmarkDotNet.Diagnostics.Windows` on Linux CI | This package targets Windows; the CI runner is `ubuntu-latest`. Building for `net8.0` on Linux should still succeed as the package conditionally applies. Verify no new build errors arise after removing the TFM list. |
-| Spec doc accuracy | `spec/tech-standards/build-system.md` explicitly documents the old multi-target list and the rationale "Multiple .NET versions for comparison". This rationale still applies but the list must be updated. |
 | `net47` removal | `net47` is .NET Framework 4.7, not .NET Core. Removing it means the benchmarking project no longer builds a .NET Framework binary. This is intentional and consistent with the issue goal. |
