@@ -26,3 +26,4 @@ HdrHistogram aims to be an extremely fast, low resource usage tool to collect la
 - Branch naming convention: `feat/`, `fix/`, `chore/` prefixes
 - PRs should target only one issue. An Issue may have multiple PRs to solve it in a managable way.
 - Before creating PRs, always have other agents test and review the code.
+- Avoid using `cd` or `git -C` when trying to perform tasks in the pwd (present working directory). It breaks the claude-code permission model forcing permission request that are unnessecary.
