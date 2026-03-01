@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable nullable reference types repo-wide -->
+    <Nullable>enable</Nullable>
+
+    <!-- Explicit using directives (consistent with existing code style) -->
+    <ImplicitUsings>disable</ImplicitUsings>
+
+    <!-- Enforce .editorconfig style rules during build -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Enable built-in .NET analysers at recommended level -->
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+
+  <!-- netstandard2.0 defaults to C# 7.3 which does not support nullable reference types.
+       Raise LangVersion to 8.0 so that <Nullable>enable</Nullable> above is accepted. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+</Project>
