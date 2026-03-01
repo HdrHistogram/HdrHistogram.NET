@@ -118,3 +118,5 @@ Backup*/
 UpgradeLog*.XML
 
 Thumbs.db
+
+.env
