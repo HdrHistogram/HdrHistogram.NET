@@ -75,7 +75,31 @@ case "$STATE" in
             exit 1
         fi
 
-        if ! PR_URL=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr create --fill \
+        PR_TITLE="feat(#${ISSUE_NUM}): $(gh issue view "$ISSUE_NUM" \
+            --repo "$UPSTREAM_REPO" --json title --jq .title)"
+
+        # Build PR body from plan artifacts
+        PR_BODY=""
+        if [ -f /tmp/plan-backup/done/brief.md ]; then
+            PR_BODY=$(cat /tmp/plan-backup/done/brief.md)
+        fi
+        if [ -f /tmp/plan-backup/done/task.md ]; then
+            PR_BODY="${PR_BODY}
+
+<details>
+<summary>Task breakdown</summary>
+
+$(cat /tmp/plan-backup/done/task.md)
+
+</details>"
+        fi
+        PR_BODY="${PR_BODY}
+
+Closes #${ISSUE_NUM}"
+
+        if ! PR_URL=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr create \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
             --repo "$UPSTREAM_REPO" \
             --head "${GIT_USER_NAME}:${BRANCH}" \
             --base "$UPSTREAM_BASE_BRANCH"); then
@@ -84,17 +108,6 @@ case "$STATE" in
             sync_state "plan(#${ISSUE_NUM}): restore after failed PR"
             exit 1
         fi
-
-        PR_NUM=$(echo "$PR_URL" | grep -oP '\d+$')
-
-        [ -f /tmp/plan-backup/done/brief.md ] && \
-            GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr comment "$PR_NUM" \
-                --repo "$UPSTREAM_REPO" \
-                --body-file /tmp/plan-backup/done/brief.md
-        [ -f /tmp/plan-backup/done/task.md ] && \
-            GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr comment "$PR_NUM" \
-                --repo "$UPSTREAM_REPO" \
-                --body-file /tmp/plan-backup/done/task.md
 
         if [ -n "$ISSUE_NUM" ]; then
             GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue comment "$ISSUE_NUM" \
