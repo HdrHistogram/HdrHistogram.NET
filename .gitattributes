@@ -1,0 +1,9 @@
+# Auto-detect text files and normalise to LF in the repo
+* text=auto eol=lf
+
+# Ensure shell scripts always use LF, even on Windows checkout
+*.sh text eol=lf
+
+# Keep Windows batch files with CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf

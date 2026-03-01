@@ -10,9 +10,12 @@ fi
 
 # Build
 docker build -t hdrhistogram-agent -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR/"
+echo "Built Docker image: hdrhistogram-agent"
+echo "Starting container with .env file and mounted nuget cache volume. Named 'hdrhistogram-agent-0'"
 
 # Run
 docker run --rm \
+    --name hdrhistogram-agent-0 \
     --cap-add NET_ADMIN \
     --cap-add NET_RAW \
     --memory=4g \
