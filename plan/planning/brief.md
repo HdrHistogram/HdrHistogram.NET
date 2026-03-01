@@ -29,7 +29,8 @@ Derived from the issue:
 - [ ] Covers **code style**: reference to `.editorconfig`; instruction to run `dotnet format` before submitting a PR.
 - [ ] Covers **git workflow**: branch naming (`feat/`, `fix/`, `chore/`), one issue per PR, PRs target `main`, no direct commits to `main`.
 - [ ] Covers **line endings**: LF convention, `.gitattributes` normalises line endings automatically; Windows batch files use CRLF by exception.
-- [ ] Covers **cross-platform notes**: shell scripts require LF; the devcontainer is available for a consistent Linux environment.
+- [ ] Covers **cross-platform notes**: shell scripts require LF; `.gitattributes` normalises line endings on checkout; all platforms with the .NET 8 SDK can build and test natively — no container is required.
+  Note: `.devcontainer/` exists in the repository but contains agent-automation infrastructure only (`fleet.sh`, `agent-loop.sh`, etc.); there is no `devcontainer.json` and it is not intended for human contributors.
 - [ ] Uses **British English**, **one sentence per line** (per `CLAUDE.md` markdown standards).
 - [ ] Headings have a blank line beneath them; ordered/unordered lists have a blank line before and after.
 - [ ] `README.md` Development section links to `CONTRIBUTING.md`.
