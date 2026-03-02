@@ -223,6 +223,7 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="value">The value to be recorded</param>
         /// <exception cref="System.IndexOutOfRangeException">if value is exceeds highestTrackableValue</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">if <paramref name="value"/> is negative.</exception>
         public void RecordValue(long value)
         {
             RecordSingleValue(value);
@@ -234,6 +235,7 @@ namespace HdrHistogram
         /// <param name="value">The value to be recorded</param>
         /// <param name="count">The number of occurrences of this value to record</param>
         /// <exception cref="System.IndexOutOfRangeException">if value is exceeds highestTrackableValue</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">if <paramref name="value"/> is negative.</exception>
         public void RecordValueWithCount(long value, long count)
         {
             // Dissect the value into bucket and sub-bucket parts, and derive index into counts array:
@@ -249,6 +251,7 @@ namespace HdrHistogram
         /// <param name="value">The value to record</param>
         /// <param name="expectedIntervalBetweenValueSamples">If <paramref name="expectedIntervalBetweenValueSamples"/> is larger than 0, add auto-generated value records as appropriate if <paramref name="value"/> is larger than <paramref name="expectedIntervalBetweenValueSamples"/></param>
         /// <exception cref="System.IndexOutOfRangeException">if value is exceeds highestTrackableValue</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">if <paramref name="value"/> is negative.</exception>
         /// <remarks>
         /// To compensate for the loss of sampled values when a recorded value is larger than the expected interval between value samples, 
         /// Histogram will auto-generate an additional series of decreasingly-smaller (down to the expectedIntervalBetweenValueSamples) value records.

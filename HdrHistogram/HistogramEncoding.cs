@@ -239,7 +239,7 @@ namespace HdrHistogram
                 case 8: return typeof(LongHistogram);
                 case 9: return typeof(LongHistogram);
                 default:
-                    throw new IndexOutOfRangeException();
+                    throw new InvalidOperationException($"Unexpected word size: {wordSizeInBytes}");
             }
         }
     }
