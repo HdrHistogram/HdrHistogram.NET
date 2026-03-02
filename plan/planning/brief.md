@@ -88,6 +88,9 @@ Options:
 2. **Suppress** the warning with `#pragma warning disable CA1711` or `[SuppressMessage]` — avoids the break but leaves the name violation.
 3. **Obsolete and alias** — add a `[Obsolete]` `HistogramFactory` type alias pointing to the old name; remove the old name in a future major version.
 
+Note: renaming to `HistogramFactory` (options 1 and 3) is not possible — that name is already taken by the existing `public abstract class HistogramFactory` in `HdrHistogram/Histogram.cs`.
+Suppression is therefore the only viable path for this issue.
+
 Recommended approach: **suppress** for this issue (scope is warnings only, not API redesign); track as a separate breaking-change issue.
 
 ### `ArgumentNullException.ThrowIfNull` target framework
