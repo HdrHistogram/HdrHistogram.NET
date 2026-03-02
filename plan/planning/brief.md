@@ -91,15 +91,28 @@ All existing `RecordValue` tests in `HistogramTestBase.cs` and `LongHistogramTes
    The .NET port should throw `ArgumentOutOfRangeException`, which is the idiomatic .NET equivalent.
    This is a deliberate, documented divergence in exception type.
 
-2. **Other recording methods** — `RecordValueWithCount`, `RecordValueWithExpectedInterval`, and `RecordSingleValueWithExpectedInterval` share the same vulnerability.
+2. **Other recording methods** — `RecordValueWithCount` and `RecordValueWithExpectedInterval` share the same vulnerability.
    The fix in `GetBucketIndex` protects all these callers in one place.
    Confirmed call chains:
    - `RecordValueWithCount` calls `GetBucketIndex` directly (line 237) — not via `RecordSingleValue`.
    - `RecordValueWithExpectedInterval` delegates to `RecordValueWithCountAndExpectedInterval` → `RecordValueWithCount` → `GetBucketIndex`.
 
-3. **`Bitwise.Imperative.NumberOfLeadingZeros` defensive fix** — even after validation is added in `GetBucketIndex`, the `Log2` method remains subtly broken for negative inputs.
+3. **Additional callers of `GetBucketIndex`** — four other methods in `HistogramBase.cs` also call `GetBucketIndex` and will throw `ArgumentOutOfRangeException` for negative inputs after the fix:
+
+   | Method | Line |
+   |--------|------|
+   | `SizeOfEquivalentValueRange(long value)` | 315 |
+   | `LowestEquivalentValue(long value)` | 335 |
+   | `GetCountAtValue(long value)` | 398 |
+   | `GetRelevantCounts()` (private) | 724 |
+
+   This behaviour change is **intentional and correct**: histogram values are always non-negative by definition, so these methods should also reject negative inputs.
+   `GetRelevantCounts` is private and receives the result of `GetMaxValue()`, which is always non-negative, so it is unaffected in practice.
+   No additional tests are required for these methods beyond verifying the existing suite continues to pass.
+
+4. **`Bitwise.Imperative.NumberOfLeadingZeros` defensive fix** — even after validation is added in `GetBucketIndex`, the `Log2` method remains subtly broken for negative inputs.
    A defensive `ArgumentOutOfRangeException` or `Debug.Assert` inside `Log2`/`NumberOfLeadingZeros` is recommended as belt-and-braces, but is not strictly required once the caller validates.
 
-4. **`Bitwise.IntrinsicNumberOfLeadingZeros` (NET5+)** — `BitOperations.LeadingZeroCount(ulong)` casts the input to `ulong`, so a negative `long` would be interpreted as a very large unsigned integer and return `0` rather than throwing.
+5. **`Bitwise.IntrinsicNumberOfLeadingZeros` (NET5+)** — `BitOperations.LeadingZeroCount(ulong)` casts the input to `ulong`, so a negative `long` would be interpreted as a very large unsigned integer and return `0` rather than throwing.
    This means the crash on NET5+ would be a silent wrong-answer rather than an exception.
    The guard in `GetBucketIndex` also fixes this path.
