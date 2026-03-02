@@ -12,7 +12,7 @@ This is a natural complement to `Add` and follows the same structural pattern (f
 
 | File | Change |
 |---|---|
-| `HdrHistogram/HistogramBase.cs` | Add `Subtract(HistogramBase)` virtual method (primary change) |
+| `HdrHistogram/HistogramBase.cs` | Add `Subtract(HistogramBase)` virtual method (primary change); fix malformed exception message in `Add` (missing `)`) |
 | `HdrHistogram.UnitTests/HistogramTestBase.cs` | Add three mirrored test methods for `Subtract` |
 | `spec/tech-standards/api-reference.md` | Document `Subtract` in the public API section alongside `Add` |
 
@@ -34,14 +34,14 @@ Concrete implementations (`LongHistogram`, `IntHistogram`, `ShortHistogram`, `Lo
 Add the following test methods to `HdrHistogram.UnitTests/HistogramTestBase.cs`, directly below the existing `Add` tests:
 
 1. **`Subtract_should_reduce_the_counts_from_two_histograms`**
-   - Record values into `histogram` and `other` (same config).
-   - Record one extra value into `histogram` at the same slots.
-   - Subtract `other` from `histogram`.
-   - Assert that counts equal the surplus, and `TotalCount` is correct.
+   - Record `TestValueLevel` and `TestValueLevel * 1000` into `histogram` twice each.
+   - Record `TestValueLevel` and `TestValueLevel * 1000` into `other` once each (same config).
+   - Call `histogram.Subtract(other)`.
+   - Assert `histogram.GetCountAtValue(TestValueLevel) == 1L`, `histogram.GetCountAtValue(TestValueLevel * 1000) == 1L`, and `histogram.TotalCount == 2L`.
 
 2. **`Subtract_should_allow_small_range_histograms_to_be_subtracted`**
    - Create `biggerOther` with double the range; record same values into both.
-   - Subtract smaller histogram from `biggerOther`.
+   - Subtract the smaller histogram from `biggerOther`.
    - Assert counts and `TotalCount` decrease correctly.
 
 3. **`Subtract_throws_if_other_has_a_larger_range`**
@@ -51,6 +51,22 @@ Add the following test methods to `HdrHistogram.UnitTests/HistogramTestBase.cs`,
 These three tests run against all concrete histogram types via the existing abstract base-test pattern (xUnit inheritance through `LongHistogramTests`, `IntHistogramTests`, `ShortHistogramTests`, etc.).
 
 ## Implementation Notes
+
+### Validation
+
+Copy the guard from `Add` verbatim, applying the same fix to the malformed exception message (missing `)`) that will also be corrected in `Add` in the same PR:
+
+```csharp
+if (HighestTrackableValue < fromHistogram.HighestTrackableValue)
+{
+    throw new ArgumentOutOfRangeException(
+        nameof(fromHistogram),
+        $"The other histogram covers a wider range ({fromHistogram.HighestTrackableValue}) than this one ({HighestTrackableValue}).");
+}
+```
+
+The existing `Add` message at line 283 is missing the closing `)` after the first interpolated value.
+Fix it in `Add` and use the corrected form in `Subtract`.
 
 ### Fast path
 
@@ -69,30 +85,12 @@ for (var i = 0; i < fromHistogram.CountsArrayLength; i++)
 for (var i = 0; i < fromHistogram.CountsArrayLength; i++)
 {
     var count = fromHistogram.GetCountAtIndex(i);
-    if (count != 0)
-    {
-        SubtractFromCountAtValue(fromHistogram.ValueFromIndex(i), count);
-    }
+    RecordValueWithCount(fromHistogram.ValueFromIndex(i), -count);
 }
 ```
 
-The slow path requires a helper `SubtractFromCountAtValue` (analogous to `RecordValueWithCount` but decrements).
-Alternatively — and more simply — reuse `RecordValueWithCount` with a **negated** count if the internal implementation tolerates it (it calls `AddToCountAtIndex` which does).
-Confirm this before coding; if `RecordValueWithCount` has a guard rejecting negative counts, a dedicated helper is needed.
-
-### Validation
-
-Identical guard to `Add`:
-
-```csharp
-if (HighestTrackableValue < fromHistogram.HighestTrackableValue)
-{
-    throw new ArgumentOutOfRangeException(
-        nameof(fromHistogram),
-        $"The other histogram covers a wider range ({fromHistogram.HighestTrackableValue}) " +
-        $"than this one ({HighestTrackableValue}).");
-}
-```
+This exactly mirrors the `Add` slow path (lines 299–303) with the sign flipped.
+`RecordValueWithCount` does not guard against negative counts — it calls `AddToCountAtIndex` directly with no validation — so no helper method is needed.
 
 ## Risks and Open Questions
 
@@ -100,12 +98,9 @@ if (HighestTrackableValue < fromHistogram.HighestTrackableValue)
    The Java reference implementation does not guard against this either; the initial implementation should follow the same lenient approach.
    A future issue can address validation if needed.
 
-2. **`RecordValueWithCount` with negative count**: Check whether `RecordValueWithCount` internally rejects negative values.
-   If it does, the slow path must call `AddToCountAtIndex` directly (after computing the index) rather than going via `RecordValueWithCount`.
-
-3. **Concurrent implementations**: `LongConcurrentHistogram` and `IntConcurrentHistogram` override `AddToCountAtIndex` with atomic operations.
+2. **Concurrent implementations**: `LongConcurrentHistogram` and `IntConcurrentHistogram` override `AddToCountAtIndex` with atomic operations.
    Because `Subtract` in the base class uses `AddToCountAtIndex` (passing negated counts), concurrent safety should be inherited automatically — but this must be verified.
 
-4. **`TotalCount` consistency**: `AddToCountAtIndex` increments `TotalCount` by the addend.
+3. **`TotalCount` consistency**: `AddToCountAtIndex` increments `TotalCount` by the addend.
    Passing a negative addend should decrement `TotalCount` correctly, keeping it consistent.
    Verify with `LongHistogram` before relying on this for all types.
