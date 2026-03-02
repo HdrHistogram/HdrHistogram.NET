@@ -2,7 +2,7 @@
 
 ## Implementation
 
-- [ ] **Fix malformed exception message in `Add` in `HistogramBase.cs`**
+- [x] **Fix malformed exception message in `Add` in `HistogramBase.cs`**
   - File: `HdrHistogram/HistogramBase.cs`, line 283
   - Change: Add missing `)` after the first interpolated value so the message reads
     `"The other histogram covers a wider range ({fromHistogram.HighestTrackableValue}) than this one ({HighestTrackableValue})."`
@@ -10,7 +10,7 @@
     the brief requires the same corrected form to be used in `Subtract`.
   - Verify: Read the line after editing; parentheses balance correctly.
 
-- [ ] **Add `Subtract(HistogramBase fromHistogram)` method to `HistogramBase`**
+- [x] **Add `Subtract(HistogramBase fromHistogram)` method to `HistogramBase`**
   - File: `HdrHistogram/HistogramBase.cs`, immediately after the closing brace of `Add`
     (currently around line 305)
   - Signature: `public virtual void Subtract(HistogramBase fromHistogram)`
@@ -27,7 +27,7 @@
     correct inversion of `Add` without any additional helper.
   - Verify: Method is present, compiles, and is callable on a `HistogramBase` instance.
 
-- [ ] **Add XML doc comment to `Subtract`**
+- [x] **Add XML doc comment to `Subtract`**
   - File: `HdrHistogram/HistogramBase.cs`, directly above the new `Subtract` method
   - Required elements: `<summary>`, `<param name="fromHistogram">`, `<exception cref="System.ArgumentOutOfRangeException">`
   - Why: The brief's acceptance criterion requires documentation matching the quality of the
@@ -36,7 +36,7 @@
 
 ## Tests
 
-- [ ] **Add `Subtract_should_reduce_the_counts_from_two_histograms` to `HistogramTestBase.cs`**
+- [x] **Add `Subtract_should_reduce_the_counts_from_two_histograms` to `HistogramTestBase.cs`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`, after the last `Add`-related test
     (currently around line 260)
   - Steps:
@@ -51,7 +51,7 @@
     itself results in zero" (via symmetry check of counts).
   - Verify: Test method is `[Fact]`, compiles, runs green for all concrete histogram types.
 
-- [ ] **Add `Subtract_should_allow_small_range_histograms_to_be_subtracted` to `HistogramTestBase.cs`**
+- [x] **Add `Subtract_should_allow_small_range_histograms_to_be_subtracted` to `HistogramTestBase.cs`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`, after the test above
   - Steps:
     1. Create `biggerOther` with `DefaultHighestTrackableValue * 2` / `DefaultSignificantFigures`.
@@ -65,7 +65,7 @@
     layout from `DefaultHighestTrackableValue`).
   - Verify: Test method is `[Fact]`, compiles, runs green for all concrete histogram types.
 
-- [ ] **Add `Subtract_throws_if_other_has_a_larger_range` to `HistogramTestBase.cs`**
+- [x] **Add `Subtract_throws_if_other_has_a_larger_range` to `HistogramTestBase.cs`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`, after the test above
   - Steps:
     1. Create `histogram` with `DefaultHighestTrackableValue` / `DefaultSignificantFigures`.
@@ -77,7 +77,7 @@
 
 ## Documentation
 
-- [ ] **Document `Subtract` in `spec/tech-standards/api-reference.md`**
+- [x] **Document `Subtract` in `spec/tech-standards/api-reference.md`**
   - File: `spec/tech-standards/api-reference.md`, lines 137–145 ("Histogram Operations"
     code block)
   - Change: Add `void Subtract(HistogramBase other)      // Remove histogram values` on the
