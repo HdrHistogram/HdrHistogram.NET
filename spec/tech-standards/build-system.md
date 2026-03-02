@@ -63,8 +63,8 @@ Targets the current LTS runtime only (developer tool, not a shipped library):
 ### Benchmarking Project
 
 ```xml
-<PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-<PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
+<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+<PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.8" />
 ```
 
 ## Package Metadata
