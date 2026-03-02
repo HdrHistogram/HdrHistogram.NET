@@ -361,6 +361,125 @@ namespace HdrHistogram.UnitTests
             Assert.Throws<ArgumentException>(() => histogram.Tag = invalidTagValue);
         }
 
+        [Fact]
+        public void GetPercentileAtOrBelowValue_EmptyHistogram_ReturnsZero()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.GetPercentileAtOrBelowValue(TestValueLevel).Should().Be(0.0);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_ValueAtOrAboveHighestTrackable_Returns100()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(TestValueLevel);
+            histogram.GetPercentileAtOrBelowValue(DefaultHighestTrackableValue).Should().Be(100.0);
+            histogram.GetPercentileAtOrBelowValue(long.MaxValue / 2).Should().Be(100.0);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_KnownValueSet_ReturnsExpectedPercentile()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            for (long i = 1; i <= 100; i++)
+            {
+                histogram.RecordValue(i);
+            }
+            histogram.GetPercentileAtOrBelowValue(50).Should().BeApproximately(50.0, 0.1);
+            histogram.GetPercentileAtOrBelowValue(100).Should().BeApproximately(100.0, 0.1);
+            histogram.GetPercentileAtOrBelowValue(1).Should().BeApproximately(1.0, 0.1);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_ResultIsAlwaysInRange()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            for (long i = 1; i <= 10; i++)
+            {
+                histogram.RecordValue(i * 100);
+            }
+            histogram.GetPercentileAtOrBelowValue(0).Should().Be(0.0);
+            foreach (var queryValue in new long[] { 0, 100, 500, DefaultHighestTrackableValue })
+            {
+                histogram.GetPercentileAtOrBelowValue(queryValue).Should().BeInRange(0.0, 100.0);
+            }
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_RoundTrip_ConsistentWithGetValueAtPercentile()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            foreach (var v in new long[] { 1, 10, 100, 1000 })
+            {
+                histogram.RecordValue(v);
+            }
+            foreach (var v in new long[] { 1, 10, 100, 1000 })
+            {
+                var p = histogram.GetPercentileAtOrBelowValue(v);
+                var valueAtP = histogram.GetValueAtPercentile(p);
+                var expected = histogram.HighestEquivalentValue(histogram.LowestEquivalentValue(v));
+                valueAtP.Should().Be(expected);
+            }
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_IsMonotonic()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            foreach (var v in new long[] { 1, 50, 100, 500, 1000 })
+            {
+                histogram.RecordValue(v);
+            }
+            var queryValues = new long[] { 1, 10, 50, 100, 500, 1000, 5000 };
+            double previous = 0.0;
+            foreach (var q in queryValues)
+            {
+                var current = histogram.GetPercentileAtOrBelowValue(q);
+                current.Should().BeGreaterThanOrEqualTo(previous);
+                previous = current;
+            }
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_SingleRecordedValue_QueriesBelow_Return0()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(TestValueLevel);
+            histogram.GetPercentileAtOrBelowValue(TestValueLevel - 1).Should().Be(0.0);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_SingleRecordedValue_QueriesAtOrAbove_Return100()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(TestValueLevel);
+            histogram.GetPercentileAtOrBelowValue(TestValueLevel).Should().Be(100.0);
+            histogram.GetPercentileAtOrBelowValue(TestValueLevel + 1000).Should().Be(100.0);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_BoundaryAtLowestTrackableValue()
+        {
+            var histogram = Create(1, DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(1);
+            histogram.RecordValue(1000);
+            histogram.GetPercentileAtOrBelowValue(1).Should().BeApproximately(50.0, 0.1);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_LargeMagnitudeValues_ReturnsCorrectPercentile()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(1000);
+            histogram.RecordValue(1_000_000);
+            // 1000 is 50% of the recorded values
+            histogram.GetPercentileAtOrBelowValue(1000).Should().BeApproximately(50.0, 0.1);
+            // 1_000_000 is 100% of the recorded values
+            histogram.GetPercentileAtOrBelowValue(1_000_000).Should().BeApproximately(100.0, 0.1);
+            // Something between 1000 and 1_000_000 is still only 50%
+            histogram.GetPercentileAtOrBelowValue(500_000).Should().BeApproximately(50.0, 0.1);
+        }
+
         private void CreateAndAdd(HistogramBase source)
         {
             source.RecordValueWithCount(1, 100);
