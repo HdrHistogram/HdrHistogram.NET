@@ -30,7 +30,7 @@ namespace HdrHistogram
         private readonly HistogramFactoryDelegate _histogramFactory;
 
         private HistogramBase _activeHistogram;
-        private HistogramBase _inactiveHistogram;
+        private HistogramBase? _inactiveHistogram;
 
         /// <summary>
         /// Creates a recorder that will delegate recording to histograms created from these parameters.
@@ -147,7 +147,7 @@ namespace HdrHistogram
         /// NOTE: The caller is responsible for not recycling the same returned interval histogram more than once. 
         /// If the same interval histogram instance is recycled more than once, behavior is undefined.
         /// </remarks>
-        public HistogramBase GetIntervalHistogram(HistogramBase histogramToRecycle)
+        public HistogramBase GetIntervalHistogram(HistogramBase? histogramToRecycle)
         {
             lock (_gate)
             {
@@ -157,7 +157,7 @@ namespace HdrHistogram
                 PerformIntervalSample();
                 var sampledHistogram = _inactiveHistogram;
                 _inactiveHistogram = null; // Once we expose the sample, we can't reuse it internally until it is recycled
-                return sampledHistogram;
+                return sampledHistogram!;
             }
         }
 
@@ -172,7 +172,7 @@ namespace HdrHistogram
             lock (_gate)
             {
                 PerformIntervalSample();
-                _inactiveHistogram.CopyInto(targetHistogram);
+                _inactiveHistogram!.CopyInto(targetHistogram);
             }
         }
 
@@ -227,7 +227,7 @@ namespace HdrHistogram
             }
         }
 
-        private void ValidateFitAsReplacementHistogram(HistogramBase replacementHistogram)
+        private void ValidateFitAsReplacementHistogram(HistogramBase? replacementHistogram)
         {
             if (replacementHistogram != null && replacementHistogram.InstanceId != _activeHistogram.InstanceId)
             {

@@ -21,7 +21,7 @@ namespace HdrHistogram
     {
         private readonly WriterReaderPhaser _wrp = new WriterReaderPhaser();
         private readonly AtomicIntArray _counts;
-        private long _totalCount = 0L;
+        private long _totalCount;
 
         /// <summary>
         /// Construct a <see cref="IntConcurrentHistogram"/> given the lowest and highest values to be tracked and a number of significant decimal digits.

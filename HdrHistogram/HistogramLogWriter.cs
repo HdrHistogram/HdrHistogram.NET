@@ -14,8 +14,8 @@ namespace HdrHistogram
         private const string HistogramLogFormatVersion = "1.3";
 
         private readonly TextWriter _log;
-        private bool _hasHeaderWritten = false;
-        private int _isDisposed = 0;
+        private bool _hasHeaderWritten;
+        private int _isDisposed;
 
         /// <summary>
         /// Writes the provided histograms to the underlying <see cref="Stream"/> with a given overall start time.

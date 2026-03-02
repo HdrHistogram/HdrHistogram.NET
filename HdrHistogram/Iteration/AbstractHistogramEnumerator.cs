@@ -55,6 +55,7 @@ namespace HdrHistogram.Iteration
             CountAtThisValue = 0;
             _freshSubBucket = true;
             _currentIterationValue = new HistogramIterationValue();
+            Current = new HistogramIterationValue();
         }
 
         /// <summary>
