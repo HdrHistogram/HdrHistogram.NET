@@ -51,4 +51,6 @@ dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj -v q -c Relea
 - Shell scripts require LF line endings.
 - `.gitattributes` normalises line endings on checkout, so no manual intervention is needed.
 - All platforms (Windows, macOS, Linux) with the .NET 8 SDK can build and test natively with no container required.
-- `.devcontainer/` exists in the repository but contains agent-automation infrastructure only (`fleet.sh`, `agent-loop.sh`, etc.) and is not intended for human contributors.
+- `.devcontainer/` contains a VS Code / GitHub Codespaces devcontainer for human contributors.
+- `autonomous/` contains the agent Docker infrastructure (`Dockerfile`, `agent-loop.sh`, etc.) used for autonomous operation.
+- Host-side entry points for running agents are `scripts/run.sh` (single agent) and `scripts/fleet.sh` (multi-agent fleet).

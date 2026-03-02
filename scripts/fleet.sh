@@ -4,10 +4,11 @@ set -euo pipefail
 
 FLEET_SIZE="${1:-3}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/.env"
+REPO_ROOT="$(realpath "$SCRIPT_DIR/..")"
+source "$REPO_ROOT/autonomous/.env"
 
 # Build the image
-docker build -t hdrhistogram-agent -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR/"
+docker build -t hdrhistogram-agent -f "$REPO_ROOT/autonomous/Dockerfile" "$REPO_ROOT/autonomous/"
 
 # Fetch assigned issues as tab-separated "number\ttitle" lines
 ASSIGNED=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue list --assignee "$GIT_USER_NAME" --state open \
@@ -67,7 +68,7 @@ for i in $(seq 0 $((ISSUE_COUNT - 1))); do
         --cap-add NET_RAW \
         --memory=4g \
         --cpus=2 \
-        --env-file "$SCRIPT_DIR/.env" \
+        --env-file "$REPO_ROOT/autonomous/.env" \
         -e ISSUE_NUMBER="$ISSUE_NUM" \
         -e MAX_ITERATIONS=50 \
         -v nuget-cache:/home/agent/.nuget/packages \
