@@ -9,12 +9,12 @@
 ## Summary
 
 When `RecordValue` is called with a negative value (e.g. `actual - expected` where actual < expected), an `IndexOutOfRangeException` is thrown deep in the bitwise utility code rather than a clear, descriptive error.
-The root cause is the absence of input validation in `RecordValue` (and `RecordSingleValue`).
-Negative values should be rejected with an `ArgumentOutOfRangeException` before they reach the bucket-index calculation.
+The root cause is the absence of input validation before values reach the bucket-index calculation.
+Negative values must be rejected with an `ArgumentOutOfRangeException` before they reach `GetBucketIndex`.
 
 ### Why This Happens
 
-The call chain is:
+The call chain for `RecordValue` is:
 
 1. `RecordValue(long value)` — no validation, passes any value through
 2. `RecordSingleValue(long value)` — no validation
@@ -24,25 +24,45 @@ The call chain is:
 
 Zero (`0`) is not affected: `0 | subBucketMask = subBucketMask` (positive), so the lookup proceeds normally.
 
+`RecordValueWithCount` and `RecordValueWithExpectedInterval` have the same vulnerability via a different call chain:
+
+- `RecordValueWithCount` calls `GetBucketIndex()` **directly** — it does not go through `RecordSingleValue`.
+- `RecordValueWithExpectedInterval` delegates to `RecordValueWithCountAndExpectedInterval`, which calls `RecordValueWithCount`, which calls `GetBucketIndex()` directly.
+
+```
+RecordValue → RecordSingleValue → GetBucketIndex
+RecordValueWithCount → GetBucketIndex
+RecordValueWithExpectedInterval → RecordValueWithCountAndExpectedInterval → RecordValueWithCount → GetBucketIndex
+```
+
+### Fix Strategy
+
+Add the validation guard inside `GetBucketIndex` itself (Option A).
+This protects all callers — `RecordSingleValue`, `RecordValueWithCount`, and any future callers — in one place, rather than duplicating the guard at each public entry point.
+
 ## Affected Files
 
 Confirmed by exploration:
 
 | File | Role |
 |------|------|
-| `HdrHistogram/HistogramBase.cs` | `RecordValue`, `RecordSingleValue`, `GetBucketIndex` — where validation must be added |
+| `HdrHistogram/HistogramBase.cs` | `RecordValue`, `RecordSingleValue`, `RecordValueWithCount`, `GetBucketIndex` — validation guard goes in `GetBucketIndex` |
 | `HdrHistogram/Utilities/Bitwise.cs` | `Log2`, `NumberOfLeadingZeros` — where the crash manifests; a defensive guard may be added here as belt-and-braces |
 | `HdrHistogram.UnitTests/HistogramTestBase.cs` | Shared test base; new negative-value tests belong here |
-| `HdrHistogram.UnitTests/LongHistogramTests.cs` | Concrete histogram tests; may need a concrete test for the exact reproducer from the issue |
+| `HdrHistogram.UnitTests/LongHistogramTests.cs` | Concrete histogram tests; concrete reproducer from the issue |
 
 ## Acceptance Criteria
 
-- Calling `RecordValue` with a negative value throws `ArgumentOutOfRangeException` with a message that names the value and states it must be non-negative.
+- Calling `RecordValue` with a negative value throws `ArgumentOutOfRangeException` with a message containing the string `"non-negative"` and the string representation of the value (e.g. `"-1"`).
+- Calling `RecordValueWithCount` with a negative value throws `ArgumentOutOfRangeException` with a message containing `"non-negative"` and the value.
+- Calling `RecordValueWithExpectedInterval` with a negative value throws `ArgumentOutOfRangeException` with a message containing `"non-negative"` and the value.
 - Calling `RecordValue(0)` succeeds without error (zero is a valid measurement).
 - Calling `RecordValue` with a value exceeding `highestTrackableValue` continues to throw `IndexOutOfRangeException` (existing behaviour is preserved).
 - The existing test suite continues to pass.
 - New tests cover:
-  - Recording a negative value → `ArgumentOutOfRangeException`
+  - Recording a negative value via `RecordValue` → `ArgumentOutOfRangeException`
+  - Recording a negative value via `RecordValueWithCount` → `ArgumentOutOfRangeException`
+  - Recording a negative value via `RecordValueWithExpectedInterval` → `ArgumentOutOfRangeException`
   - Recording zero → succeeds
   - The exact reproducer from the issue (`LongHistogram` with 15-minute range, recording a negative delta)
 
@@ -52,8 +72,10 @@ Confirmed by exploration:
 
 In `HdrHistogram.UnitTests/HistogramTestBase.cs` (shared across all histogram types):
 
-- `RecordValue_WhenValueIsNegative_ThrowsArgumentOutOfRangeException` — asserts `ArgumentOutOfRangeException` is thrown and the message is informative.
+- `RecordValue_WhenValueIsNegative_ThrowsArgumentOutOfRangeException` — asserts `ArgumentOutOfRangeException` is thrown and the message contains `"non-negative"` and the value as a string.
 - `RecordValue_WhenValueIsZero_Succeeds` — asserts the call completes and the histogram count increases.
+- `RecordValueWithCount_WhenValueIsNegative_ThrowsArgumentOutOfRangeException` — asserts `ArgumentOutOfRangeException` is thrown with a message containing `"non-negative"` and the value.
+- `RecordValueWithExpectedInterval_WhenValueIsNegative_ThrowsArgumentOutOfRangeException` — asserts `ArgumentOutOfRangeException` is thrown with a message containing `"non-negative"` and the value.
 
 In `HdrHistogram.UnitTests/LongHistogramTests.cs`:
 
@@ -69,13 +91,15 @@ All existing `RecordValue` tests in `HistogramTestBase.cs` and `LongHistogramTes
    The .NET port should throw `ArgumentOutOfRangeException`, which is the idiomatic .NET equivalent.
    This is a deliberate, documented divergence in exception type.
 
-2. **Other recording methods** — `RecordValueWithCount`, `RecordValueWithExpectedInterval`, and `RecordSingleValueWithExpectedInterval` in `HistogramBase.cs` may have the same gap.
-   These should be audited and, if they delegate to `RecordSingleValue`, they are protected by the guard added there.
-   If they call the bucket-index path directly, they need their own guard.
+2. **Other recording methods** — `RecordValueWithCount`, `RecordValueWithExpectedInterval`, and `RecordSingleValueWithExpectedInterval` share the same vulnerability.
+   The fix in `GetBucketIndex` protects all these callers in one place.
+   Confirmed call chains:
+   - `RecordValueWithCount` calls `GetBucketIndex` directly (line 237) — not via `RecordSingleValue`.
+   - `RecordValueWithExpectedInterval` delegates to `RecordValueWithCountAndExpectedInterval` → `RecordValueWithCount` → `GetBucketIndex`.
 
-3. **`Bitwise.Imperative.NumberOfLeadingZeros` defensive fix** — even after validation is added in `RecordSingleValue`, the `Log2` method remains subtly broken for negative inputs.
+3. **`Bitwise.Imperative.NumberOfLeadingZeros` defensive fix** — even after validation is added in `GetBucketIndex`, the `Log2` method remains subtly broken for negative inputs.
    A defensive `ArgumentOutOfRangeException` or `Debug.Assert` inside `Log2`/`NumberOfLeadingZeros` is recommended as belt-and-braces, but is not strictly required once the caller validates.
 
 4. **`Bitwise.IntrinsicNumberOfLeadingZeros` (NET5+)** — `BitOperations.LeadingZeroCount(ulong)` casts the input to `ulong`, so a negative `long` would be interpreted as a very large unsigned integer and return `0` rather than throwing.
    This means the crash on NET5+ would be a silent wrong-answer rather than an exception.
-   The guard in `RecordSingleValue` also fixes this path.
+   The guard in `GetBucketIndex` also fixes this path.
