@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(realpath "$SCRIPT_DIR/..")"
+ISSUE_NUMBER="${1:-}"
 
 # Load env
 if [ -f "$REPO_ROOT/autonomous/.env" ]; then
@@ -22,5 +23,6 @@ docker run --rm \
     --memory=4g \
     --cpus=2 \
     --env-file "$REPO_ROOT/autonomous/.env" \
+    ${ISSUE_NUMBER:+-e ISSUE_NUMBER="$ISSUE_NUMBER"} \
     -v nuget-cache:/home/agent/.nuget/packages \
     hdrhistogram-agent
