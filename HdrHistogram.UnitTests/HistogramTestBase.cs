@@ -480,6 +480,27 @@ namespace HdrHistogram.UnitTests
             histogram.GetPercentileAtOrBelowValue(500_000).Should().BeApproximately(50.0, 0.1);
         }
 
+        [Fact]
+        public void GetPercentileAtOrBelowValue_ZeroValue_WithPositiveRecordedValues_ReturnsZero()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(100);
+            histogram.RecordValue(1000);
+            // No recorded values are <= 0, so should return 0.0
+            histogram.GetPercentileAtOrBelowValue(0).Should().Be(0.0);
+        }
+
+        [Fact]
+        public void GetPercentileAtOrBelowValue_NegativeValue_ReturnsZero()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(100);
+            histogram.RecordValue(1000);
+            // Negative values are below any trackable range, so should return 0.0
+            histogram.GetPercentileAtOrBelowValue(-1).Should().Be(0.0);
+            histogram.GetPercentileAtOrBelowValue(long.MinValue).Should().Be(0.0);
+        }
+
         private void CreateAndAdd(HistogramBase source)
         {
             source.RecordValueWithCount(1, 100);

@@ -392,11 +392,15 @@ namespace HdrHistogram
         /// This is the inverse of <see cref="GetValueAtPercentile"/>.
         /// All values within the same equivalent-value range map to the same percentile.
         /// </summary>
-        /// <param name="value">The value to find the percentile for</param>
+        /// <param name="value">The value to find the percentile for.</param>
         /// <returns>The percentage of recorded values that are less than or equal to <paramref name="value"/>, in the range <c>[0.0, 100.0]</c>. Returns <c>0.0</c> if no values have been recorded, or <c>100.0</c> if the value is at or above the highest trackable value.</returns>
         public double GetPercentileAtOrBelowValue(long value)
         {
             if (TotalCount == 0)
+            {
+                return 0.0;
+            }
+            if (value < 0)
             {
                 return 0.0;
             }
