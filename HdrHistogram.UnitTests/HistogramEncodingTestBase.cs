@@ -30,6 +30,25 @@ namespace HdrHistogram.UnitTests
             HistogramAssert.AreValueEqual(source, result);
         }
 
+        [Theory]
+        [InlineData(1, 10000)]
+        [InlineData(2, 10000)]
+        [InlineData(3, 10000)]
+        [InlineData(4, 10000)]
+        [InlineData(5, 10000)]
+        [InlineData(4, 50000)]
+        public void Given_varying_significant_digits_When_compressed_encoded_and_decoded_Then_data_is_preserved(int significantDigits, int valueCount)
+        {
+            var highestTrackableValue = 3600L * 1000 * 1000 * 1000;
+            var source = Create(highestTrackableValue, significantDigits);
+            for (long i = 0; i < valueCount; i++)
+            {
+                source.RecordValue(i * 1000);
+            }
+            var result = CompressedEncodeDecode(source);
+            HistogramAssert.AreValueEqual(source, result);
+        }
+
         [Fact]
         public void Given_a_Histogram_populated_with_full_range_of_values_When_encoded_and_decoded_Then_data_is_preserved()
         {

@@ -83,7 +83,14 @@ namespace HdrHistogram.Utilities
         /// <returns>The number of bytes read.</returns>
         public int ReadFrom(System.IO.Stream source, int length)
         {
-            return source.Read(_internalBuffer, Position, length);
+            int totalRead = 0;
+            while (totalRead < length)
+            {
+                int bytesRead = source.Read(_internalBuffer, Position + totalRead, length - totalRead);
+                if (bytesRead == 0) break;
+                totalRead += bytesRead;
+            }
+            return totalRead;
         }
 
         /// <summary>
