@@ -20,3 +20,5 @@ Include tasks for:
 
 Use `[ ]` for each task. 
 Validate the task list is complete by cross-referencing every acceptance criterion in the brief — each criterion must be covered by at least one task.
+
+Any task that attempts to alter the ./.github folder will likely fail due to permissions restrictions. These changes should accompany the PR as an attached file with clear direction on the manual intervention required to complete the work. 
