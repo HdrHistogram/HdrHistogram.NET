@@ -388,6 +388,42 @@ namespace HdrHistogram
         }
 
         /// <summary>
+        /// Get the percentile at or below a given value.
+        /// This is the inverse of <see cref="GetValueAtPercentile"/>.
+        /// All values within the same equivalent-value range map to the same percentile.
+        /// </summary>
+        /// <param name="value">The value to find the percentile for.</param>
+        /// <returns>The percentage of recorded values that are less than or equal to <paramref name="value"/>, in the range <c>[0.0, 100.0]</c>. Returns <c>0.0</c> if no values have been recorded, or <c>100.0</c> if the value is at or above the highest trackable value.</returns>
+        public double GetPercentileAtOrBelowValue(long value)
+        {
+            if (TotalCount == 0)
+            {
+                return 0.0;
+            }
+            if (value < 0)
+            {
+                return 0.0;
+            }
+            var bucketIndex = GetBucketIndex(value);
+            var subBucketIndex = GetSubBucketIndex(value, bucketIndex);
+            if (bucketIndex >= BucketCount)
+            {
+                return 100.0;
+            }
+            long runningCount = 0;
+            for (var i = 0; i <= bucketIndex; i++)
+            {
+                var jStart = (i == 0) ? 0 : (SubBucketCount / 2);
+                var jEnd = (i == bucketIndex) ? subBucketIndex : (SubBucketCount - 1);
+                for (var j = jStart; j <= jEnd; j++)
+                {
+                    runningCount += GetCountAt(i, j);
+                }
+            }
+            return Math.Min(100.0, (100.0 * runningCount) / TotalCount);
+        }
+
+        /// <summary>
         /// Get the count of recorded values at a specific value
         /// </summary>
         /// <param name="value">The value for which to provide the recorded count</param>
