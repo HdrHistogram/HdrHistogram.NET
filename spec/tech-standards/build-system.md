@@ -22,26 +22,28 @@ HdrHistogram.sln
 ### Main Library (HdrHistogram.csproj)
 
 ```xml
-<TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+<TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.0</TargetFrameworks>
 ```
 
 | Target | Description |
 |--------|-------------|
-| `net8.0` | Modern .NET (primary target) |
+| `net10.0` | Modern .NET (current LTS target) |
+| `net9.0` | Modern .NET (STS target) |
+| `net8.0` | Modern .NET (LTS target) |
 | `netstandard2.0` | Broad compatibility (.NET Framework 4.6.1+, .NET Core 2.0+) |
 
 ### Test Project
 
 ```xml
-<TargetFramework>net8.0</TargetFramework>
+<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
 ```
 
 ### Benchmarking Project
 
-Targets the current LTS runtime only (developer tool, not a shipped library):
+Targets all supported modern runtimes (developer tool, not a shipped library):
 
 ```xml
-<TargetFrameworks>net8.0</TargetFrameworks>
+<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
 ```
 
 ## Dependencies
@@ -63,8 +65,8 @@ Targets the current LTS runtime only (developer tool, not a shipped library):
 ### Benchmarking Project
 
 ```xml
-<PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-<PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
+<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+<PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.8" />
 ```
 
 ## Package Metadata
@@ -224,7 +226,9 @@ dotnet run -c Release -- -f *Recording*
 ### Benchmark Configuration
 
 BenchmarkDotNet is used with these targets:
-- `net8.0` (current LTS runtime)
+- `net10.0` (current LTS runtime)
+- `net9.0` (STS runtime)
+- `net8.0` (LTS runtime)
 - Windows diagnostics support
 - Memory allocation tracking
 
@@ -251,7 +255,7 @@ HdrHistogram/bin/{Configuration}/{TargetFramework}/
 
 ### Prerequisites
 
-- .NET 8.0 SDK (or later)
+- .NET 10.0 SDK (or later)
 - Visual Studio 2022 (optional, for IDE development)
 - Git
 
