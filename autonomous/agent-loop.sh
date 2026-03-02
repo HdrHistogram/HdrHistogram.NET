@@ -7,12 +7,53 @@ UPSTREAM_REPO="${UPSTREAM_REPO}"
 UPSTREAM_BASE_BRANCH="${UPSTREAM_BASE_BRANCH:-main}"
 PROMPT_DIR="${PROMPT_DIR:-/usr/local/share/agent-prompts}"
 
+push_or_defer_workflows() {
+    local branch="$1"
+    local push_stderr
+
+    # Attempt the push, capturing stderr
+    if push_stderr=$(git push -u origin "$branch" 2>&1); then
+        return 0
+    fi
+
+    # Check if the failure is workflow-related
+    if ! echo "$push_stderr" | grep -qi "workflow"; then
+        echo "ERROR: git push failed: $push_stderr" >&2
+        return 1
+    fi
+
+    echo "WARNING: push rejected due to workflow file permissions, deferring workflow changes" >&2
+
+    # Save the workflow diff against upstream base
+    git diff "upstream/$UPSTREAM_BASE_BRANCH" -- .github/workflows/ > /tmp/workflow_changes.diff
+
+    if [ ! -s /tmp/workflow_changes.diff ]; then
+        echo "ERROR: workflow rejection detected but no workflow diff found" >&2
+        return 1
+    fi
+
+    # Restore .github/workflows/ to upstream state
+    rm -rf .github/workflows
+    git checkout "upstream/$UPSTREAM_BASE_BRANCH" -- .github/workflows/ 2>/dev/null || true
+    git add -A
+    git commit --amend --no-edit
+
+    # Retry the push
+    if ! push_stderr=$(git push -u origin "$branch" 2>&1); then
+        echo "ERROR: git push failed after stripping workflow changes: $push_stderr" >&2
+        return 1
+    fi
+
+    echo "WARNING: workflow changes deferred to /tmp/workflow_changes.diff" >&2
+    return 0
+}
+
 sync_state() {
     local msg="${1:-agent: update plan state}"
     git add -A
     if ! git diff --cached --quiet; then
         git commit -m "$msg"
-        git push -u origin "$(git branch --show-current)"
+        push_or_defer_workflows "$(git branch --show-current)"
     fi
 }
 
@@ -70,7 +111,7 @@ case "$STATE" in
         git add -A
         git diff --cached --quiet || git commit -m "feat(#${ISSUE_NUM}): complete implementation"
 
-        if ! git push origin "$BRANCH"; then
+        if ! push_or_defer_workflows "$BRANCH"; then
             echo "ERROR: git push failed, restoring plan state" >&2
             cp -r /tmp/plan-backup ./plan 2>/dev/null || true
             exit 1
@@ -113,6 +154,27 @@ Closes #${ISSUE_NUM}"
         if [ -n "$ISSUE_NUM" ]; then
             GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue comment "$ISSUE_NUM" \
                 --repo "$UPSTREAM_REPO" --body "PR created: $PR_URL"
+        fi
+
+        # Post deferred workflow changes as a PR comment
+        if [ -s /tmp/workflow_changes.diff ]; then
+            DIFF_CONTENT=$(cat /tmp/workflow_changes.diff)
+            WORKFLOW_COMMENT=$(cat <<EOF
+:warning: **Workflow file changes require manual application**
+
+The agent's PAT lacks the \`workflow\` scope needed to push changes under \`.github/workflows/\`.
+Please apply the following diff manually:
+
+\`\`\`diff
+${DIFF_CONTENT}
+\`\`\`
+EOF
+)
+            PR_NUMBER=$(echo "$PR_URL" | grep -oP '\d+$')
+            GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr comment "$PR_NUMBER" \
+                --repo "$UPSTREAM_REPO" --body "$WORKFLOW_COMMENT"
+            rm -f /tmp/workflow_changes.diff
+            echo "WARNING: workflow changes posted as PR comment"
         fi
 
         # Clean up backup after successful PR creation
