@@ -18,6 +18,7 @@ None of these require behaviour changes — they are annotation, style, and API-
 | `HdrHistogram/Iteration/AbstractHistogramEnumerator.cs` | 38 | CS8618 | `public HistogramIterationValue Current { get; private set; }` not set in ctor | Initialise `Current = new HistogramIterationValue();` in constructor |
 | `HdrHistogram/Recorder.cs` | 134 | CS8625 | `return GetIntervalHistogram(null)` passes null to non-nullable param | Change `histogramToRecycle` param and `_inactiveHistogram` field to nullable (`HistogramBase?`) |
 | `HdrHistogram/Recorder.cs` | 159 | CS8625 | `_inactiveHistogram = null` on non-nullable field | Same fix as above; use `sampledHistogram!` null-forgiving on return since post-`PerformIntervalSample()` the value is guaranteed non-null |
+| `HdrHistogram/Recorder.cs` | 175 | CS8602 | `_inactiveHistogram.CopyInto(targetHistogram)` after `PerformIntervalSample()` | `_inactiveHistogram!.CopyInto(targetHistogram)` — safe because `PerformIntervalSample()` always ensures non-null before returning (creates a new histogram if field is null, and runs under the same lock) |
 | `HdrHistogram/Utilities/TypeHelper.cs` | 22–23 | CS8603 | `FirstOrDefault(...)` returns nullable but method signature is `ConstructorInfo` | Change return type to `ConstructorInfo?` |
 
 ### String comparison locale warnings
@@ -53,7 +54,7 @@ None of these require behaviour changes — they are annotation, style, and API-
 |------|------|---------|--------------|--------------|
 | `HdrHistogram/HistogramFactoryDelegate.cs` | 18 | CA1711 | `public delegate … HistogramFactoryDelegate` | Rename to `HistogramFactory` — **breaking public API change; see Risks** |
 | `HdrHistogram/HistogramEncoding.cs` | 242 | CA2201 | `throw new IndexOutOfRangeException()` | Replace with `throw new InvalidOperationException(…)` (reserved by runtime) |
-| `HdrHistogram/Utilities/ByteBuffer.cs` | 198 | CA1510 | Manual `if (value == null) throw new ArgumentNullException(…)` | `ArgumentNullException.ThrowIfNull(value)` |
+| `HdrHistogram/Utilities/ByteBuffer.cs` | 198 | CA1510 | Manual `if (value == null) throw new ArgumentNullException(…)` | Suppress with `#pragma warning disable CA1510` — `ArgumentNullException.ThrowIfNull` requires .NET 6+, not available on `netstandard2.0` target |
 
 ## Acceptance Criteria
 
@@ -91,8 +92,10 @@ Recommended approach: **suppress** for this issue (scope is warnings only, not A
 ### `ArgumentNullException.ThrowIfNull` target framework
 
 `ArgumentNullException.ThrowIfNull` was introduced in .NET 6.
-The project targets `netstandard2.0` and `net6.0` (check `.csproj`/`Directory.Build.props`).
-If `netstandard2.0` is a target, the call must be guarded with `#if NET6_0_OR_GREATER` or a polyfill, or the warning should be suppressed for the netstandard build.
+The project targets both `net8.0` and `netstandard2.0` (confirmed in `HdrHistogram.csproj` and `Directory.Build.props`), so the API is not available on the `netstandard2.0` target.
+
+**Resolution:** Suppress CA1510 with `#pragma warning disable CA1510` at the call site and leave the existing manual null-check in place.
+Do not use `#if NET6_0_OR_GREATER` — it adds complexity for a trivial guard that already works correctly.
 
 ### `string?` propagation in `HistogramLogReader.ParseTag`
 
