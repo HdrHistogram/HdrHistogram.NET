@@ -42,8 +42,8 @@ namespace HdrHistogram.Utilities
     {
         private readonly object _readerLock = new object();
 
-        private long _startEpoch = 0;
-        private long _evenEndEpoch = 0;
+        private long _startEpoch;
+        private long _evenEndEpoch;
         private long _oddEndEpoch = long.MinValue;
 
         private static long GetAndIncrement(ref long value)

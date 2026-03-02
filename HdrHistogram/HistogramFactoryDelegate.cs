@@ -15,6 +15,8 @@ namespace HdrHistogram
     /// The number of significant decimal digits to which the histogram will maintain value resolution and separation. 
     /// Must be a non-negative integer between 0 and 5.
     /// </param>
+#pragma warning disable CA1711
     public delegate HistogramBase HistogramFactoryDelegate(
         long instanceId, long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits);
+#pragma warning restore CA1711
 }

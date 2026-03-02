@@ -195,10 +195,12 @@ namespace HdrHistogram.Utilities
         /// </exception>
         private static void CheckByteArgument(byte[] value, int startIndex, int bytesRequired)
         {
+#pragma warning disable CA1510
             if (value == null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
+#pragma warning restore CA1510
             if (startIndex < 0 || startIndex > value.Length - bytesRequired)
             {
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
