@@ -20,12 +20,13 @@ None of these require behaviour changes — they are annotation, style, and API-
 | `HdrHistogram/Recorder.cs` | 159 | CS8625 | `_inactiveHistogram = null` on non-nullable field | Same fix as above; use `sampledHistogram!` null-forgiving on return since post-`PerformIntervalSample()` the value is guaranteed non-null |
 | `HdrHistogram/Recorder.cs` | 175 | CS8602 | `_inactiveHistogram.CopyInto(targetHistogram)` after `PerformIntervalSample()` | `_inactiveHistogram!.CopyInto(targetHistogram)` — safe because `PerformIntervalSample()` always ensures non-null before returning (creates a new histogram if field is null, and runs under the same lock) |
 | `HdrHistogram/Utilities/TypeHelper.cs` | 22–23 | CS8603 | `FirstOrDefault(...)` returns nullable but method signature is `ConstructorInfo` | Change return type to `ConstructorInfo?` |
+| `HdrHistogram/HistogramBase.cs` | `Tag` property | CS8618 (secondary) | `public string Tag { get; set; }` | `public string? Tag { get; set; }` — required because the nullable backing field `_tag` makes a non-nullable getter return type a compiler error; all callers of `Tag` must handle a possible null return |
 
 ### String comparison locale warnings
 
 | File | Lines | Warning | Current code | Required fix |
 |------|-------|---------|--------------|--------------|
-| `HdrHistogram/HistogramLogReader.cs` | 242 | CA1310/CA1866 | `line.StartsWith("#")` | Use char overload: `line.StartsWith('#')` |
+| `HdrHistogram/HistogramLogReader.cs` | 242 | CA1310/CA1866 | `line.StartsWith("#")` | `line.StartsWith("#", StringComparison.Ordinal)` — **not** the char overload (`string.StartsWith(char)` requires .NET Standard 2.1+, unavailable on `netstandard2.0`; ordinal comparison satisfies CA1310 and avoids CA1866 on both targets) |
 | `HdrHistogram/HistogramLogReader.cs` | 247 | CA1310 | `line.StartsWith("#[StartTime: ")` | Add `StringComparison.Ordinal` |
 | `HdrHistogram/HistogramLogReader.cs` | 252 | CA1310 | `line.StartsWith("#[BaseTime: ")` | Add `StringComparison.Ordinal` |
 | `HdrHistogram/HistogramLogReader.cs` | 258 | CA1309 | `line.Equals(legend)` | `string.Equals(line, legend, StringComparison.Ordinal)` |
@@ -105,6 +106,5 @@ Verify that the callers already handle null correctly at runtime.
 
 ### `HistogramBase._tag` nullability and the `Tag` property setter
 
-The `Tag` property setter currently accepts any string (including empty).
-After marking `_tag` as `string?`, the getter return type should also become `string?` to stay consistent.
-Verify that all callers of `Tag` handle a possible null return.
+The getter return type change is captured in the Affected Files table above.
+Verify that all callers of `Tag` already handle a possible null return at runtime.
