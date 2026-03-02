@@ -53,6 +53,36 @@ namespace HdrHistogram.UnitTests.Persistence
             HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
         }
 
+        [Theory]
+        [InlineData(1, 1000)]
+        [InlineData(2, 1000)]
+        [InlineData(3, 1000)]
+        [InlineData(4, 1000)]
+        [InlineData(5, 1000)]
+        [InlineData(1, 10000)]
+        [InlineData(2, 10000)]
+        [InlineData(3, 10000)]
+        [InlineData(4, 10000)]
+        [InlineData(5, 10000)]
+        [InlineData(4, 50000)]
+        [InlineData(5, 50000)]
+        public void CanRoundTripSingleHistogramWithVaryingSignificantDigits(int significantDigits, int valueCount)
+        {
+            var highestTrackableValue = OneHourOfNanoseconds;
+            var histogram = Create(highestTrackableValue, significantDigits);
+            for (long i = 0; i < valueCount; i++)
+            {
+                histogram.RecordValue(i * 1000);
+            }
+
+            histogram.SetTimes();
+            var data = histogram.WriteLog();
+            var actualHistograms = data.ReadHistograms();
+
+            Assert.Single(actualHistograms);
+            HistogramAssert.AreValueEqual(histogram, actualHistograms.Single());
+        }
+
         protected void RoundTripSingleHistogramsWithFullRangesOfCountsAndValues(long count)
         {
             var value = 1;
