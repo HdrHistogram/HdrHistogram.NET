@@ -2,8 +2,11 @@
 # HdrHistogram.NET Agent Container
 # .NET SDK + Claude Code + gh CLI + firewall
 # =============================================================================
-FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim
 RUN dotnet_version=8.0 \
+    && curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin \
+       --runtime dotnet --channel $dotnet_version --install-dir /usr/share/dotnet \
+    && dotnet_version=9.0 \
     && curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin \
        --runtime dotnet --channel $dotnet_version --install-dir /usr/share/dotnet
 
