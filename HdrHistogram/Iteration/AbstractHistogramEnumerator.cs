@@ -35,7 +35,7 @@ namespace HdrHistogram.Iteration
         protected long TotalCountToCurrentIndex { get; private set; }
         protected long CountAtThisValue { get; private set; }
 
-        public HistogramIterationValue Current { get; private set; }
+        public HistogramIterationValue Current => _currentIterationValue;
 
         protected AbstractHistogramEnumerator(HistogramBase histogram)
         {
@@ -55,7 +55,6 @@ namespace HdrHistogram.Iteration
             CountAtThisValue = 0;
             _freshSubBucket = true;
             _currentIterationValue = new HistogramIterationValue();
-            Current = new HistogramIterationValue();
         }
 
         /// <summary>
@@ -161,7 +160,7 @@ namespace HdrHistogram.Iteration
             var canMove = HasNext();
             if (canMove)
             {
-                Current = Next();
+                Next();
             }
             return canMove;
         }
