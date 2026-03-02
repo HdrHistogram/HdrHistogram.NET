@@ -240,7 +240,11 @@ namespace HdrHistogram
 
         private static bool IsComment(string line)
         {
+#if NETSTANDARD2_0
             return line.StartsWith("#", StringComparison.Ordinal);
+#else
+            return line.StartsWith('#');
+#endif
         }
 
         private static bool IsStartTime(string line)
