@@ -361,6 +361,41 @@ namespace HdrHistogram.UnitTests
             Assert.Throws<ArgumentException>(() => histogram.Tag = invalidTagValue);
         }
 
+        [Fact]
+        public void RecordValue_WhenValueIsNegative_ThrowsArgumentOutOfRangeException()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => histogram.RecordValue(-1));
+            ex.Message.Should().Contain("non-negative");
+            ex.Message.Should().Contain("-1");
+        }
+
+        [Fact]
+        public void RecordValue_WhenValueIsZero_Succeeds()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(0);
+            histogram.TotalCount.Should().Be(1);
+        }
+
+        [Fact]
+        public void RecordValueWithCount_WhenValueIsNegative_ThrowsArgumentOutOfRangeException()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => histogram.RecordValueWithCount(-1, 1));
+            ex.Message.Should().Contain("non-negative");
+            ex.Message.Should().Contain("-1");
+        }
+
+        [Fact]
+        public void RecordValueWithExpectedInterval_WhenValueIsNegative_ThrowsArgumentOutOfRangeException()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => histogram.RecordValueWithExpectedInterval(-1, 1000));
+            ex.Message.Should().Contain("non-negative");
+            ex.Message.Should().Contain("-1");
+        }
+
         private void CreateAndAdd(HistogramBase source)
         {
             source.RecordValueWithCount(1, 100);

@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Diagnostics;
 
 namespace HdrHistogram.Utilities
 {
@@ -101,6 +102,7 @@ namespace HdrHistogram.Utilities
 
             private static int Log2(int i)
             {
+                Debug.Assert(i >= 0, "Log2 called with a negative value; caller must validate.");
                 if (i >= 0x1000000) { return Lookup[i >> 24] + 24; }
                 if (i >= 0x10000) { return Lookup[i >> 16] + 16; }
                 if (i >= 0x100) { return Lookup[i >> 8] + 8; }

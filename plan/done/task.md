@@ -2,7 +2,7 @@
 
 ## Implementation
 
-- [ ] **HistogramBase.cs — Add guard in `GetBucketIndex` (static overload, line 684)**
+- [x] **HistogramBase.cs — Add guard in `GetBucketIndex` (static overload, line 684)**
   - File: `HdrHistogram/HistogramBase.cs`
   - Change: At the start of the static `GetBucketIndex(long value, long subBucketMask, int bucketIndexOffset)` method, add:
     ```csharp
@@ -13,7 +13,7 @@
   - Why: This is the single choke-point for all callers — `RecordSingleValue`, `RecordValueWithCount`, and every query method that calls `GetBucketIndex`. One guard protects all paths.
   - Verify: The three `RecordValue*` methods and the three query methods (`SizeOfEquivalentValueRange`, `LowestEquivalentValue`, `GetCountAtValue`) all reach this method before touching `Bitwise`; the new guard will be hit first.
 
-- [ ] **Bitwise.cs — Add defensive `Debug.Assert` in `Imperative.Log2` (line ~102)**
+- [x] **Bitwise.cs — Add defensive `Debug.Assert` in `Imperative.Log2` (line ~102)**
   - File: `HdrHistogram/Utilities/Bitwise.cs`
   - Change: At the top of `Imperative.Log2(int i)`, add:
     ```csharp
@@ -24,25 +24,25 @@
 
 ## Tests — Shared Base (covers all histogram types)
 
-- [ ] **HistogramTestBase.cs — Add `RecordValue_WhenValueIsNegative_ThrowsArgumentOutOfRangeException`**
+- [x] **HistogramTestBase.cs — Add `RecordValue_WhenValueIsNegative_ThrowsArgumentOutOfRangeException`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`
   - Change: Add a `[Fact]` test that calls `RecordValue(-1)` on the default histogram and asserts an `ArgumentOutOfRangeException` is thrown whose message contains both `"non-negative"` and `"-1"`.
   - Why: Covers acceptance criterion — `RecordValue` with a negative value must throw `ArgumentOutOfRangeException` with a message containing `"non-negative"` and the value string.
   - Verify: Test appears in the test runner output for `ShortHistogramTests`, `IntHistogramTests`, and `LongHistogramTests` (all inherit from the base).
 
-- [ ] **HistogramTestBase.cs — Add `RecordValue_WhenValueIsZero_Succeeds`**
+- [x] **HistogramTestBase.cs — Add `RecordValue_WhenValueIsZero_Succeeds`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`
   - Change: Add a `[Fact]` test that calls `RecordValue(0)` and asserts no exception is thrown and `TotalCount` equals `1`.
   - Why: Covers acceptance criterion — zero is a valid measurement and must not be rejected by the guard.
   - Verify: Test passes; `TotalCount` is `1` after a single `RecordValue(0)` call.
 
-- [ ] **HistogramTestBase.cs — Add `RecordValueWithCount_WhenValueIsNegative_ThrowsArgumentOutOfRangeException`**
+- [x] **HistogramTestBase.cs — Add `RecordValueWithCount_WhenValueIsNegative_ThrowsArgumentOutOfRangeException`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`
   - Change: Add a `[Fact]` test that calls `RecordValueWithCount(-1, 1)` and asserts an `ArgumentOutOfRangeException` is thrown whose message contains `"non-negative"` and `"-1"`.
   - Why: Covers acceptance criterion — `RecordValueWithCount` calls `GetBucketIndex` directly (not via `RecordSingleValue`); the guard must fire on this path too.
   - Verify: Test appears for all concrete histogram types and the exception message matches.
 
-- [ ] **HistogramTestBase.cs — Add `RecordValueWithExpectedInterval_WhenValueIsNegative_ThrowsArgumentOutOfRangeException`**
+- [x] **HistogramTestBase.cs — Add `RecordValueWithExpectedInterval_WhenValueIsNegative_ThrowsArgumentOutOfRangeException`**
   - File: `HdrHistogram.UnitTests/HistogramTestBase.cs`
   - Change: Add a `[Fact]` test that calls `RecordValueWithExpectedInterval(-1, 1000)` and asserts an `ArgumentOutOfRangeException` is thrown whose message contains `"non-negative"` and `"-1"`.
   - Why: Covers acceptance criterion — `RecordValueWithExpectedInterval` delegates through `RecordValueWithCountAndExpectedInterval` → `RecordValueWithCount` → `GetBucketIndex`; the guard must fire on this path.
@@ -50,7 +50,7 @@
 
 ## Tests — Concrete Reproducer (LongHistogram-specific)
 
-- [ ] **LongHistogramTests.cs — Add `RecordValue_NegativeDelta_ThrowsArgumentOutOfRangeException`**
+- [x] **LongHistogramTests.cs — Add `RecordValue_NegativeDelta_ThrowsArgumentOutOfRangeException`**
   - File: `HdrHistogram.UnitTests/LongHistogramTests.cs`
   - Change: Add a `[Fact]` test that:
     1. Creates a `LongHistogram` via `HistogramFactory.With64BitBucketSize().WithValuesUpTo((long)TimeSpan.FromMinutes(15).TotalMilliseconds).WithPrecisionOf(3).Create()`.

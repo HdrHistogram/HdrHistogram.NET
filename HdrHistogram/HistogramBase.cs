@@ -683,6 +683,9 @@ namespace HdrHistogram
         }
         private static int GetBucketIndex(long value, long subBucketMask, int bucketIndexOffset)
         {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), value,
+                    $"Histogram recorded values must be non-negative. Got: {value}");
             var leadingZeros = Bitwise.NumberOfLeadingZeros(value | subBucketMask); // smallest power of 2 containing value
             return bucketIndexOffset - leadingZeros;
         }
