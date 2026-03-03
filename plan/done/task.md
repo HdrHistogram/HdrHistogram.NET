@@ -12,7 +12,7 @@ All tasks related to that file are handled by preparing an attachment and manual
 
 ### Preparation
 
-- [ ] **T1 — Dry-run format check locally**
+- [x] **T1 — Dry-run format check locally**
   - **File:** repo root (runs against `HdrHistogram.sln`)
   - **Change:** Execute `dotnet format --verify-no-changes --verbosity diagnostic` from `/workspace/repo` and confirm exit code is `0`.
   - **Why:** Acceptance criterion 4 — CI must pass on the current codebase.
@@ -24,7 +24,7 @@ All tasks related to that file are handled by preparing an attachment and manual
 > **Note:** The `.github/` directory cannot be edited directly in this environment.
 > Tasks T2–T4 produce an attachment file and instructions that a maintainer must apply manually.
 
-- [ ] **T2 — Create patch file for `ci.yml`**
+- [x] **T2 — Create patch file for `ci.yml`**
   - **File:** Create `plan/ready/ci-format-step.patch` (or `plan/ready/ci.yml.proposed`) containing the full proposed `ci.yml` content with the new step inserted.
   - **Change:** Insert the following step between `dotnet restore` and `dotnet build` in the `jobs.build.steps` array:
     ```yaml
@@ -34,7 +34,7 @@ All tasks related to that file are handled by preparing an attachment and manual
   - **Why:** Provides the maintainer with a ready-to-apply artefact rather than relying on prose instructions alone.
   - **Verification:** File exists at `plan/ready/ci.yml.proposed`; diff against current `ci.yml` shows exactly one new step inserted in the correct position.
 
-- [ ] **T3 — Create manual-intervention instructions file**
+- [x] **T3 — Create manual-intervention instructions file**
   - **File:** Create `plan/ready/manual-intervention.md`
   - **Change:** Document the exact steps a maintainer must follow:
     1. Copy `plan/ready/ci.yml.proposed` to `.github/workflows/ci.yml` (or apply the diff).
@@ -44,7 +44,7 @@ All tasks related to that file are handled by preparing an attachment and manual
   - **Why:** Satisfies the project requirement that `.github/` changes be accompanied by explicit manual-intervention directions.
   - **Verification:** File exists at `plan/ready/manual-intervention.md` and covers all four points above.
 
-- [ ] **T4 — Validate step content satisfies all acceptance criteria**
+- [x] **T4 — Validate step content satisfies all acceptance criteria**
   - **File:** `plan/ready/ci.yml.proposed` (review only)
   - **Change:** Cross-check the proposed file against every acceptance criterion:
     - AC1: `dotnet format --verify-no-changes` is present. ✓

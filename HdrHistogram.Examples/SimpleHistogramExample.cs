@@ -21,7 +21,7 @@ namespace HdrHistogram.Examples
     static class SimpleHistogramExample
     {
         private static readonly LongHistogram Histogram = new LongHistogram(TimeStamp.Hours(1), 3);
-        private static volatile Socket _socket;
+        private static volatile Socket _socket = null!;
         private static readonly Lazy<AddressFamily> AddressFamily = new Lazy<AddressFamily>(() => GetAddressFamily("google.com"));
 
         private static readonly TimeSpan RunPeriod = TimeSpan.FromSeconds(10);

@@ -321,7 +321,7 @@ namespace HdrHistogram.UnitTests.Persistence
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);
             return GetType().GetTypeInfo()
                 .Assembly
-                .GetManifestResourceStream(fileName);
+                .GetManifestResourceStream(fileName)!;
         }
 
         protected abstract HistogramBase Create(long highestTrackableValue, int numberOfSignificantValueDigits);
