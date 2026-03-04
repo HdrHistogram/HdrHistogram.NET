@@ -22,6 +22,8 @@ jobs:
           cache-dependency-path: '**/*.csproj'
 
       - run: dotnet restore
+      - name: Check code formatting
+        run: dotnet format --verify-no-changes --verbosity diagnostic
       - run: dotnet build -c Release --no-restore /p:Version=${{ env.SEMVER }}
       - run: dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj --no-build -c Release
       - run: dotnet pack ./HdrHistogram/HdrHistogram.csproj -c Release --no-build --include-symbols --no-restore /p:Version=${{ env.SEMVER }}
