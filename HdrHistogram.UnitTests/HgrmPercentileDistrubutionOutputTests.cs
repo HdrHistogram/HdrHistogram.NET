@@ -85,7 +85,7 @@ namespace HdrHistogram.UnitTests
             var fileName = string.Format(CultureInfo.InvariantCulture, "HdrHistogram.UnitTests.Resources.{0}", filename);
             return GetType().GetTypeInfo()
                 .Assembly
-                .GetManifestResourceStream(fileName);
+                .GetManifestResourceStream(fileName)!;
         }
 
         private string GetEmbeddedFileText(string filename)

@@ -47,7 +47,7 @@ namespace HdrHistogram.Examples
                 .WithThreadSafeReads()                  //returns a Recorder that wraps the LongConcurrentHistogram
                 .Create();
 
-            var outputThread = new Thread(ts => WriteToDisk((Recorder)ts));
+            var outputThread = new Thread(ts => WriteToDisk((Recorder)ts!));
             outputThread.Start(recorder);
 
             RecordMeasurements(recorder);
