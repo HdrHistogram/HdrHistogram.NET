@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.Utilities
+namespace HdrHistogram.Utilities
 {
     /// <summary>
     /// Extension methods for Arrays.

@@ -1,4 +1,4 @@
-﻿using HdrHistogram.Utilities;
+using HdrHistogram.Utilities;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -21,7 +21,7 @@ namespace HdrHistogram
     {
         private readonly WriterReaderPhaser _wrp = new WriterReaderPhaser();
         private readonly AtomicLongArray _counts;
-        private long _totalCount = 0L;
+        private long _totalCount;
 
 
         /// <summary>

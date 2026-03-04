@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This is a .NET port of the original Java version, which was written by
  * Gil Tene as described in
  * https://github.com/HdrHistogram/HdrHistogram
@@ -42,8 +42,8 @@ namespace HdrHistogram.Utilities
     {
         private readonly object _readerLock = new object();
 
-        private long _startEpoch = 0;
-        private long _evenEndEpoch = 0;
+        private long _startEpoch;
+        private long _evenEndEpoch;
         private long _oddEndEpoch = long.MinValue;
 
         private static long GetAndIncrement(ref long value)

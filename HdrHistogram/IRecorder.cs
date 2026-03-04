@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram
+namespace HdrHistogram
 {
     /// <summary>
     /// Provides methods to record values.

@@ -40,7 +40,7 @@ namespace HdrHistogram.Utilities
             ulong testValue = (ulong)value;
             return System.Numerics.BitOperations.LeadingZeroCount(testValue);
 
-        }        
+        }
 #endif
 
         //Code has been tested and taken from :

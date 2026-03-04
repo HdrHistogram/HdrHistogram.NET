@@ -1,4 +1,4 @@
-﻿namespace HdrHistogram.Encoding
+namespace HdrHistogram.Encoding
 {
     internal sealed class RecordedData : IRecordedData
     {

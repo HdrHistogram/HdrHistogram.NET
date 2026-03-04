@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HdrHistogram.Persistence
@@ -8,7 +8,7 @@ namespace HdrHistogram.Persistence
     /// </summary>
     public static class CountsDecoder
     {
-        private static readonly IDictionary<int, ICountsDecoder> Decoders;
+        private static readonly Dictionary<int, ICountsDecoder> Decoders;
 
         static CountsDecoder()
         {

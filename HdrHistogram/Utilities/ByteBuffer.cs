@@ -83,7 +83,14 @@ namespace HdrHistogram.Utilities
         /// <returns>The number of bytes read.</returns>
         public int ReadFrom(System.IO.Stream source, int length)
         {
-            return source.Read(_internalBuffer, Position, length);
+            int totalRead = 0;
+            while (totalRead < length)
+            {
+                int bytesRead = source.Read(_internalBuffer, Position + totalRead, length - totalRead);
+                if (bytesRead == 0) break;
+                totalRead += bytesRead;
+            }
+            return totalRead;
         }
 
         /// <summary>
@@ -188,10 +195,12 @@ namespace HdrHistogram.Utilities
         /// </exception>
         private static void CheckByteArgument(byte[] value, int startIndex, int bytesRequired)
         {
+#pragma warning disable CA1510
             if (value == null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
+#pragma warning restore CA1510
             if (startIndex < 0 || startIndex > value.Length - bytesRequired)
             {
                 throw new ArgumentOutOfRangeException(nameof(startIndex));

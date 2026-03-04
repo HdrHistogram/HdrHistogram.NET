@@ -2,14 +2,16 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(realpath "$SCRIPT_DIR/..")"
+ISSUE_NUMBER="${1:-}"
 
 # Load env
-if [ -f "$SCRIPT_DIR/.env" ]; then
-    set -a; source "$SCRIPT_DIR/.env"; set +a
+if [ -f "$REPO_ROOT/autonomous/.env" ]; then
+    set -a; source "$REPO_ROOT/autonomous/.env"; set +a
 fi
 
 # Build
-docker build -t hdrhistogram-agent -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR/"
+docker build -t hdrhistogram-agent -f "$REPO_ROOT/autonomous/Dockerfile" "$REPO_ROOT/autonomous/"
 echo "Built Docker image: hdrhistogram-agent"
 echo "Starting container with .env file and mounted nuget cache volume. Named 'hdrhistogram-agent-0'"
 
@@ -20,6 +22,7 @@ docker run --rm \
     --cap-add NET_RAW \
     --memory=4g \
     --cpus=2 \
-    --env-file "$SCRIPT_DIR/.env" \
+    --env-file "$REPO_ROOT/autonomous/.env" \
+    ${ISSUE_NUMBER:+-e ISSUE_NUMBER="$ISSUE_NUMBER"} \
     -v nuget-cache:/home/agent/.nuget/packages \
     hdrhistogram-agent

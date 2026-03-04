@@ -7,18 +7,60 @@ UPSTREAM_REPO="${UPSTREAM_REPO}"
 UPSTREAM_BASE_BRANCH="${UPSTREAM_BASE_BRANCH:-main}"
 PROMPT_DIR="${PROMPT_DIR:-/usr/local/share/agent-prompts}"
 
+push_or_defer_workflows() {
+    local branch="$1"
+    local push_stderr
+
+    # Attempt the push, capturing stderr
+    if push_stderr=$(git push -u origin "$branch" 2>&1); then
+        return 0
+    fi
+
+    # Check if the failure is workflow-related
+    if ! echo "$push_stderr" | grep -qi "workflow"; then
+        echo "ERROR: git push failed: $push_stderr" >&2
+        return 1
+    fi
+
+    echo "WARNING: push rejected due to workflow file permissions, deferring workflow changes" >&2
+
+    # Save the workflow diff against upstream base
+    git diff "upstream/$UPSTREAM_BASE_BRANCH" -- .github/workflows/ > /tmp/workflow_changes.diff
+
+    if [ ! -s /tmp/workflow_changes.diff ]; then
+        echo "ERROR: workflow rejection detected but no workflow diff found" >&2
+        return 1
+    fi
+
+    # Restore .github/workflows/ to upstream state
+    rm -rf .github/workflows
+    git checkout "upstream/$UPSTREAM_BASE_BRANCH" -- .github/workflows/ 2>/dev/null || true
+    git add -A
+    git commit --amend --no-edit
+
+    # Retry the push
+    if ! push_stderr=$(git push -u origin "$branch" 2>&1); then
+        echo "ERROR: git push failed after stripping workflow changes: $push_stderr" >&2
+        return 1
+    fi
+
+    echo "WARNING: workflow changes deferred to /tmp/workflow_changes.diff" >&2
+    return 0
+}
+
 sync_state() {
     local msg="${1:-agent: update plan state}"
     git add -A
     if ! git diff --cached --quiet; then
         git commit -m "$msg"
-        git push -u origin "$(git branch --show-current)"
+        push_or_defer_workflows "$(git branch --show-current)"
     fi
 }
 
 run_claude() {
     local prompt="$1"
-    timeout "$CLAUDE_TIMEOUT" claude --dangerously-skip-permissions --print "$prompt"
+    timeout "$CLAUDE_TIMEOUT" claude --dangerously-skip-permissions --print \
+        --output-format stream-json --verbose "$prompt"
 }
 
 load_prompt() {
@@ -69,13 +111,37 @@ case "$STATE" in
         git add -A
         git diff --cached --quiet || git commit -m "feat(#${ISSUE_NUM}): complete implementation"
 
-        if ! git push origin "$BRANCH"; then
+        if ! push_or_defer_workflows "$BRANCH"; then
             echo "ERROR: git push failed, restoring plan state" >&2
             cp -r /tmp/plan-backup ./plan 2>/dev/null || true
             exit 1
         fi
 
-        if ! PR_URL=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr create --fill \
+        PR_TITLE="feat(#${ISSUE_NUM}): $(gh issue view "$ISSUE_NUM" \
+            --repo "$UPSTREAM_REPO" --json title --jq .title)"
+
+        # Build PR body from plan artifacts
+        PR_BODY=""
+        if [ -f /tmp/plan-backup/done/brief.md ]; then
+            PR_BODY=$(cat /tmp/plan-backup/done/brief.md)
+        fi
+        if [ -f /tmp/plan-backup/done/task.md ]; then
+            PR_BODY="${PR_BODY}
+
+<details>
+<summary>Task breakdown</summary>
+
+$(cat /tmp/plan-backup/done/task.md)
+
+</details>"
+        fi
+        PR_BODY="${PR_BODY}
+
+Closes #${ISSUE_NUM}"
+
+        if ! PR_URL=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr create \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
             --repo "$UPSTREAM_REPO" \
             --head "${GIT_USER_NAME}:${BRANCH}" \
             --base "$UPSTREAM_BASE_BRANCH"); then
@@ -85,20 +151,30 @@ case "$STATE" in
             exit 1
         fi
 
-        PR_NUM=$(echo "$PR_URL" | grep -oP '\d+$')
-
-        [ -f /tmp/plan-backup/done/brief.md ] && \
-            GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr comment "$PR_NUM" \
-                --repo "$UPSTREAM_REPO" \
-                --body-file /tmp/plan-backup/done/brief.md
-        [ -f /tmp/plan-backup/done/task.md ] && \
-            GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr comment "$PR_NUM" \
-                --repo "$UPSTREAM_REPO" \
-                --body-file /tmp/plan-backup/done/task.md
-
         if [ -n "$ISSUE_NUM" ]; then
             GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue comment "$ISSUE_NUM" \
                 --repo "$UPSTREAM_REPO" --body "PR created: $PR_URL"
+        fi
+
+        # Post deferred workflow changes as a PR comment
+        if [ -s /tmp/workflow_changes.diff ]; then
+            DIFF_CONTENT=$(cat /tmp/workflow_changes.diff)
+            WORKFLOW_COMMENT=$(cat <<EOF
+:warning: **Workflow file changes require manual application**
+
+The agent's PAT lacks the \`workflow\` scope needed to push changes under \`.github/workflows/\`.
+Please apply the following diff manually:
+
+\`\`\`diff
+${DIFF_CONTENT}
+\`\`\`
+EOF
+)
+            PR_NUMBER=$(echo "$PR_URL" | grep -oP '\d+$')
+            GH_TOKEN="$GH_TOKEN_UPSTREAM" gh pr comment "$PR_NUMBER" \
+                --repo "$UPSTREAM_REPO" --body "$WORKFLOW_COMMENT"
+            rm -f /tmp/workflow_changes.diff
+            echo "WARNING: workflow changes posted as PR comment"
         fi
 
         # Clean up backup after successful PR creation
@@ -132,23 +208,33 @@ case "$STATE" in
         ;;
 
     pick-issue)
-        ISSUE_JSON=$(gh issue list --assignee @me --state open \
-            --repo "$UPSTREAM_REPO" \
-            --json number,title --limit 1 2>/dev/null || echo "[]")
-
-        if [ "$ISSUE_JSON" = "[]" ] || [ "$ISSUE_JSON" = "" ]; then
-            ISSUE_JSON=$(gh issue list --label agent --state open \
+        if [ -n "${ISSUE_NUMBER:-}" ]; then
+            # Issue pre-assigned by fleet.sh
+            ISSUE_NUM="$ISSUE_NUMBER"
+            ISSUE_TITLE=$(GH_TOKEN="$GH_TOKEN_UPSTREAM" gh issue view "$ISSUE_NUM" \
+                --repo "$UPSTREAM_REPO" --json title --jq .title)
+        else
+            # Self-select: assigned first, then labelled 'agent'
+            ISSUE_JSON=$(gh issue list --assignee @me --state open \
                 --repo "$UPSTREAM_REPO" \
-                --json number,title --limit 1 2>/dev/null || echo "[]")
-        fi
+                --json number,title --limit 1 \
+                --search "sort:created-asc" 2>/dev/null || echo "[]")
 
-        ISSUE_NUM=$(echo "$ISSUE_JSON" | jq -r '.[0].number // empty')
-        if [ -z "$ISSUE_NUM" ]; then
-            echo "No work available."
-            exit 0
-        fi
+            if [ "$ISSUE_JSON" = "[]" ] || [ "$ISSUE_JSON" = "" ]; then
+                ISSUE_JSON=$(gh issue list --label agent --state open \
+                    --repo "$UPSTREAM_REPO" \
+                    --json number,title --limit 1 \
+                    --search "sort:created-asc" 2>/dev/null || echo "[]")
+            fi
 
-        ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.[0].title')
+            ISSUE_NUM=$(echo "$ISSUE_JSON" | jq -r '.[0].number // empty')
+            if [ -z "$ISSUE_NUM" ]; then
+                echo "No work available."
+                exit 0
+            fi
+
+            ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.[0].title')
+        fi
         BRANCH_SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | \
             sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | head -c 40)
 

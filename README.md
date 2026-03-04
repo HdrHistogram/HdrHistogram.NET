@@ -256,10 +256,28 @@ histogram.OutputPercentileDistribution(
 
 ### How would I contribute to this project?
 
-We welcome pull requests!
-If you do choose to contribute, please first raise an issue so we are not caught off guard by the pull request.
-Next can you please ensure that your PR (Pull Request) has a comment in it describing what it achieves and the issues that it closes.
-Ideally if it is fixing an issue or a bug, there would be a Unit Test proving the fix and a reference to the Issues in the PR comments.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
+
+## Development
+
+For prerequisites and development setup, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Running the Tests
+
+The unit tests can be run using `dotnet test`.
+
+```sh
+dotnet test ./HdrHistogram.UnitTests/HdrHistogram.UnitTests.csproj -v q -c Release
+```
+
+### Running the Benchmarks
+
+The benchmarks are run using `dotnet run` in Release mode.
+A full benchmark run may take several minutes.
+
+```sh
+dotnet run -c Release --project ./HdrHistogram.Benchmarking/HdrHistogram.Benchmarking.csproj
+```
 
 ---
 

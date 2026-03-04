@@ -1,4 +1,4 @@
-﻿using HdrHistogram.Encoding;
+using HdrHistogram.Encoding;
 using HdrHistogram.Utilities;
 using System;
 using System.IO;
@@ -62,7 +62,7 @@ namespace HdrHistogram
         /// <param name="decompressor">The <see cref="DeflateStream"/> that is being used to decompress the payload. Optional.</param>
         /// <returns>The newly constructed histogram</returns>
         public static HistogramBase DecodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue,
-           DeflateStream decompressor = null)
+           DeflateStream? decompressor = null)
         {
             var header = ReadHeader(buffer);
             var wordSizeInBytes = GetWordSizeInBytesFromCookie(header.Cookie);
@@ -165,7 +165,7 @@ namespace HdrHistogram
             }
         }
 
-        private static ByteBuffer PayLoadSourceBuffer(ByteBuffer buffer, DeflateStream decompressor, int expectedCapacity, IHeader header)
+        private static ByteBuffer PayLoadSourceBuffer(ByteBuffer buffer, DeflateStream? decompressor, int expectedCapacity, IHeader header)
         {
             ByteBuffer payLoadSourceBuffer;
             if (decompressor == null)
@@ -239,7 +239,7 @@ namespace HdrHistogram
                 case 8: return typeof(LongHistogram);
                 case 9: return typeof(LongHistogram);
                 default:
-                    throw new IndexOutOfRangeException();
+                    throw new InvalidOperationException($"Unexpected word size: {wordSizeInBytes}");
             }
         }
     }

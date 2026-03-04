@@ -1,4 +1,4 @@
-﻿using HdrHistogram.Utilities;
+using HdrHistogram.Utilities;
 
 namespace HdrHistogram.Persistence
 {

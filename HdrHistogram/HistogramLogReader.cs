@@ -1,6 +1,7 @@
 using HdrHistogram.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -239,31 +240,35 @@ namespace HdrHistogram
 
         private static bool IsComment(string line)
         {
-            return line.StartsWith("#");
+#if NETSTANDARD2_0
+            return line.StartsWith("#", StringComparison.Ordinal);
+#else
+            return line.StartsWith('#');
+#endif
         }
 
         private static bool IsStartTime(string line)
         {
-            return line.StartsWith("#[StartTime: ");
+            return line.StartsWith("#[StartTime: ", StringComparison.Ordinal);
         }
 
         private static bool IsBaseTime(string line)
         {
-            return line.StartsWith("#[BaseTime: ");
+            return line.StartsWith("#[BaseTime: ", StringComparison.Ordinal);
         }
 
         private static bool IsLegend(string line)
         {
             var legend = "\"StartTimestamp\",\"Interval_Length\",\"Interval_Max\",\"Interval_Compressed_Histogram\"";
-            return line.Equals(legend);
+            return string.Equals(line, legend, StringComparison.Ordinal);
         }
         private static bool IsV1Legend(string line)
         {
             var legend = "\"StartTimestamp\",\"EndTimestamp\",\"Interval_Max\",\"Interval_Compressed_Histogram\"";
-            return line.Equals(legend);
+            return string.Equals(line, legend, StringComparison.Ordinal);
         }
 
-        private static string ParseTag(string value)
+        private static string? ParseTag(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -288,7 +293,7 @@ namespace HdrHistogram
         private static double ParseDouble(Match match, string group)
         {
             var value = match.Groups[group].Value;
-            return double.Parse(value);
+            return double.Parse(value, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
