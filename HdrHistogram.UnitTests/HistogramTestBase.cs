@@ -259,6 +259,51 @@ namespace HdrHistogram.UnitTests
             Assert.Throws<ArgumentOutOfRangeException>(() => { histogram.Add(biggerOther); });
         }
 
+        [Fact]
+        public void Subtract_should_reduce_the_counts_from_two_histograms()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var other = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            histogram.RecordValue(TestValueLevel);
+            histogram.RecordValue(TestValueLevel);
+            histogram.RecordValue(TestValueLevel * 1000);
+            histogram.RecordValue(TestValueLevel * 1000);
+            other.RecordValue(TestValueLevel);
+            other.RecordValue(TestValueLevel * 1000);
+
+            histogram.Subtract(other);
+
+            Assert.Equal(1L, histogram.GetCountAtValue(TestValueLevel));
+            Assert.Equal(1L, histogram.GetCountAtValue(TestValueLevel * 1000));
+            Assert.Equal(2L, histogram.TotalCount);
+        }
+
+        [Fact]
+        public void Subtract_should_allow_small_range_histograms_to_be_subtracted()
+        {
+            var biggerOther = Create(DefaultHighestTrackableValue * 2, DefaultSignificantFigures);
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            biggerOther.RecordValue(TestValueLevel);
+            biggerOther.RecordValue(TestValueLevel * 1000);
+            histogram.RecordValue(TestValueLevel);
+            histogram.RecordValue(TestValueLevel * 1000);
+
+            biggerOther.Subtract(histogram);
+
+            Assert.Equal(0L, biggerOther.GetCountAtValue(TestValueLevel));
+            Assert.Equal(0L, biggerOther.GetCountAtValue(TestValueLevel * 1000));
+            Assert.Equal(0L, biggerOther.TotalCount);
+        }
+
+        [Fact]
+        public void Subtract_throws_if_other_has_a_larger_range()
+        {
+            var histogram = Create(DefaultHighestTrackableValue, DefaultSignificantFigures);
+            var biggerOther = Create(DefaultHighestTrackableValue * 2, DefaultSignificantFigures);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => { histogram.Subtract(biggerOther); });
+        }
+
         [Theory]
         [InlineData(1, 1)]
         [InlineData(2, 2500)]

@@ -138,6 +138,7 @@ long GetCountBetweenValues(long lowValue, long highValue)
 
 ```csharp
 void Add(HistogramBase other)           // Merge histograms
+void Subtract(HistogramBase other)      // Remove histogram values
 HistogramBase Copy()                     // Create a copy
 void Reset()                             // Clear all counts
 bool HasOverflowed()                     // Check for overflow

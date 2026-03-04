@@ -280,7 +280,7 @@ namespace HdrHistogram
         {
             if (HighestTrackableValue < fromHistogram.HighestTrackableValue)
             {
-                throw new ArgumentOutOfRangeException(nameof(fromHistogram), $"The other histogram covers a wider range ({fromHistogram.HighestTrackableValue} than this one ({HighestTrackableValue}).");
+                throw new ArgumentOutOfRangeException(nameof(fromHistogram), $"The other histogram covers a wider range ({fromHistogram.HighestTrackableValue}) than this one ({HighestTrackableValue}).");
             }
             if ((BucketCount == fromHistogram.BucketCount) &&
                     (SubBucketCount == fromHistogram.SubBucketCount) &&
@@ -305,7 +305,42 @@ namespace HdrHistogram
         }
 
         /// <summary>
-        /// Get the size (in value units) of the range of values that are equivalent to the given value within the histogram's resolution. 
+        /// Subtract the contents of another histogram from this one.
+        /// </summary>
+        /// <param name="fromHistogram">The other histogram.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">if fromHistogram covers a wider range than this histogram.</exception>
+        public virtual void Subtract(HistogramBase fromHistogram)
+        {
+            if (HighestTrackableValue < fromHistogram.HighestTrackableValue)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(fromHistogram),
+                    $"The other histogram covers a wider range ({fromHistogram.HighestTrackableValue}) than this one ({HighestTrackableValue}).");
+            }
+            if ((BucketCount == fromHistogram.BucketCount) &&
+                    (SubBucketCount == fromHistogram.SubBucketCount) &&
+                    (_unitMagnitude == fromHistogram._unitMagnitude))
+            {
+                // Counts arrays are of the same length and meaning, so we can just iterate and subtract directly:
+                for (var i = 0; i < fromHistogram.CountsArrayLength; i++)
+                {
+                    AddToCountAtIndex(i, -fromHistogram.GetCountAtIndex(i));
+                }
+            }
+            else
+            {
+                // Arrays are not a direct match, so we can't just stream through and subtract them.
+                // Instead, go through the array and subtract each non-zero value found at its proper value:
+                for (var i = 0; i < fromHistogram.CountsArrayLength; i++)
+                {
+                    var count = fromHistogram.GetCountAtIndex(i);
+                    RecordValueWithCount(fromHistogram.ValueFromIndex(i), -count);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the size (in value units) of the range of values that are equivalent to the given value within the histogram's resolution.
         /// Where "equivalent" means that value samples recorded for any two equivalent values are counted in a common total count.
         /// </summary>
         /// <param name="value">The given value</param>
