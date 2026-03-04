@@ -18,7 +18,7 @@ namespace HdrHistogram
         private static readonly Regex BaseTimeMatcher = new Regex(@"#\[BaseTime: (?<seconds>\d*\.\d{1,3}) ", RegexOptions.Compiled);
         //Content lines - format =  startTimestamp, intervalLength, maxTime, histogramPayload
         private static readonly Regex UntaggedLogLineMatcher = new Regex(@"(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
-        private static readonly Regex TaggedLogLineMatcher = new Regex(@"((?<tag>Tag=.+),)?(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
+        private static readonly Regex TaggedLogLineMatcher = new Regex(@"((?<tag>Tag=[^,]+),)?(?<startTime>\d*\.\d*),(?<interval>\d*\.\d*),(?<max>\d*\.\d*),(?<payload>.*)", RegexOptions.Compiled);
         private readonly TextReader _log;
         private double _startTimeInSeconds;
 
