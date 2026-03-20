@@ -69,4 +69,99 @@ namespace HdrHistogram.UnitTests.Utilities
             public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
         }
     }
+
+    public class ByteBufferReadWriteTests
+    {
+        [Theory]
+        [InlineData(42)]
+        [InlineData(-1)]
+        [InlineData(int.MaxValue)]
+        public void PutInt_and_GetInt_roundtrip(int value)
+        {
+            var buffer = ByteBuffer.Allocate(sizeof(int));
+            buffer.PutInt(value);
+            buffer.Position = 0;
+            var result = buffer.GetInt();
+            Assert.Equal(value, result);
+            Assert.Equal(sizeof(int), buffer.Position);
+        }
+
+        [Theory]
+        [InlineData(4, 12345)]
+        [InlineData(8, -99999)]
+        public void PutInt_at_index_and_GetInt_roundtrip(int index, int value)
+        {
+            var buffer = ByteBuffer.Allocate(index + sizeof(int));
+            buffer.Position = index;
+            int positionBefore = buffer.Position;
+            buffer.PutInt(index, value);
+            Assert.Equal(positionBefore, buffer.Position);
+            buffer.Position = index;
+            var result = buffer.GetInt();
+            Assert.Equal(value, result);
+        }
+
+        [Theory]
+        [InlineData(100L)]
+        [InlineData(-1L)]
+        [InlineData(long.MaxValue)]
+        public void PutLong_and_GetLong_roundtrip(long value)
+        {
+            var buffer = ByteBuffer.Allocate(sizeof(long));
+            buffer.PutLong(value);
+            buffer.Position = 0;
+            var result = buffer.GetLong();
+            Assert.Equal(value, result);
+            Assert.Equal(sizeof(long), buffer.Position);
+        }
+
+        [Theory]
+        [InlineData(0.0)]
+        [InlineData(double.PositiveInfinity)]
+        [InlineData(3.14159265358979)]
+        public void PutDouble_and_GetDouble_roundtrip(double value)
+        {
+            var buffer = ByteBuffer.Allocate(sizeof(double));
+            buffer.PutDouble(value);
+            buffer.Position = 0;
+            var result = buffer.GetDouble();
+            Assert.Equal(BitConverter.DoubleToInt64Bits(value), BitConverter.DoubleToInt64Bits(result));
+            Assert.Equal(sizeof(double), buffer.Position);
+        }
+
+        [Fact]
+        public void PutDouble_and_GetDouble_roundtrip_NaN()
+        {
+            var buffer = ByteBuffer.Allocate(sizeof(double));
+            buffer.PutDouble(double.NaN);
+            buffer.Position = 0;
+            var result = buffer.GetDouble();
+            Assert.Equal(BitConverter.DoubleToInt64Bits(double.NaN), BitConverter.DoubleToInt64Bits(result));
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 0x01, 0x00 }, (short)256)]
+        [InlineData(new byte[] { 0x00, 0x7F }, (short)127)]
+        public void GetShort_returns_big_endian_value(byte[] bytes, short expected)
+        {
+            var buffer = ByteBuffer.Allocate(bytes.Length);
+            Buffer.BlockCopy(bytes, 0, ByteBufferTestHelper.GetInternalBuffer(buffer), 0, bytes.Length);
+            buffer.Position = 0;
+            var result = buffer.GetShort();
+            Assert.Equal(expected, result);
+        }
+    }
+
+    /// <summary>
+    /// Test helper to access internal buffer via reflection for test setup.
+    /// </summary>
+    internal static class ByteBufferTestHelper
+    {
+        public static byte[] GetInternalBuffer(ByteBuffer buffer)
+        {
+            var field = typeof(ByteBuffer).GetField("_internalBuffer",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            return (byte[])field!.GetValue(buffer)!;
+        }
+    }
 }

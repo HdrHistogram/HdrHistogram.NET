@@ -9,7 +9,7 @@
  */
 
 using System;
-using System.Net;
+using System.Buffers.Binary;
 
 namespace HdrHistogram.Utilities
 {
@@ -108,8 +108,8 @@ namespace HdrHistogram.Utilities
         /// <returns>The value of the <see cref="short"/> at the current position.</returns>
         public short GetShort()
         {
-            var shortValue = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(_internalBuffer, Position));
-            Position += (sizeof(short));
+            var shortValue = BinaryPrimitives.ReadInt16BigEndian(_internalBuffer.AsSpan(Position));
+            Position += sizeof(short);
             return shortValue;
         }
 
@@ -119,7 +119,7 @@ namespace HdrHistogram.Utilities
         /// <returns>The value of the <see cref="int"/> at the current position.</returns>
         public int GetInt()
         {
-            var intValue = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(_internalBuffer, Position));
+            var intValue = BinaryPrimitives.ReadInt32BigEndian(_internalBuffer.AsSpan(Position));
             Position += sizeof(int);
             return intValue;
         }
@@ -130,7 +130,7 @@ namespace HdrHistogram.Utilities
         /// <returns>The value of the <see cref="long"/> at the current position.</returns>
         public long GetLong()
         {
-            var longValue = IPAddress.HostToNetworkOrder(BitConverter.ToInt64(_internalBuffer, Position));
+            var longValue = BinaryPrimitives.ReadInt64BigEndian(_internalBuffer.AsSpan(Position));
             Position += sizeof(long);
             return longValue;
         }
@@ -141,88 +141,9 @@ namespace HdrHistogram.Utilities
         /// <returns>The value of the <see cref="double"/> at the current position.</returns>
         public double GetDouble()
         {
-            var doubleValue = Int64BitsToDouble(ToInt64(_internalBuffer, Position));
+            var longBits = BinaryPrimitives.ReadInt64BigEndian(_internalBuffer.AsSpan(Position));
             Position += sizeof(double);
-            return doubleValue;
-        }
-
-        /// <summary>
-        /// Converts the specified 64-bit signed integer to a double-precision 
-        /// floating point number. Note: the endianness of this converter does not
-        /// affect the returned value.
-        /// </summary>
-        /// <param name="value">The number to convert. </param>
-        /// <returns>A double-precision floating point number whose value is equivalent to value.</returns>
-        private static double Int64BitsToDouble(long value)
-        {
-            return BitConverter.Int64BitsToDouble(value);
-        }
-
-        /// <summary>
-        /// Returns a 64-bit signed integer converted from eight bytes at a specified position in a byte array.
-        /// </summary>
-        /// <param name="value">An array of bytes.</param>
-        /// <param name="startIndex">The starting position within value.</param>
-        /// <returns>A 64-bit signed integer formed by eight bytes beginning at startIndex.</returns>
-        private static long ToInt64(byte[] value, int startIndex)
-        {
-            return CheckedFromBytes(value, startIndex, 8);
-        }
-
-        /// <summary>
-        /// Checks the arguments for validity before calling FromBytes
-        /// (which can therefore assume the arguments are valid).
-        /// </summary>
-        /// <param name="value">The bytes to convert after checking</param>
-        /// <param name="startIndex">The index of the first byte to convert</param>
-        /// <param name="bytesToConvert">The number of bytes to convert</param>
-        /// <returns></returns>
-        private static long CheckedFromBytes(byte[] value, int startIndex, int bytesToConvert)
-        {
-            CheckByteArgument(value, startIndex, bytesToConvert);
-            return FromBytes(value, startIndex, bytesToConvert);
-        }
-
-        /// <summary>
-        /// Checks the given argument for validity.
-        /// </summary>
-        /// <param name="value">The byte array passed in</param>
-        /// <param name="startIndex">The start index passed in</param>
-        /// <param name="bytesRequired">The number of bytes required</param>
-        /// <exception cref="ArgumentNullException">value is a null reference</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// startIndex is less than zero or greater than the length of value minus bytesRequired.
-        /// </exception>
-        private static void CheckByteArgument(byte[] value, int startIndex, int bytesRequired)
-        {
-#pragma warning disable CA1510
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-#pragma warning restore CA1510
-            if (startIndex < 0 || startIndex > value.Length - bytesRequired)
-            {
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
-            }
-        }
-
-        /// <summary>
-        /// Returns a value built from the specified number of bytes from the given buffer,
-        /// starting at index.
-        /// </summary>
-        /// <param name="buffer">The data in byte array format</param>
-        /// <param name="startIndex">The first index to use</param>
-        /// <param name="bytesToConvert">The number of bytes to use</param>
-        /// <returns>The value built from the given bytes</returns>
-        private static long FromBytes(byte[] buffer, int startIndex, int bytesToConvert)
-        {
-            long ret = 0;
-            for (int i = 0; i < bytesToConvert; i++)
-            {
-                ret = unchecked((ret << 8) | buffer[startIndex + i]);
-            }
-            return ret;
+            return BitConverter.Int64BitsToDouble(longBits);
         }
 
         /// <summary>
@@ -240,9 +161,8 @@ namespace HdrHistogram.Utilities
         /// <param name="value">The value to set the current position to.</param>
         public void PutInt(int value)
         {
-            var intAsBytes = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
-            Array.Copy(intAsBytes, 0, _internalBuffer, Position, intAsBytes.Length);
-            Position += intAsBytes.Length;
+            BinaryPrimitives.WriteInt32BigEndian(_internalBuffer.AsSpan(Position), value);
+            Position += sizeof(int);
         }
 
         /// <summary>
@@ -255,8 +175,7 @@ namespace HdrHistogram.Utilities
         /// </remarks>
         public void PutInt(int index, int value)
         {
-            var intAsBytes = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
-            Array.Copy(intAsBytes, 0, _internalBuffer, index, intAsBytes.Length);
+            BinaryPrimitives.WriteInt32BigEndian(_internalBuffer.AsSpan(index), value);
             // We don't increment the Position as this is an explicit write.
         }
 
@@ -266,9 +185,8 @@ namespace HdrHistogram.Utilities
         /// <param name="value">The value to set the current position to.</param>
         public void PutLong(long value)
         {
-            var longAsBytes = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
-            Array.Copy(longAsBytes, 0, _internalBuffer, Position, longAsBytes.Length);
-            Position += longAsBytes.Length;
+            BinaryPrimitives.WriteInt64BigEndian(_internalBuffer.AsSpan(Position), value);
+            Position += sizeof(long);
         }
 
         /// <summary>
@@ -277,11 +195,8 @@ namespace HdrHistogram.Utilities
         /// <param name="value">The value to set the current position to.</param>
         public void PutDouble(double value)
         {
-            //PutDouble(ix(CheckIndex(i, (1 << 3))), x);
-            var doubleAsBytes = BitConverter.GetBytes(value);
-            Array.Reverse(doubleAsBytes);
-            Array.Copy(doubleAsBytes, 0, _internalBuffer, Position, doubleAsBytes.Length);
-            Position += doubleAsBytes.Length;
+            BinaryPrimitives.WriteInt64BigEndian(_internalBuffer.AsSpan(Position), BitConverter.DoubleToInt64Bits(value));
+            Position += sizeof(double);
         }
 
         /// <summary>

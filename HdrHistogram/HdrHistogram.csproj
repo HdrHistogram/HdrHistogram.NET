@@ -21,6 +21,10 @@
     <None Include="../README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" Version="4.5.*" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
     <DocumentationFile>bin\Release\net8.0\HdrHistogram.xml</DocumentationFile>
   </PropertyGroup>
