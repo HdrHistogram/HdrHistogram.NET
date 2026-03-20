@@ -16,14 +16,9 @@ namespace HdrHistogram.Benchmarking
                     StatisticColumn.OperationsPerSecond,
                     StatisticColumn.Mean, StatisticColumn.StdErr, StatisticColumn.StdDev,
                     StatisticColumn.P0, StatisticColumn.Q1, StatisticColumn.P50, StatisticColumn.P67, StatisticColumn.Q3, StatisticColumn.P80, StatisticColumn.P90, StatisticColumn.P95, StatisticColumn.P100)
-                .AddJob(Job.Default.WithRuntime(ClrRuntime.Net481).WithJit(Jit.LegacyJit))
-                .AddJob(Job.Default.WithRuntime(ClrRuntime.Net481).WithJit(Jit.RyuJit))
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core31))
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core50))
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60))
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core70))
                 .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core90))
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.CreateForNewVersion("net10.0", "Core 10.0")))
                 ;
 
             var switcher = new BenchmarkSwitcher(new[] {
