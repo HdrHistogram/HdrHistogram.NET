@@ -18,4 +18,4 @@ IF %ERRORLEVEL% NEQ 0 GOTO EOF
 dotnet pack .\HdrHistogram\HdrHistogram.csproj --no-build --include-symbols -c=Release /p:Version=%SemVer%
 IF %ERRORLEVEL% NEQ 0 GOTO EOF
 
-.\HdrHistogram.Benchmarking\bin\Release\net8.0\HdrHistogram.Benchmarking.exe -f *
+.\HdrHistogram.Benchmarking\bin\Release\net8.0\HdrHistogram.Benchmarking.exe -f * --runtimes net8.0 net9.0
