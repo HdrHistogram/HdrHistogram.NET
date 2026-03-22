@@ -240,11 +240,8 @@ dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassNa
 
 ### Existing Benchmarks
 
-| Class | Location | What it measures |
-|-------|----------|-----------------|
-| `LeadingZeroCount64BitBenchmark` | `LeadingZeroCount/` | Bit counting algorithm comparison |
-| `LeadingZeroCount32BitBenchmark` | `LeadingZeroCount/` | 32-bit bit counting comparison |
-| `Recording32BitBenchmark` | `Recording/` | Value recording throughput |
+Check `HdrHistogram.Benchmarking/` for the current set of benchmark classes.
+Each subdirectory groups benchmarks by area (e.g. `LeadingZeroCount/`, `Recording/`).
 
 ## Test Organization Guidelines
 

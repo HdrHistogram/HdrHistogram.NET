@@ -30,7 +30,7 @@ Special handling for benchmark tasks (applies when brief category is `performanc
 
 Baseline capture (Phase 1 benchmark tasks):
 - After creating benchmark classes, commit ONLY the benchmark files:
-  `git add HdrHistogram.Benchmarking/ Program.cs && git commit -m "bench: add benchmarks for baseline capture"`
+  `git add HdrHistogram.Benchmarking/ && git commit -m "bench: add benchmarks for baseline capture"`
 - Run benchmarks in Release configuration. Use `--filter` to target only the relevant benchmarks.
 - BenchmarkDotNet outputs markdown tables to stdout and detailed results to `BenchmarkDotNet.Artifacts/`.
   Copy the results table into `plan/benchmarks/baseline.md`.
@@ -43,6 +43,6 @@ Post-change validation (Phase 3 benchmark tasks):
 - If any benchmark shows a regression, flag it in comparison.md and add a new task to investigate.
 
 Benchmark execution notes:
-- Use `--job short` for faster feedback during development iterations.
-- For the final Phase 3 comparison, use default BenchmarkDotNet settings (no `--job short`).
+- Both Phase 1 (baseline) and Phase 3 (final comparison) MUST use default BenchmarkDotNet settings — do NOT use `--job short` for these runs.
+- Use `--job short` ONLY for ad-hoc iteration during Phase 2 development.
 - Benchmarks that fail to compile or run must be fixed before proceeding.
