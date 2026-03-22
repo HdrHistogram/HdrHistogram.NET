@@ -41,6 +41,7 @@ This file provides guidance on where to find standards and specifications for th
 | encoding, LEB128, DEFLATE, compression | [Histogram Encoding](./tech-standards/histogram-encoding.md) |
 | log format, V2, persistence | [Histogram Encoding](./tech-standards/histogram-encoding.md) |
 | xUnit, test, FluentAssertions | [Testing Standards](./tech-standards/testing-standards.md) |
+| benchmark, performance, allocation, BenchmarkDotNet | [Testing Standards](./tech-standards/testing-standards.md) |
 | naming convention, XML docs, style | [Coding Standards](./tech-standards/coding-standards.md) |
 | build, NuGet, AppVeyor, CI/CD | [Build System](./tech-standards/build-system.md) |
 | milestone, issue, PR, GitHub | [GitHub CLI Reference](./tech-standards/github.md) |

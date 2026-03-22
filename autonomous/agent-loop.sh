@@ -135,6 +135,16 @@ $(cat /tmp/plan-backup/done/task.md)
 
 </details>"
         fi
+        if [ -f /tmp/plan-backup/benchmarks/comparison.md ]; then
+            PR_BODY="${PR_BODY}
+
+<details>
+<summary>Benchmark comparison</summary>
+
+$(cat /tmp/plan-backup/benchmarks/comparison.md)
+
+</details>"
+        fi
         PR_BODY="${PR_BODY}
 
 Closes #${ISSUE_NUM}"
@@ -249,7 +259,7 @@ EOF
             # If plan state doesn't exist on the branch, re-initialise
             if [ ! -d ./plan ]; then
                 echo "No plan state found on branch, starting fresh"
-                mkdir -p ./plan/planning ./plan/ready ./plan/done
+                mkdir -p ./plan/planning ./plan/ready ./plan/done ./plan/benchmarks
 
                 ISSUE_BODY=$(gh issue view "$ISSUE_NUM" --repo "$UPSTREAM_REPO" \
                     --json body,title --jq '"# Issue #'"$ISSUE_NUM"': " + .title + "\n\n" + .body')
@@ -264,7 +274,7 @@ EOF
             echo "Starting fresh: agent/${ISSUE_NUM}-${BRANCH_SLUG}"
             git fetch upstream
             git checkout -b "agent/${ISSUE_NUM}-${BRANCH_SLUG}" "upstream/$UPSTREAM_BASE_BRANCH"
-            mkdir -p ./plan/planning ./plan/ready ./plan/done
+            mkdir -p ./plan/planning ./plan/ready ./plan/done ./plan/benchmarks
 
             ISSUE_BODY=$(gh issue view "$ISSUE_NUM" --repo "$UPSTREAM_REPO" \
                 --json body,title --jq '"# Issue #'"$ISSUE_NUM"': " + .title + "\n\n" + .body')

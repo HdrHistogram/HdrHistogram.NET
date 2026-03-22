@@ -22,3 +22,13 @@ Using the exploration results, create ./plan/planning/brief.md containing:
 - Acceptance criteria derived from the issue
 - Test strategy: which tests to add or modify
 - Risks or open questions
+- Category: classify as either `functional` or `performance`
+  - `performance` if the issue mentions: allocation, memory, throughput, latency,
+    GC pressure, benchmark, hot path, serialisation performance, or similar
+  - `functional` for all other issues (bugs, features, refactors)
+- Benchmark strategy (required for `performance` issues, optional for `functional`):
+  Follow the benchmark-driven development process in spec/tech-standards/testing-standards.md.
+  Identify:
+  - Which existing benchmarks are relevant (check HdrHistogram.Benchmarking/)
+  - What new micro-benchmarks and end-to-end benchmarks are needed
+  - Which metrics matter: throughput, allocation, GC collections

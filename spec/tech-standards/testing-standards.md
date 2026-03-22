@@ -171,13 +171,77 @@ Resource types:
 
 ## Performance Testing
 
-Run tests in Release mode for accurate performance measurements:
+### Benchmarking Framework
+
+The `HdrHistogram.Benchmarking/` project uses BenchmarkDotNet for performance measurement.
+All benchmarks must run in Release mode for accurate results.
+
+| Component | Details |
+|-----------|---------|
+| Framework | BenchmarkDotNet |
+| Targets | net10.0, net9.0, net8.0 |
+| Entry point | `Program.cs` with `BenchmarkSwitcher` |
+| Diagnostics | `[MemoryDiagnoser]` on all benchmark classes |
+
+### Benchmark-Driven Development
+
+Performance issues follow a benchmark-first methodology, analogous to test-driven development.
+Benchmarks are the tests for non-functional requirements.
+
+**Phase 1 — Benchmark scaffolding (before any implementation changes):**
+
+1. Create benchmark classes covering both levels:
+   - **Micro-benchmarks** — isolate the specific operation being optimised (e.g. `PutLong`/`GetLong`)
+   - **End-to-end benchmarks** — exercise the realistic user workflow that the micro-operation feeds into (e.g. histogram encode/decode round-trip)
+2. Register benchmarks in `Program.cs` `BenchmarkSwitcher`
+3. Run benchmarks against the **unmodified code** to establish a baseline
+4. Record baseline results (Mean, StdDev, Allocated, Op/s)
+
+**Phase 2 — Implementation:**
+
+5. Apply the optimisation
+6. Add or update unit tests as normal
+
+**Phase 3 — Validation (after implementation is complete):**
+
+7. Run the same benchmarks with identical configuration
+8. Compare against baseline: generate a side-by-side table with deltas
+9. Document the results — including if the change shows no meaningful improvement
+
+Both levels of benchmark are required because:
+
+- Micro-benchmarks prove the isolated operation improved
+- End-to-end benchmarks prove the improvement matters in a realistic context
+- A micro-optimisation with no observable end-to-end impact may not justify the change
+
+### Benchmark Design Guidelines
+
+- Use `[MemoryDiagnoser]` on every benchmark class to surface allocation counts
+- Reset buffer positions or state in each benchmark method, not in setup (matches BDN iteration model)
+- Pre-allocate buffers in `[GlobalSetup]` so setup allocation is excluded from measurements
+- Use realistic data sizes and distributions that match production usage
+- Name benchmark methods clearly: `Encode`, `Decode`, `EncodeCompressed`, not `Test1`, `Bench_A`
+
+### Running Benchmarks
 
 ```bash
-dotnet test --configuration Release
+# Build in Release mode (required)
+dotnet build HdrHistogram.Benchmarking/ -c Release
+
+# Run specific benchmarks
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*'
+
+# Export results as JSON for comparison
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*' --exporters json
+
+# Quick iteration (fewer iterations, faster feedback)
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*' --job short
 ```
 
-Separate benchmarking project (`HdrHistogram.Benchmarking`) uses BenchmarkDotNet for micro-benchmarks.
+### Existing Benchmarks
+
+Check `HdrHistogram.Benchmarking/` for the current set of benchmark classes.
+Each subdirectory groups benchmarks by area (e.g. `LeadingZeroCount/`, `Recording/`).
 
 ## Test Organization Guidelines
 
