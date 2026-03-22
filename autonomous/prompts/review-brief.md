@@ -12,6 +12,11 @@ Review the brief for:
 - Feasibility: Do the proposed changes align with what the code actually looks like?
 - Test strategy: Are there specific test cases identified?
 - Acceptance criteria: Are they measurable and verifiable?
+- Category: Is the classification correct? Performance issues MUST be marked `performance`.
+- Benchmark strategy (for `performance` issues, per spec/tech-standards/testing-standards.md):
+  - Are both micro-benchmarks AND end-to-end benchmarks identified?
+  - Do the benchmarks measure what the issue actually claims to improve?
+  - Are the benchmarks testing the realistic hot path, not just the changed code in isolation?
 
 If changes are needed: create ./plan/planning/brief-review.md with specific,
 actionable suggestions.
