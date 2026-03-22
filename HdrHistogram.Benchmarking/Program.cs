@@ -25,6 +25,7 @@ namespace HdrHistogram.Benchmarking
                 typeof(LeadingZeroCount.LeadingZeroCount32BitBenchmark),
                 typeof(Recording.Recording32BitBenchmark),
                 typeof(ByteBuffer.ByteBufferBenchmark),
+                typeof(Serialisation.SerialisationBenchmark),
             });
             switcher.Run(args, config);
         }

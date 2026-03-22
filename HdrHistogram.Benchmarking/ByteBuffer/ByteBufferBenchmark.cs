@@ -22,7 +22,7 @@ namespace HdrHistogram.Benchmarking.ByteBuffer
         }
 
         [Benchmark]
-        public void PutLong_After()
+        public void PutLong()
         {
             _writeBuffer.Position = 0;
             for (int i = 0; i < Iterations; i++)
@@ -32,7 +32,7 @@ namespace HdrHistogram.Benchmarking.ByteBuffer
         }
 
         [Benchmark]
-        public long GetLong_After()
+        public long GetLong()
         {
             _readBuffer.Position = 0;
             long last = 0;

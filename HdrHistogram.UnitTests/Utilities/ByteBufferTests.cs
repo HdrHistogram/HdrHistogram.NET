@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using FluentAssertions;
 using HdrHistogram.Utilities;
 using Xunit;
 
@@ -76,6 +77,7 @@ namespace HdrHistogram.UnitTests.Utilities
         [InlineData(42)]
         [InlineData(-1)]
         [InlineData(int.MaxValue)]
+        [InlineData(int.MinValue)]
         public void PutInt_and_GetInt_roundtrip(int value)
         {
             var buffer = ByteBuffer.Allocate(sizeof(int));
@@ -105,6 +107,7 @@ namespace HdrHistogram.UnitTests.Utilities
         [InlineData(100L)]
         [InlineData(-1L)]
         [InlineData(long.MaxValue)]
+        [InlineData(long.MinValue)]
         public void PutLong_and_GetLong_roundtrip(long value)
         {
             var buffer = ByteBuffer.Allocate(sizeof(long));
@@ -149,6 +152,7 @@ namespace HdrHistogram.UnitTests.Utilities
             buffer.Position = 0;
             var result = buffer.GetShort();
             Assert.Equal(expected, result);
+            buffer.Position.Should().Be(sizeof(short));
         }
     }
 

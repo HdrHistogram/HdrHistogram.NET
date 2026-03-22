@@ -29,7 +29,7 @@ The checklist below reflects all tasks required by the brief; already-committed 
 
 ### Register benchmarks
 
-- [ ] **`HdrHistogram.Benchmarking/Program.cs`** — Add `typeof(Serialisation.SerialisationBenchmark)`
+- [x] **`HdrHistogram.Benchmarking/Program.cs`** — Add `typeof(Serialisation.SerialisationBenchmark)`
   to the `BenchmarkSwitcher` array alongside `ByteBufferBenchmark`.
   Why: `SerialisationBenchmark` was created but never registered; it cannot be selected at runtime.
   Verify: `Program.cs` `BenchmarkSwitcher` array contains
@@ -37,7 +37,7 @@ The checklist below reflects all tasks required by the brief; already-committed 
 
 ### Build verification
 
-- [ ] **Build benchmarking project in Release configuration.**
+- [x] **Build benchmarking project in Release configuration.**
   Command: `dotnet build HdrHistogram.Benchmarking/ -c Release`
   Why: confirms benchmark classes compile against all target frameworks before capturing results.
   Verify: command exits with code 0, no compilation errors.
@@ -51,10 +51,10 @@ The checklist below reflects all tasks required by the brief; already-committed 
 > If a pre-implementation baseline cannot be obtained, document this limitation in
 > `plan/benchmarks/baseline.md` and treat the post-change results as the sole data point.
 
-- [ ] **Create `plan/benchmarks/` directory.**
+- [x] **Create `plan/benchmarks/` directory.**
   Verify: directory exists at `plan/benchmarks/`.
 
-- [ ] **Run baseline benchmarks on the pre-implementation state and save results.**
+- [x] **Run baseline benchmarks on the pre-implementation state and save results.**
   Steps:
 
   1. Create an isolated worktree at the pre-implementation commit:
@@ -163,7 +163,7 @@ The checklist below reflects all tasks required by the brief; already-committed 
 
 ### Run all unit tests
 
-- [ ] **Run full test suite to confirm no regressions.**
+- [x] **Run full test suite to confirm no regressions.**
   Command: `dotnet test HdrHistogram.UnitTests/ -c Release`
   Must pass:
 
@@ -177,7 +177,7 @@ The checklist below reflects all tasks required by the brief; already-committed 
 
 ## Phase 3 — Benchmark Validation
 
-- [ ] **Run post-change benchmarks** with identical configuration to baseline.
+- [x] **Run post-change benchmarks** with identical configuration to baseline.
   Commands:
 
   ```
@@ -190,7 +190,7 @@ The checklist below reflects all tasks required by the brief; already-committed 
   Verify: `plan/benchmarks/post-change.md` exists; `PutLong_After` and `GetLong_After` rows show
   `Allocated = 0 B`.
 
-- [ ] **Generate comparison in `plan/benchmarks/comparison.md`.**
+- [x] **Generate comparison in `plan/benchmarks/comparison.md`.**
   Required content:
 
   - Side-by-side table: `Benchmark | Baseline | Post-Change | Delta | Delta %`
@@ -198,6 +198,26 @@ The checklist below reflects all tasks required by the brief; already-committed 
   - Verdict: does the data support the change?
 
   Verify: `plan/benchmarks/comparison.md` exists with all three sections completed.
+
+---
+
+## Phase 4 — Code Review Fixes
+
+- [x] **`HdrHistogram.Benchmarking/ByteBuffer/ByteBufferBenchmark.cs` — Rename benchmark methods.**
+  Rename `PutLong_After` to `PutLong` and `GetLong_After` to `GetLong`.
+  Why: the `_After` suffix encodes transient development context; BenchmarkDotNet uses method names as identifiers in output tables.
+  Verify: no `_After` suffix in the benchmark methods; project builds.
+
+- [x] **`HdrHistogram.UnitTests/Utilities/ByteBufferTests.cs` — Add position assertion to `GetShort_returns_big_endian_value`.**
+  After calling `buffer.GetShort()`, assert that `buffer.Position` equals `sizeof(short)` (2).
+  Why: `GetInt`, `GetLong`, and `GetDouble` tests all assert position advancement; `GetShort` was the only one missing this check.
+  Verify: test still passes; assertion is present.
+
+- [x] **`HdrHistogram.UnitTests/Utilities/ByteBufferTests.cs` — Add `MinValue` cases to round-trip tests.**
+  Add `[InlineData(int.MinValue)]` to `PutInt_and_GetInt_roundtrip`.
+  Add `[InlineData(long.MinValue)]` to `PutLong_and_GetLong_roundtrip`.
+  Why: `MinValue` is the most important sign-extension edge case for big-endian two's-complement encoding.
+  Verify: both tests pass with the new `MinValue` cases.
 
 ---
 
