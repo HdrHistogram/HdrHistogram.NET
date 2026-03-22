@@ -57,10 +57,12 @@ sync_state() {
     fi
 }
 
+CLAUDE_RC=0
+
 run_claude() {
     local prompt="$1"
     timeout "$CLAUDE_TIMEOUT" claude --dangerously-skip-permissions --print \
-        --output-format stream-json --verbose "$prompt"
+        --output-format stream-json --verbose "$prompt" || CLAUDE_RC=$?
 }
 
 load_prompt() {
@@ -288,3 +290,5 @@ EOF
         fi
         ;;
 esac
+
+exit $CLAUDE_RC
