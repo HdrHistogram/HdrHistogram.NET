@@ -224,12 +224,30 @@ Both levels of benchmark are required because:
 
 ### Running Benchmarks
 
+> **Timeout warning:** A full benchmark run (all classes, all runtimes) can take **over 30 minutes**.
+> Automated agents have a 30-minute iteration timeout and **must not** attempt a full suite in a single run.
+> Always segment benchmark runs as described below.
+
+**Segmentation strategies** (pick one or combine):
+
+- **By benchmark class** — run one category at a time (e.g. encoding, recording, leading-zero-count)
+- **By runtime** — restrict to a single target framework per run (e.g. `net8.0` only)
+- **By filter** — use `--filter` to select specific benchmark methods
+
 ```bash
 # Build in Release mode (required)
 dotnet build HdrHistogram.Benchmarking/ -c Release
 
-# Run specific benchmarks
-dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*'
+# Run a SINGLE benchmark class (recommended for agents)
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*Recording32BitBenchmark*'
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*LeadingZeroCount64BitBenchmark*'
+
+# Run benchmarks for a SINGLE runtime only
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*' --runtimes net8.0
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*' --runtimes net9.0
+
+# Combine both: one class, one runtime (fastest, safest for agents)
+dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*Recording32BitBenchmark*' --runtimes net8.0
 
 # Export results as JSON for comparison
 dotnet run -c Release --project HdrHistogram.Benchmarking/ -- --filter '*ClassName*' --exporters json
