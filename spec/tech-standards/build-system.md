@@ -22,7 +22,7 @@ HdrHistogram.sln
 ### Main Library (HdrHistogram.csproj)
 
 ```xml
-<TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.0</TargetFrameworks>
+<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
 ```
 
 | Target | Description |
@@ -30,7 +30,6 @@ HdrHistogram.sln
 | `net10.0` | Modern .NET (current LTS target) |
 | `net9.0` | Modern .NET (STS target) |
 | `net8.0` | Modern .NET (LTS target) |
-| `netstandard2.0` | Broad compatibility (.NET Framework 4.6.1+, .NET Core 2.0+) |
 
 ### Test Project
 
