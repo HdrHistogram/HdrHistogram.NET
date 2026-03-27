@@ -86,7 +86,7 @@ XML documentation is generated for Release builds:
 
 ```xml
 <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\HdrHistogram.xml</DocumentationFile>
+  <DocumentationFile>bin\Release\$(TargetFramework)\HdrHistogram.xml</DocumentationFile>
 </PropertyGroup>
 ```
 

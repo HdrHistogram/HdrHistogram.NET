@@ -6,8 +6,6 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-using System;
-
 namespace HdrHistogram.Utilities
 {
     /// <summary>

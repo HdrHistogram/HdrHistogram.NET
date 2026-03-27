@@ -6,6 +6,7 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
+using FluentAssertions;
 using HdrHistogram.Utilities;
 using Xunit;
 
@@ -37,9 +38,10 @@ namespace HdrHistogram.UnitTests.Utilities
         [InlineData(1L << 32, 31)]
         [InlineData(1L << 62, 1)]
         [InlineData(long.MaxValue, 1)]
+        [InlineData(-1L, 0)]
         public void NumberOfLeadingZeros_ReturnsCorrectValue(long value, int expected)
         {
-            Assert.Equal(expected, Bitwise.NumberOfLeadingZeros(value));
+            Bitwise.NumberOfLeadingZeros(value).Should().Be(expected);
         }
     }
 }
