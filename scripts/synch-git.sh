@@ -13,7 +13,7 @@ git fetch upstream --prune
 
 echo ""
 echo "=== Deleting local branches merged into main ==="
-merged=$(git branch --merged main | grep -v '^\*\|main' || true)
+merged=$(git branch --merged main | grep -v '^\*\|^+\|main' || true)
 if [ -n "$merged" ]; then
   echo "$merged" | xargs git branch -d
 else
