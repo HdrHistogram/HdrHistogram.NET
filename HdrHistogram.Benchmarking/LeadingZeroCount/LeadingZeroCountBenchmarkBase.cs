@@ -53,7 +53,6 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             var functions = new Dictionary<string, Func<long, int>>
             {
                 {"CurrentImpl", Bitwise.NumberOfLeadingZeros},
-                {"Imperative", Bitwise.Imperative.NumberOfLeadingZeros},
                 {"IfAndShift", LeadingZeroCount.IfAndShift.GetLeadingZeroCount},
                 //{"MathLog", LeadingZeroCount.MathLog.GetLeadingZeroCount},
                 {"StringManipulation", LeadingZeroCount.StringManipulation.GetLeadingZeroCount},
@@ -117,17 +116,6 @@ namespace HdrHistogram.Benchmarking.LeadingZeroCount
             for (int i = 0; i < _testValues.Length; i++)
             {
                 sum += Bitwise.NumberOfLeadingZeros(_testValues[i]);
-            }
-            return sum;
-        }
-
-        [Benchmark(OperationsPerInvoke = TEST_VALUE_LENGTH)]
-        public int ImperativeImplementation()
-        {
-            var sum = 0;
-            for (int i = 0; i < _testValues.Length; i++)
-            {
-                sum += Bitwise.Imperative.NumberOfLeadingZeros(_testValues[i]);
             }
             return sum;
         }
