@@ -57,12 +57,15 @@ sync_state() {
     fi
 }
 
-CLAUDE_RC=0
-
 run_claude() {
     local prompt="$1"
+    local rc=0
     timeout "$CLAUDE_TIMEOUT" claude --dangerously-skip-permissions --print \
-        --output-format stream-json --verbose "$prompt" || CLAUDE_RC=$?
+        --output-format stream-json --verbose "$prompt" || rc=$?
+    if [ "$rc" -ne 0 ]; then
+        echo "WARNING: claude exited with code $rc" >&2
+    fi
+    return "$rc"
 }
 
 load_prompt() {
@@ -197,25 +200,25 @@ EOF
 
     execute-tasks)
         ISSUE_NUM=$(get_issue_num)
-        run_claude "$(load_prompt execute-tasks)"
+        run_claude "$(load_prompt execute-tasks)" || true
         sync_state "feat(#${ISSUE_NUM}): implement tasks"
         ;;
 
     create-tasks)
         ISSUE_NUM=$(get_issue_num)
-        run_claude "$(load_prompt create-tasks)"
+        run_claude "$(load_prompt create-tasks)" || true
         sync_state "plan(#${ISSUE_NUM}): create task breakdown"
         ;;
 
     apply-review)
         ISSUE_NUM=$(get_issue_num)
-        run_claude "$(load_prompt apply-review)"
+        run_claude "$(load_prompt apply-review)" || true
         sync_state "plan(#${ISSUE_NUM}): apply brief review feedback"
         ;;
 
     review-brief)
         ISSUE_NUM=$(get_issue_num)
-        run_claude "$(load_prompt review-brief)"
+        run_claude "$(load_prompt review-brief)" || true
         sync_state "plan(#${ISSUE_NUM}): review brief"
         ;;
 
@@ -269,7 +272,7 @@ EOF
                 PROMPT=$(load_prompt pick-issue)
                 PROMPT="${PROMPT//\{\{ISSUE_BODY\}\}/$ISSUE_BODY}"
 
-                run_claude "$PROMPT"
+                run_claude "$PROMPT" || true
                 sync_state "plan(#${ISSUE_NUM}): initial brief from issue"
             fi
         else
@@ -285,10 +288,8 @@ EOF
             PROMPT=$(load_prompt pick-issue)
             PROMPT="${PROMPT//\{\{ISSUE_BODY\}\}/$ISSUE_BODY}"
 
-            run_claude "$PROMPT"
+            run_claude "$PROMPT" || true
             sync_state "plan(#${ISSUE_NUM}): initial brief from issue"
         fi
         ;;
 esac
-
-exit $CLAUDE_RC

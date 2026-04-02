@@ -39,11 +39,8 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
     EXIT_CODE=0
     bash /usr/local/bin/agent-loop.sh || EXIT_CODE=$?
 
-    if [ "$EXIT_CODE" -ne 0 ] && [ "$EXIT_CODE" -ne 124 ]; then
-        echo "Iteration $i failed with exit code $EXIT_CODE"
-        break
-    elif [ "$EXIT_CODE" -eq 124 ]; then
-        echo "Iteration $i timed out (exit code 124), continuing..."
+    if [ "$EXIT_CODE" -ne 0 ]; then
+        echo "Iteration $i exited with code $EXIT_CODE, continuing to next state..."
     fi
 
     # Done?
