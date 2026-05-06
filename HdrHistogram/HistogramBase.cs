@@ -355,7 +355,7 @@ namespace HdrHistogram
                 bucketIndex++;
             }
 
-            var distanceToNextValue = 1 << (_unitMagnitude + bucketIndex);
+            var distanceToNextValue = 1L << (_unitMagnitude + bucketIndex);
             return distanceToNextValue;
         }
 

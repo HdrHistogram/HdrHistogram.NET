@@ -546,6 +546,27 @@ namespace HdrHistogram.UnitTests
             histogram.GetPercentileAtOrBelowValue(long.MinValue).Should().Be(0.0);
         }
 
+        [Fact]
+        public void SizeOfEquivalentValueRangeDoesNotOverflow()
+        {
+            var histogram = Create(long.MaxValue, DefaultSignificantFigures);
+
+            for (int i = 0; i < 8; i++)
+            {
+                histogram.RecordValue(1);
+            }
+
+            histogram.RecordValue((1L << 41) + 1);
+
+            histogram.RecordValue((1L << 50) + 1);
+
+            var p90 = histogram.GetValueAtPercentile(90);
+
+            p90.Should().BeGreaterThan((1L << 41) + 1);
+            histogram.SizeOfEquivalentValueRange((1L << 41) + 1).Should().Be((1L << 31));
+            p90.Should().Be((1L << 41) + (1L << 31) - 1);
+        }
+
         private void CreateAndAdd(HistogramBase source)
         {
             source.RecordValueWithCount(1, 100);
