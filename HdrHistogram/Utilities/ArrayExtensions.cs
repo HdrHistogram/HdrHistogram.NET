@@ -1,3 +1,5 @@
+using System;
+
 namespace HdrHistogram.Utilities
 {
     /// <summary>
@@ -16,6 +18,11 @@ namespace HdrHistogram.Utilities
         {
             if (source.Length != other.Length)
                 return false;
+
+            // Primitive equality agrees with object.Equals; preserve custom equality
+            // and covariant reference arrays by keeping their existing comparison path.
+            if (typeof(T).IsPrimitive)
+                return source.AsSpan().SequenceEqual(other.AsSpan(), comparer: null);
 
             for (int i = 0; i < other.Length; i++)
             {
